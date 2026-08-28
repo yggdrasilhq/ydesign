@@ -31,10 +31,16 @@ component layer:
    multi-line paragraphs: control row proportions broken, toggle stranded in
    dead space. Fix = the **short-phrase rule** (one muted phrase, under the
    control, never a paragraph beside it). See *Forms & settings*.
-2. **A browser tab rail's header** — a filter chip and a `+` button floating
-   above the rows with no heading row and no partition rhythm. Fix = the
-   **header anatomy** standard: title row → tool row → section heading. See
-   *Sidebars*.
+2. **A browser tab rail's header** — the profile pill and `+` ride the
+   heading as solid accent fills, stacked under the nav row and omnibox:
+   three bands of loud before any row. Fix = the **header anatomy** standard
+   (title row → tool row → section heading) with header actions at ICON
+   weight — muted, accent on hover only (`session_row_action_button_style`),
+   matching the yedit files header; the accent budget belongs to the rows'
+   own states. Code: yggterm-shell `right_rail.rs` `WebTabsRailBody`
+   (RailHeader actions, ~line 1554). ⚠ Owned by yggterm (WebTabs rail is
+   yggterm chrome), but coordinate with any active ychrome-ux lane before
+   touching it. See *Sidebars*.
 
 ## How this page grows
 
