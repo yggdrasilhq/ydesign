@@ -158,43 +158,24 @@ pub fn viewport_view(view: &View) -> Value {
 }
 
 /// The live appendix for an exhibition page: real painted widgets standing in
-/// for the patterns the page's prose describes. Each block is prefixed by a
-/// plain section header so the specimen is labelled inside the page flow.
+/// for the patterns the page's prose describes.
+///
+/// ⛔ BODY WIDGETS ONLY. On a document surface the host paints `markdown`,
+/// `list-row` and editor widgets in the BODY flow; every other kind
+/// (`section`, `label`, `toggle`, `search-box`, …) forms the TOP BAR. The
+/// first build of this appendix appended bar widgets after the prose and the
+/// pixel proof caught them squeezed into a horizontal strip above the page —
+/// the design system's own first filed-and-fixed defect. A specimen that
+/// wants a rail-only widget belongs in a rail, not here.
 fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
+    let _ = view;
     let mut widgets = Vec::new();
     if nb.id == "gallery" {
-        widgets.push(section("Live specimens — controls as the host paints them", false));
-
-        widgets.push(section("A section card is a form's home (card: true)", true));
         widgets.push(json!({
-            "kind": "toggle",
-            "id": "specimen_autohide",
-            "action": "demo",
-            "label": "Auto-hide titlebar",
-            "value": false,
+            "kind": "markdown",
+            "id": "specimen_gallery_intro",
+            "source": "## Live specimens — rows as the host paints them\n\nRail-density rows, driven by the shared row engine: a status slot per row (durable · transient · empty), the selected row wearing the tint, and the whole title track free at rest.".to_string(),
         }));
-        widgets.push(json!({
-            "kind": "toggle",
-            "id": "specimen_mirror",
-            "action": "demo",
-            "label": "Mirror chrome",
-            "value": false,
-        }));
-
-        widgets.push(section("Segmented control — one look for every mode switch", false));
-        widgets.push(json!({
-            "kind": "tabs",
-            "id": "specimen_tabs",
-            "action": "demo_tab",
-            "active": "one",
-            "tabs": [
-                {"id": "one", "label": "Segment"},
-                {"id": "two", "label": "Segment"},
-                {"id": "three", "label": "Segment"},
-            ],
-        }));
-
-        widgets.push(section("Rows — the shared row engine, Rail density", false));
         for (idx, (title, status, selected)) in [
             ("Saved note — durable", "durable", false),
             ("Draft note — transient", "transient", true),
@@ -215,16 +196,10 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
     }
 
     if nb.id == "examples" {
-        widgets.push(section(
-            "Specimen 1 — the Live Sessions anatomy, rebuilt",
-            false,
-        ));
         widgets.push(json!({
-            "kind": "search-box",
-            "id": "specimen_live_filter",
-            "action": "demo",
-            "value": "",
-            "placeholder": "Filter sessions…",
+            "kind": "markdown",
+            "id": "specimen_live_intro",
+            "source": "## Specimen 1 — the Live Sessions anatomy, rebuilt\n\nA filter lives in a rail's tool row — on a document surface it would paint into the top bar, which is exactly where the first draft of this page put it. The rows below are the anatomy: one unbroken dot column, a count badge on the group's trailing edge, durability in the slot.".to_string(),
         }));
         for (idx, (title, status, badge)) in [
             ("9.4 Continue the novel outline", "durable", ""),
@@ -247,19 +222,11 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
             widgets.push(row);
         }
 
-        widgets.push(section(
-            "Specimen 2 — the partitioned sidebar (top partition ≤ 30%)",
-            false,
-        ));
-        widgets.push(section("Knobs — the small top partition", true));
         widgets.push(json!({
-            "kind": "toggle",
-            "id": "specimen_wrap",
-            "action": "demo",
-            "label": "Soft wrap",
-            "value": true,
+            "kind": "markdown",
+            "id": "specimen_partition_intro",
+            "source": "## Specimen 2 — the partitioned sidebar, its list partition\n\nThe yedit files rail is the reference: top partition ≤ 30% (a card of toggles — a RAIL sight, shown in every settings rail), the FILES list as the majority, and the status line pinned in the footer. Below, its list partition as rows:".to_string(),
         }));
-        widgets.push(section("FILES — the majority partition", false));
         for (idx, (name, status)) in [
             ("triage-board.md", "durable"),
             ("meeting-notes.md", "transient"),
@@ -277,12 +244,11 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
             }));
         }
         widgets.push(json!({
-            "kind": "label",
-            "text": "Status line: 3 files · 1,204 words — the footer is the third partition",
-            "muted": true,
+            "kind": "markdown",
+            "id": "specimen_partition_footer",
+            "source": "*Status line: 3 files · 1,204 words — on a rail this is the pinned footer, the third partition.*".to_string(),
         }));
     }
 
-    let _ = view;
     widgets
 }

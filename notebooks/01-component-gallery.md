@@ -42,6 +42,14 @@ The vocabulary grows only when a second app needs a kind.
 | `toggle`, `button` | `footer` buttons honour `primary: true` — a form's Save is pinned, not scrolled |
 | `markdown` | A page of emd, rendered through `yggui::prose` typography |
 
+⭐ **Body vs bar on a document surface.** In the viewport, `markdown`,
+`list-row` and editor widgets render in the BODY flow; every other kind
+(`section`, `label`, `toggle`, `search-box`, `tabs`, `button`) paints into
+the TOP BAR strip. This was caught by ydesign's own pixel proof — its first
+exhibition page appended rail-style controls after the prose and they
+squeezed into a horizontal bar above the page. A control that wants to sit
+in a flow belongs in a rail pane, or as prose in a document.
+
 ## emd components (a ```emd fence carries JSON; the host renders)
 
 `grid`, `panel`, `plot`, `sparkline`, `metric`, `query`, `datagrid`,

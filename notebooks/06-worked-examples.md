@@ -46,7 +46,8 @@ list.
 ## How to compare — the loop
 
 1. `ydesign` inside yggterm; open this page in Examples mode.
-2. `server app screenshot` your surface (faithful backend for DOM surfaces).
+2. Screenshot it — the shadow client's own compositor capture, or
+   `server app screenshot` with the faithful backend when focus allows.
 3. Put the two images side by side. Compare, in order: **partitions →
    heading voice → row grid → status column → title track → field skin**.
 4. Name the first divergence. Fix it **at the component layer** — in the
@@ -57,6 +58,17 @@ list.
 A divergence you cannot name is still information: it usually means a
 partition is missing rather than a pixel is off. Go back to the structure
 before touching spacing.
+
+### The first catch — this page's own defect
+
+The first build of this appendix appended rail-style controls (a search box,
+toggles, section headers) after the prose. The pixel proof caught them
+instantly: they painted into the document surface's TOP BAR, squeezed into a
+horizontal strip above the page. Rule learned, now in the Component gallery:
+**on a document surface the body flow takes `markdown`, `list-row` and
+editors only — everything else is a rail sight.** The specimens below are
+body widgets because of that catch, which is the whole method working: build,
+shoot, name the divergence, fix at the layer, re-shoot.
 
 ## Extending this page
 
