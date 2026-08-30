@@ -117,7 +117,7 @@ pub fn viewport_view(view: &View) -> Value {
                 widgets.push(json!({
                     "kind": "markdown",
                     "id": format!("book_page:{}", page.id),
-                    "source": page.markdown,
+                    "source": notebook::resolve_asset_paths(&page.markdown),
                 }));
                 // ── The exhibition half ─────────────────────────────────────
                 // A design language is argued from pixels, so the pages that

@@ -20,6 +20,44 @@ pub const MODE_EXAMPLES: &str = "examples";
 /// start-here page are part of working, not of one mode's reading list.
 pub const ALWAYS_VISIBLE: &[&str] = &["start-here", "roadmap"];
 
+/// The catalogue's screenshots, embedded at build time. The notebook
+/// markdown references them as `%ASSETS%/name.png`; the schema substitutes a
+/// `data:image/png;base64` URL built from these bytes — data URLs render
+/// from ANY page origin, which file:// does not (WebKit blocks file
+/// subresources from the shell's own origin; the first build of this
+/// exhibited as bare caption chips where the screenshots should have been).
+pub const ASSETS: &[(&str, &[u8])] = &[
+    (
+        "catalogue-emd-reader.png",
+        include_bytes!("../assets/catalogue-emd-reader.png"),
+    ),
+    (
+        "catalogue-forms-rail.png",
+        include_bytes!("../assets/catalogue-forms-rail.png"),
+    ),
+    (
+        "catalogue-notebook-page.png",
+        include_bytes!("../assets/catalogue-notebook-page.png"),
+    ),
+];
+
+/// The served markdown: every `%ASSETS%/name.png` becomes an inline data URL.
+pub fn resolve_asset_paths(markdown: &str) -> String {
+    use base64::Engine as _;
+    let mut out = markdown.to_string();
+    for (name, bytes) in ASSETS {
+        let placeholder = format!("%ASSETS%/{name}");
+        if out.contains(&placeholder) {
+            let data_url = format!(
+                "data:image/png;base64,{}",
+                base64::engine::general_purpose::STANDARD.encode(bytes)
+            );
+            out = out.replace(&placeholder, &data_url);
+        }
+    }
+    out
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Page {
     pub id: String,
@@ -101,6 +139,13 @@ pub fn base_notebooks() -> Vec<Notebook> {
             "emd & notebooks",
             "What emd-renderer is, the component contracts, and the demanded components not built yet.",
             include_str!("../notebooks/05-emd-and-notebooks.md"),
+        ),
+        (
+            "catalogue",
+            MODE_GUIDE,
+            "The catalogue — the design, exhibited",
+            "Real pixels from the running fleet: the patterns, and the choices behind them.",
+            include_str!("../notebooks/08-design-catalogue.md"),
         ),
         (
             "examples",
@@ -193,6 +238,7 @@ mod tests {
             "forms",
             "motion",
             "emd",
+            "catalogue",
             "examples",
             "roadmap",
         ] {
@@ -226,13 +272,27 @@ mod tests {
     }
 
     #[test]
-    fn guide_mode_shows_the_seven_guide_notebooks() {
+    fn guide_mode_shows_the_eight_guide_notebooks() {
         let guide = list_notebooks(Some(MODE_GUIDE));
         assert!(guide.iter().all(|nb| nb.mode == MODE_GUIDE));
-        assert_eq!(guide.len(), 7, "six concerns + the roadmap shelf");
+        assert_eq!(guide.len(), 8, "seven concerns + the roadmap shelf");
         let examples = list_notebooks(Some(MODE_EXAMPLES));
         // Examples mode shows only its own notebook plus the always-visible pair.
         assert_eq!(examples.len(), 3);
+    }
+
+    #[test]
+    fn the_catalogue_references_embedded_assets_and_the_resolver_resolves_them() {
+        let nb = get_notebook("catalogue").expect("shipped");
+        let md = &nb.pages[0].markdown;
+        assert!(md.contains("%ASSETS%/catalogue-forms-rail.png"));
+        let resolved = resolve_asset_paths(md);
+        assert!(!resolved.contains("%ASSETS%"), "placeholder must be gone");
+        assert_eq!(
+            resolved.matches("data:image/png;base64,").count(),
+            3,
+            "every exhibit becomes an inline data URL"
+        );
     }
 
     #[test]
