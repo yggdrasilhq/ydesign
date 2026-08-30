@@ -1,0 +1,25 @@
+{
+  "name": "@ygghq/ydesign",
+  "version": "0.1.0",
+  "description": "The yggui base design language \u2014 design tokens and the base design notebooks, as consumable data for web projects",
+  "license": "GPL-3.0-or-later AND CC-BY-SA-4.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yggdrasilhq/ydesign.git"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "yggdrasil",
+    "yggui",
+    "markdown"
+  ],
+  "files": [
+    "notebooks/",
+    "design-tokens.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

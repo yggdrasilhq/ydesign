@@ -1,0 +1,56 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "ydesign": "0.1.0",
+  "color": {
+    "status": {
+      "durable": "#22c55e",
+      "transient": "#3b82f6",
+      "attention": "#f59e0b",
+      "reserved-dead": "#ef4444"
+    },
+    "accent": "theme-derived; never hardcode — derive from the dominant gradient stop",
+    "chrome": "pale blue-grey foundation; a faint blue-to-green fresh tint over a muted neutral base",
+    "forbidden": ["muddy greys", "purple-heavy defaults", "alpha-only chrome without fill", "gratuitous gradients in the main content region"]
+  },
+  "typography": {
+    "interface": "Inter Variable",
+    "monospace": "JetBrains Mono",
+    "reading": {
+      "body": "16px / 1.7 / letter-spacing 0.002em, legible sans stack",
+      "columnPx": 720,
+      "meta": "10px, wide-tracked, dim, tabular figures"
+    },
+    "headingVoice": "10px, weight 800, uppercase, tracking 0.07em, TEXT colour (not muted)"
+  },
+  "density": {
+    "sidebar": { "indentBasePx": 12, "indentStepPx": 12, "iconBoxPx": 20, "statusColumnPx": 9, "fontPx": 12, "radiusPx": 12 },
+    "rail": { "indentBasePx": 8, "indentStepPx": 19, "iconBoxPx": 20, "fontPx": 12, "paddingY": 5, "paddingX": 8, "radiusPx": 8, "rowGapPx": 2 },
+    "rules": [
+      "typography and icon-box geometry are IDENTICAL across densities",
+      "the empty slot is still laid out; an appearing dot never shifts a title",
+      "the title track is the whole row; trailing actions are display:none at rest",
+      "no background behind revealed verbs — the title reflow is the point",
+      "folders above loose rows at every level; the disclosure control is always visible"
+    ]
+  },
+  "sidebarPartition": { "topPartitionMaxPct": 30, "majority": "the list, unbroken, no cards", "footer": "pinned status line behind a separator" },
+  "motion": {
+    "blinkPeriodMs": 2400,
+    "blinkShape": "full off / full on square wave, one shared clock, join by marker",
+    "durationsMs": { "enter": 190, "stateShift": 170 },
+    "curves": "Material-3-style: emphasized decelerate on enter, emphasized accelerate on exit, standard for small shifts",
+    "law": "decoration must never move text; colour only"
+  },
+  "loading": "stage-curtain: final frame, or a still ghost, or a flat veil — nothing else; latency over flicker",
+  "feedback": {
+    "toastAnchor": "viewport-owned: top-centre over terminals, bottom corner over documents; identical style keys in every arm",
+    "destructive": "undo by toast, never a confirmation modal; bulk actions name their count"
+  },
+  "emd": {
+    "componentVersion": 1,
+    "kinds": ["grid", "panel", "plot", "sparkline", "metric", "query", "datagrid", "agentfinding"],
+    "bounds": { "componentsPerTree": 64, "series": 16, "points": 2048, "gridRows": 500, "plotHeight": "120..720" },
+    "law": "analytical components carry an evidence block; a missing sample is null (a gap), never zero"
+  },
+  "consultationLadder": "your layer → the layer below → grow the LOWER layer (never hand-roll) → argue from pixel screenshots"
+}
