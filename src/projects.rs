@@ -81,7 +81,7 @@ fn resolve_assets(source: &str, design: &Path) -> Result<String> {
     let mut out = source.to_string();
     // Explicit portable asset marker; never resolve arbitrary notebook URLs or fetch remote images.
     for tail in source.split("%ASSETS%/").skip(1) {
-        let name = tail.split(|c: char| c == ')' || c == '"' || c.is_whitespace()).next().unwrap_or("");
+        let name = tail.split(|c: char| matches!(c, ')' | '"' | '`' | ']' | '(') || c.is_whitespace()).next().unwrap_or("");
         let asset = design.join("assets").join(name).canonicalize()?;
         let asset_root = design.join("assets").canonicalize()?;
         if !asset.starts_with(asset_root) { bail!("asset escapes design/assets"); }
@@ -159,6 +159,7 @@ mod tests {
         let shelf = read_shelf(&config).unwrap();
         let page = &shelf.iter().find(|n| n.id == "project/sample/gallery").unwrap().pages[0];
         assert!(page.markdown.contains("data:image/svg+xml;base64,"));
+        assert!(resolve_assets("[`%ASSETS%/sample.svg`](%ASSETS%/sample.svg)", &repo.join("design")).unwrap().contains("data:image/svg+xml;base64,"));
         assert!(shelf.iter().all(|n| n.id.starts_with("project/sample/")));
         std::fs::write(repo.join("design/escape.md"), "# Escaped\n![bad](%ASSETS%/../../DESIGN.md)").unwrap();
         assert!(read_shelf(&config).is_err());

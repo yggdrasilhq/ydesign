@@ -21,6 +21,19 @@ it first — visibly, here, so the next app finds it instead of reinventing it.
 | **Full-width calendar** — Notion-class month component | knowledge app | emd component (new `calendar` kind, Tier C: admitted when its second consumer lands) | Demanded |
 | **Axiom-class log/query views** — devtools-grade filtering over logs | log viewers, tracing | emd `query` + `datagrid` grow saved views | Demanded |
 
+## Notebook review additions
+
+| Finding | Owner and acceptance | State |
+|---|---|---|
+| Detached ribbon panel, dark tab slab and weak command groups | Shared ribbon renderer; continuous shell tabs, explicit pinned/temporary modes, grouped commands, keyboard and pixel proof | Proposed anatomy in Ribbons; component change pending |
+| Vault setup repeated across pages; generic credential bubbles obscure site identity | Browser sidebar content plus shared row renderer; contextual setup, site marks, distinct credential labels, short Fill/details paths | Measured row: 264 × 38, icon 15, bubble 26; proposal in Complex sidebars, not shipped |
+| EMD panel controls rendered disabled | Document host's panel-action routing; demonstrate a real state-changing control before calling it interactive | Filed; current notebooks use supported schema-row exercises |
+| Notebook images capped at 560 × 320 | Document image renderer; distinguish a reading illustration from an inspectable full-width design specimen | Measured in shadow; diagrams redrawn to this cap so labels stay readable. Full-width/zoom affordance remains pending |
+
+The exercises model transitions, not production ribbon or vault components.
+Passing their actions does not validate a repaired component. Private runtime
+captures stay outside this public repository; published studies use invented data.
+
 ## The first filed defects
 
 The design system opens its ledger with the two defects that motivated it.
