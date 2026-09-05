@@ -70,8 +70,8 @@ the **emd & notebooks** page. One taste rule here: a component carries an
 
 ## The specimens below this prose
 
-The appended block is *live*: a real section card with toggles, a real
-segmented control, and real rows with their status slots. Screenshot this
+The appended block is *live*: real rows with their status slots. Rail-only
+cards and toggles are not rendered in this document appendix. Screenshot this
 page and compare your surface against it — same fonts, same tint, same row
 anatomy. If yours disagrees, the fix belongs in the shared component, not in
 your stylesheet.

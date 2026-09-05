@@ -16,6 +16,8 @@
   ],
   "files": [
     "notebooks/",
+    "assets/",
+    "Inheritance.md",
     "design-tokens.json",
     "README.md"
   ],

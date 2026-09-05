@@ -34,6 +34,13 @@ hand-roll. Judge every visual decision from a **pixel screenshot**.
 
 ## Running
 
+Create an app design layer with `ydesign init /path/to/worktree --id sample-app`.
+The local `~/.config/ydesign/projects.json` registry adds its `design/*.md`
+notebooks to the same shelf, under `project/sample-app/*`. Use `--config` for
+an isolated registry. See [notebook layers](docs/notebook-layers.md),
+[inheritance](Inheritance.md), and the [ydesign skill](.agents/skills/ydesign/SKILL.md).
+Brand and typography decisions live in notebooks; DESIGN.md routes readers.
+
 Inside yggterm (thin-client surface mode — the daemon exports
 `YGGTERM_SESSION_ID`):
 
