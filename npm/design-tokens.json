@@ -44,7 +44,7 @@
   "loading": "stage-curtain: final frame, or a still ghost, or a flat veil — nothing else; latency over flicker",
   "feedback": {
     "toastAnchor": "viewport-owned: top-centre over terminals, bottom corner over documents; identical style keys in every arm",
-    "destructive": "undo by toast, never a confirmation modal; bulk actions name their count"
+    "destructive": "offer Undo when restoration is real; irreversible actions require appropriate confirmation; bulk actions name their count"
   },
   "emd": {
     "componentVersion": 1,

@@ -119,6 +119,12 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
             let value = action_value(&body);
             let mut pane = state.lock().unwrap();
 
+            if pane.view.study_action(action) {
+                pane.touch();
+                respond(stream, 200, &json!({"ok":true, "schema":schema::viewport_view(&pane.view)}));
+                return;
+            }
+
             match action {
                 "mode" => {
                     if pane.view.select_mode(value) {

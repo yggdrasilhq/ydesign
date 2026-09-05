@@ -45,20 +45,26 @@ and never from a description. The instruments:
 
 ## Where authority lives
 
-- **yggterm `DESIGN.md`** — the prose constitution: brand intent, control
-  language, status vocabulary, motion, the settled failure stories.
-- **These notebooks** — the same language, *exhibited*: real components,
-  real schemas, patterns you can screenshot and compare against.
+- **DESIGN.md** — routing and working procedure. Palette, typography and
+  brand rationale belong in the design notebooks it points to.
+- **These notebooks and the app's design/ notebooks** — the visual authority:
+  components, specimens, semantic tokens and their rationale.
+- **Inheritance.md** — parent layers and explicit override scope, from Dioxus
+  through yggui into an app. Undefined decisions inherit transitively.
 - **libyggterm specs** — `docs/spec-app-architecture.md` (the tier decision:
   who paints the pixels) and `docs/spec-emd-renderer.md` (what a document is).
 - **`.agents/skills/libyggterm-surfaces/SKILL.md`** — the app-platform
   contract: surfaces, transport, lifecycle, the widget vocabulary.
 
-When a notebook and `DESIGN.md` disagree, fix the drifted one — and record
-the correction in the notebook, because notebooks are what the next agent
-reads first.
+When DESIGN.md duplicates a visual decision, move that decision and its
+rationale into the appropriate notebook and leave a pointer.
 
 ## How other apps consume this
+
+Run `ydesign init <worktree> --id <project>` to create missing scaffolding
+and register its notebooks. A local projects.json makes all registered
+layers selectable in one shelf; each notebook remains independently readable.
+App identity belongs in its notebook, not in the shared base palette.
 
 An app's campaign memory points at these notebooks (the shelf ships inside
 the app: run `ydesign` inside yggterm). A project that defines its own layer

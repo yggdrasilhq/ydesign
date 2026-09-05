@@ -1,4 +1,8 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Spec — ydesign, the design-language app
+
+The 2026-09-05 extension in [Notebook layers](notebook-layers.md) defines
+project scaffolding, registration, inheritance and the visual teaching contract.
 
 Recorded 2026-08-28, owner-directed. ydesign is the yggui base design
 language made visible: a libyggterm document-surface app whose notebooks are
@@ -13,7 +17,7 @@ the base design system the fleet's Web/GUI projects consult.
   pane (`rail`) carrying the notebook shelf.
 - An app-declared titlebar switch: **Guide | Examples** — the guideline
   shelf and the worked-examples shelf are the two reading modes.
-- Eight base notebooks compiled into the binary from `notebooks/*.md`
+- Base notebooks compiled into the binary from `notebooks/*.md`
   (CC-BY-SA-4.0); the exhibition pages (`gallery`, `examples`) append real
   composed widgets below their prose so the page is a screenshot-able
   specimen, not a description.
@@ -21,9 +25,9 @@ the base design system the fleet's Web/GUI projects consult.
 ## What it does NOT cover
 
 - It does not render anything itself. It authors schemas; yggterm paints.
-- It does not replace DESIGN.md. The notebooks exhibit and point at the
-  prose constitutions; where they disagree, fix the drifted layer and record
-  the correction.
+- DESIGN.md routes readers and describes workflow. Notebooks own the visual
+  decisions; move any palette, typography or brand rules into the app's
+  design notebooks and repair conflicting pointers.
 - It does not decide app-specific design. App layers (L2) and project
   overlays (L3) own their patterns; this base set owns the vocabulary and
   the canonical patterns beneath them.

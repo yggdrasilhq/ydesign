@@ -6,6 +6,13 @@ because a form is nothing but decisions repeated: every field, every label,
 every button is a fresh chance to drift. The rules here collapse those
 decisions into defaults.
 
+![Form rail at readable component scale](%ASSETS%/catalogue-forms-rail.png)
+
+Start with a concrete job: change a setting, understand its consequence, and
+continue. Keep the label, control and brief help together. Long explanations
+belong in an accessible details disclosure when they are necessary to decide;
+a tooltip must not be the only way keyboard or touch users learn a consequence.
+
 ## Section cards: a form is a card, a list is not
 
 A form group — heading plus the fields under it — sits in a card (14px
@@ -29,8 +36,8 @@ whole rail read as a document with buttons in it.
 The rule:
 
 - **One short phrase, under the control it explains.** Muted, ~10.5px, never
-  a paragraph. If the phrase needs a second sentence, the design is wrong —
-  split the control or move the explanation to a tooltip.
+  a paragraph. If more explanation is needed, offer a labeled disclosure;
+  a concise tooltip may supplement it.
 - **Never beside.** Prose to the left of a toggle with a dead gap between is
   the exact failure shape. Under, demoted, or nothing.
 - The proportion test: the control should dominate its row. If the
@@ -76,9 +83,9 @@ and silently kills hover and focus for that surface.
   AA contrast or better. "This does not look like a button" is a design
   failure, stated as a rule.
 - **Destructive verbs**: reversible by default. Bulk actions name their count
-  ("Close 12 other tabs") and are **undone by toast**, not guarded by a
-  confirmation modal. A modal taxes every correct use to catch a rare wrong
-  one.
+  ("Close 12 other tabs"). Offer Undo when restoration is real. Irreversible
+  or consequential actions need an explicit review of the target and effect;
+  never promise Undo for data that cannot be restored.
 
 ## Accepting a form change
 

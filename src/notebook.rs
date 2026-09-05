@@ -27,6 +27,8 @@ pub const ALWAYS_VISIBLE: &[&str] = &["start-here", "roadmap"];
 /// subresources from the shell's own origin; the first build of this
 /// exhibited as bare caption chips where the screenshots should have been).
 pub const ASSETS: &[(&str, &[u8])] = &[
+    ("ribbon-study.svg", include_bytes!("../assets/ribbon-study.svg")),
+    ("vault-study.svg", include_bytes!("../assets/vault-study.svg")),
     (
         "catalogue-emd-reader.png",
         include_bytes!("../assets/catalogue-emd-reader.png"),
@@ -49,7 +51,8 @@ pub fn resolve_asset_paths(markdown: &str) -> String {
         let placeholder = format!("%ASSETS%/{name}");
         if out.contains(&placeholder) {
             let data_url = format!(
-                "data:image/png;base64,{}",
+                "data:{};base64,{}",
+                if name.ends_with(".svg") { "image/svg+xml" } else { "image/png" },
                 base64::engine::general_purpose::STANDARD.encode(bytes)
             );
             out = out.replace(&placeholder, &data_url);
@@ -98,6 +101,10 @@ pub fn base_notebooks() -> Vec<Notebook> {
         .map(|d| d.as_millis() as u64)
         .unwrap_or(0);
     let shipped: &[(&str, &str, &str, &str, &str)] = &[
+        ("foundations", MODE_GUIDE, "Foundations — the visual language", "Color, typography, material and relationships.", include_str!("../notebooks/11-foundations.md")),
+        ("ribbons", MODE_GUIDE, "Ribbons — commands in context", "Rejected and proposed anatomy, command grouping and keyboard intent.", include_str!("../notebooks/09-ribbons.md")),
+        ("complex-sidebars", MODE_GUIDE, "Complex sidebars — task and identity", "A vault study: identity, progressive disclosure and common action paths.", include_str!("../notebooks/10-complex-sidebars.md")),
+        ("inheritance", MODE_GUIDE, "Inheritance — the base chain", "Dioxus, yggui and app notebook ownership.", include_str!("../Inheritance.md")),
         (
             "start-here",
             MODE_GUIDE,
@@ -162,7 +169,7 @@ pub fn base_notebooks() -> Vec<Notebook> {
             include_str!("../notebooks/07-roadmap.md"),
         ),
     ];
-    shipped
+    let mut notebooks: Vec<_> = shipped
         .iter()
         .map(|(id, mode, title, description, md)| {
             let body = strip_licence_banner(md);
@@ -182,7 +189,12 @@ pub fn base_notebooks() -> Vec<Notebook> {
             }
             .one_page()
         })
-        .collect()
+        .collect();
+    if let Some(index) = notebooks.iter().position(|nb| nb.id == "start-here") {
+        let home = notebooks.remove(index);
+        notebooks.insert(0, home);
+    }
+    notebooks
 }
 
 /// `notebooks/*.md` open with a machine-readable licence banner so a reader of
@@ -198,13 +210,14 @@ fn strip_licence_banner(source: &str) -> String {
 }
 
 pub fn get_notebook(id: &str) -> Option<Notebook> {
-    base_notebooks().into_iter().find(|nb| nb.id == id)
+    base_notebooks().into_iter().chain(crate::projects::notebooks()).find(|nb| nb.id == id)
 }
 
 /// The shelf for a mode: base notebooks first (never shadowed), then composed
 /// ones from disk, deduped by (mode, title).
 pub fn list_notebooks(mode: Option<&str>) -> Vec<Notebook> {
     let mut out = base_notebooks();
+    out.extend(crate::projects::notebooks());
     out.retain(|nb| match mode {
         Some(m) => nb.mode == m || ALWAYS_VISIBLE.contains(&nb.id.as_str()),
         None => true,
@@ -217,7 +230,7 @@ pub fn list_notebooks(mode: Option<&str>) -> Vec<Notebook> {
 /// that exist to exhibit real controls compose; a pure reading page never
 /// grows a random control block under it.
 pub fn composes_live_widgets(notebook_id: &str) -> bool {
-    matches!(notebook_id, "gallery" | "examples")
+    matches!(notebook_id, "gallery" | "examples" | "ribbons" | "complex-sidebars" | "forms" | "motion" | "emd")
 }
 
 #[cfg(test)]
@@ -272,10 +285,12 @@ mod tests {
     }
 
     #[test]
-    fn guide_mode_shows_the_eight_guide_notebooks() {
+    fn guide_mode_shows_design_studies_and_inheritance() {
         let guide = list_notebooks(Some(MODE_GUIDE));
         assert!(guide.iter().all(|nb| nb.mode == MODE_GUIDE));
-        assert_eq!(guide.len(), 8, "seven concerns + the roadmap shelf");
+        for id in ["ribbons", "complex-sidebars", "inheritance"] {
+            assert!(guide.iter().any(|nb| nb.id == id));
+        }
         let examples = list_notebooks(Some(MODE_EXAMPLES));
         // Examples mode shows only its own notebook plus the always-visible pair.
         assert_eq!(examples.len(), 3);

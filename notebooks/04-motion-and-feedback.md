@@ -5,6 +5,12 @@ Motion is functional, not decorative. The workspace should feel tighter and
 more exact after a transition, not more playful. State changes are crisp;
 nothing rubbers, bounces, or lags.
 
+Read a transition as a sequence: ready → working → result, or working →
+recoverable error. The same job occupies the same place throughout. Progress
+must come from measured work; if the total is unknown, say “Working” without
+inventing a percentage. A stable label is more useful than a lively spinner
+that tells the user nothing.
+
 ## Durations and curves
 
 - Desktop-fast durations with Material-3-style curves: **emphasized
@@ -29,8 +35,8 @@ nothing rubbers, bounces, or lags.
 - Tones are clear; stacks animate upward as items leave; job notifications
   **coalesce by task identity** instead of stacking duplicate progress cards.
 - Long-running work is never silent: visible progress, or it did not happen.
-- Undo beats confirmation: the toast that reports a destructive action names
-  the undo, at the moment it happens.
+- Offer Undo for reversible actions. Irreversible actions require appropriate
+  confirmation; a toast cannot recover something the system did not retain.
 
 ## The stage-curtain loading rule
 
@@ -75,6 +81,10 @@ marker in their style; they never declare an animation of their own.
   Docked stays the seamless in-flow panel it always was.
 
 ## Proving motion
+
+Test reduced-motion preferences as well as the default. Reduced motion should
+preserve status and focus without requiring blinking or movement to understand
+the result. A steady working label is still informative.
 
 Motion is proved in time, not in a single frame: burst screenshots across the
 transition (enter, settle, exit), checked for the three forbidden things —

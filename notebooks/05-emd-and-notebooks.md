@@ -1,6 +1,14 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # emd & notebooks
 
+![A rendered notebook is a reading surface, not raw syntax](%ASSETS%/catalogue-emd-reader.png)
+
+Author the smallest example that makes the decision visible. Pair an observed
+or clearly labeled proposed image with the reason it matters, then a small
+exercise with reset and an observable outcome. Current EMD panel controls are
+disabled by the host; ydesign's interactive exercises use supported schema
+actions. Do not paste JavaScript or HTML into Markdown and expect execution.
+
 `emd-renderer` is the fleet's extended-markdown system: one general-purpose
 wheel so every scrolling UI — editors, transcripts, telemetry notebooks,
 readers — renders beautifully without reinventing it. **emd says what a

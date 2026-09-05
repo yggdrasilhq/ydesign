@@ -18,6 +18,10 @@ pub struct View {
     pub selected_notebook: Option<String>,
     pub selected_page: Option<String>,
     pub notice: Option<String>,
+    pub study_proposed: bool,
+    pub study_detail: bool,
+    pub study_actions: usize,
+    pub lesson_step: usize,
 }
 
 impl Default for View {
@@ -30,11 +34,35 @@ impl Default for View {
             selected_notebook: Some("start-here".to_string()),
             selected_page: Some("start-here-page".to_string()),
             notice: None,
+            study_proposed: true,
+            study_detail: false,
+            study_actions: 0,
+            lesson_step: 0,
         }
     }
 }
 
 impl View {
+    pub fn study_action(&mut self, action: &str) -> bool {
+        match action {
+            "study:next" => self.lesson_step = (self.lesson_step + 1) % 3,
+            "study:compare" => self.study_proposed = !self.study_proposed,
+            "study:open" => self.study_detail = true,
+            "study:back" => self.study_detail = false,
+            "study:fill" | "study:save" => self.study_actions += 1,
+            "study:reset" => {
+                self.study_proposed = true;
+                self.study_detail = false;
+                self.study_actions = 0;
+                self.lesson_step = 0;
+            },
+            _ => return false,
+        }
+        self.notice = Some(format!("Study: {} · {} · {} simulated commands",
+            if self.study_proposed { "proposed" } else { "rejected" },
+            if self.study_detail { "entry details" } else { "list" }, self.study_actions));
+        true
+    }
     pub fn select_mode(&mut self, mode: &str) -> bool {
         if !matches!(mode, MODE_GUIDE | MODE_EXAMPLES) {
             return false;
@@ -49,6 +77,27 @@ impl View {
         self.selected_page = Some(format!("{home}-page"));
         self.notice = None;
         true
+    }
+}
+
+#[cfg(test)]
+mod study_tests {
+    use super::*;
+    #[test]
+    fn study_changes_visible_state_and_resets_without_external_actions() {
+        let mut view = View::default();
+        view.selected_notebook = Some("complex-sidebars".into());
+        let before = viewport_view(&view);
+        assert!(view.study_action("study:open"));
+        assert_ne!(before, viewport_view(&view));
+        assert!(view.study_action("study:fill"));
+        assert_eq!(view.study_actions, 1);
+        assert!(view.study_action("study:back"));
+        assert!(!view.study_detail);
+        assert!(!view.study_action("fill-real-vault"));
+        assert!(view.study_action("study:reset"));
+        assert_eq!(view.study_actions, 0);
+        assert!(view.study_proposed);
     }
 }
 
@@ -170,6 +219,40 @@ pub fn viewport_view(view: &View) -> Value {
 fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
     let _ = view;
     let mut widgets = Vec::new();
+    if matches!(nb.id.as_str(), "forms" | "motion" | "emd") {
+        let states = match nb.id.as_str() {
+            "forms" => ["Draft · delivery address changed. Save is available and Cancel restores the saved value.", "Needs correction · enter a valid email address. Keep the draft and put the error beside its field.", "Saved · the confirmed value is visible. The form no longer claims unsaved changes."],
+            "motion" => ["Ready · no work is running, so there is no progress indicator.", "Working · total unknown. Keep one stable job label; do not invent a percentage.", "Complete · replace the working state with the result in the same place."],
+            _ => ["Reading · a heading and a paragraph establish the hierarchy.", "Editing · the draft belongs to the selected block; switching blocks must not apply it to another one.", "Committed · render the accepted Markdown and preserve the reading position."],
+        };
+        widgets.push(json!({"kind":"markdown", "id":"lesson-state", "source":format!("## State walkthrough\n\n{}\n\nThis interactive walkthrough models the state contract; it is not a live form, animation or block editor.",states[view.lesson_step])}));
+        widgets.push(json!({"kind":"list-row", "id":"lesson-next", "title":"Next state", "row_action":"study:next"}));
+        widgets.push(json!({"kind":"list-row", "id":"lesson-reset", "title":"Reset walkthrough", "row_action":"study:reset"}));
+        return widgets;
+    }
+    if matches!(nb.id.as_str(), "ribbons" | "complex-sidebars") {
+        widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
+            "## Live exercise\n\n{} anatomy · {} · {} simulated commands. These controls use the current host row renderer; the study image proposes the future composition.",
+            if view.study_proposed {"Proposed"} else {"Rejected"},
+            if view.study_detail {"entry details"} else {"list"}, view.study_actions)}));
+        widgets.push(json!({"kind":"list-row", "id":"study-compare", "title":"Switch rejected / proposed", "row_action":"study:compare"}));
+        if nb.id == "complex-sidebars" {
+            if view.study_detail {
+                widgets.push(json!({"kind":"list-row", "id":"study-back", "title":"Back to matching accounts", "row_action":"study:back"}));
+                widgets.push(json!({"kind":"markdown", "id":"study-account", "source":"### Example · Personal\n\nreader@example.test · Passkey\n\nThis is an invented account. No secret is loaded or copied."}));
+            } else {
+                if !view.study_proposed {
+                    widgets.push(json!({"kind":"markdown", "id":"study-obstruction", "source":"### Repeated setup explanation\n\nThis rejected state repeats passkey setup ahead of the task. Notice the added reading and travel before reaching an account."}));
+                }
+                widgets.push(json!({"kind":"list-row", "id":"study-personal", "title":"Example · Personal", "subtitle":"reader@example.test · Passkey", "row_action":"study:open", "actions":[{"action":"study:fill","label":"Simulate Fill"}]}));
+                widgets.push(json!({"kind":"list-row", "id":"study-work", "title":"Example · Work", "subtitle":"writer@example.test · Password", "row_action":"study:open"}));
+            }
+        } else {
+            widgets.push(json!({"kind":"list-row", "id":"study-save", "title":"File · Simulate Save", "subtitle":if view.study_proposed {"Commands belong to a task group"} else {"Sparse command stretched across a floating panel"}, "row_action":"study:save"}));
+        }
+        widgets.push(json!({"kind":"list-row", "id":"study-reset", "title":"Reset exercise", "row_action":"study:reset"}));
+        return widgets;
+    }
     if nb.id == "gallery" {
         widgets.push(json!({
             "kind": "markdown",

@@ -11,6 +11,7 @@
 
 mod manifest;
 mod notebook;
+mod projects;
 mod osc;
 mod schema;
 mod server;
@@ -32,6 +33,11 @@ const HEARTBEAT: Duration = Duration::from_secs(4);
     about = "The yggui base design language as live notebooks (libyggterm document surface)"
 )]
 struct Args {
+    #[command(subcommand)]
+    command: Option<Command>,
+    /// Local registry of external project notebooks.
+    #[arg(long, global = true)]
+    config: Option<std::path::PathBuf>,
     /// Shelf mode: "guide" (the design language) or "examples" (canonical
     /// surfaces rebuilt as live schemas).
     #[arg(long, value_parser = ["guide", "examples"], default_value = "guide")]
@@ -52,8 +58,19 @@ struct Args {
     page: Option<usize>,
 }
 
+#[derive(clap::Subcommand)]
+enum Command {
+    /// Create design notebooks without overwriting existing files, and register the repo.
+    Init { repo: std::path::PathBuf, #[arg(long)] id: String },
+}
+
 fn main() -> Result<()> {
     let args = Args::parse();
+    let config = args.config.unwrap_or_else(projects::config_path);
+    if let Some(Command::Init { repo, id }) = args.command {
+        return projects::init(&repo, &id, &config);
+    }
+    projects::load(&config)?;
     manifest::write_best_effort();
 
     if let Some(id) = args.notebook {

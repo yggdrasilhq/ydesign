@@ -55,8 +55,9 @@ Every session-style list row is ONE anatomy, drawn by ONE engine:
 
 ## Sidebar partitioning (the pattern with intent)
 
-A well-partitioned sidebar (the yedit files rail is the reference) has three
-partitions and no more:
+A list-oriented sidebar (the yedit files rail is the reference) has three
+regions. A details or edit page need not repeat the list's controls; see
+the Complex sidebars notebook for that distinction:
 
 1. **Top partition — the knobs.** Small, ≤ 30% of the rail's height: identity
    row, tool buttons, the search field, a segmented control, at most a couple
@@ -71,6 +72,12 @@ A sidebar that mixes these — prose paragraphs beside toggles, a toolbar
 grafted onto a list with no heading voice — reads broken even when every
 individual row is fine. When a rail feels wrong, check the partitions before
 touching any row.
+
+![Large sidebar anatomy study, reconstructed failure and proposed account list](%ASSETS%/vault-study.svg)
+
+The 30% figure is a diagnostic ceiling, not a quota to fill. Start with the
+smallest controls needed for the active task. Search should shorten the list;
+setup explanations should not become permanent partitions in every page.
 
 ## Header anatomy (the top of a rail, in order)
 
