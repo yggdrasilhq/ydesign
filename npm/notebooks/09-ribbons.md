@@ -68,6 +68,33 @@ and repeated commands with the panel pinned and collapsed.
 
 ## Try the decision
 
+## Review a ribbon by doing a job
+
+Use an invented document with unsaved text. Keep the window size, theme and
+document identical across comparisons. Begin with the ribbon collapsed; then
+repeat with it pinned. Count actions separately for the two starting states.
+
+| Job | What the person needs | Reject the design if |
+| --- | --- | --- |
+| Save, then keep typing | Recognize Save, see confirmation, regain the caret | Save steals focus permanently, closes the wrong surface, or hides the first line |
+| Find a word, then replace it | Related commands stay together; the search state stays visible | Find and Replace move to unrelated groups or the query disappears on tab change |
+| Discover an unfamiliar command | Read task labels, scan groups, use command search if needed | Every command is an unlabeled icon or search is the only discoverable route |
+| Repeat a formatting action | Predictable location with the panel pinned | Every click collapses the panel despite the chosen pinned mode |
+
+Do not fill empty ribbon space with commands merely to resemble an office
+suite. The reference teaches grouping and continuity, not maximum density.
+An editor with four useful commands may need a compact command band; it does
+not need a nearly empty floating dialog. Equally, removing all labels to make
+the band look cleaner makes an unfamiliar command harder to recognize.
+
+For each review, record three separate verdicts: composition, task completion,
+and keyboard/focus. A beautiful screenshot can pass the first and fail the
+other two. Capture the tab focus ring and the document's first line as well as
+the resting ribbon. A keyboard test passes only when the intended command ran
+and focus returned to the correct place, not when a key event was accepted.
+
+## Exercise limits
+
 The live specimen below switches between the rejected and proposed anatomy
 and records an example command. It teaches the state and grouping choices;
 the figure is an explanatory composition, not the shared ribbon renderer.
