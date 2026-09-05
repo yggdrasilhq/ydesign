@@ -14,7 +14,9 @@ inspection on 2026-09-05. A shadow capture confirmed repeated generic globe
 bubbles, small metadata, and a long list competing with sync and explanatory
 chrome. In that captured state the shadow had no active website context, so
 the passkey enrollment card was absent. Do not describe that image as proof
-of the card's height on a site.
+of the card's height on a site. The inspected row measured 264 × 38 CSS px,
+with 12 px text and a 15 px SVG icon; its generic icon bubble was 26 px.
+This is one measured desktop state, not a universal size across themes.
 
 The source inserts passkey setup before every tab's content. For a site with
 no stored passkey, a card explains browser internals and asks for enrollment.
