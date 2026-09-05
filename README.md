@@ -24,6 +24,10 @@ hand-roll. Judge every visual decision from a **pixel screenshot**.
 | Notebook | What it covers |
 |---|---|
 | Start here | The layer ladder, the consultation ladder, the pixel-proof habit |
+| Foundations | Color, typography, material and visual relationships |
+| Ribbons | Rejected and proposed composition, command groups and keyboard paths |
+| Complex sidebars | Account recognition, contextual setup and common task paths |
+| Inheritance | Dioxus → yggui → app, override ownership and provenance |
 | Component gallery | Every yggui component and schema widget, with live specimens |
 | Sidebars | The row engine, status vocabulary, partitioning, header anatomy |
 | Forms & settings | Section cards, the one field skin, the short-phrase rule |
