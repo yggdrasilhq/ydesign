@@ -119,7 +119,7 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
             let value = action_value(&body);
             let mut pane = state.lock().unwrap();
 
-            if pane.view.study_action(action) {
+            if pane.view.book_action(action) || pane.view.study_action(action) {
                 pane.touch();
                 respond(stream, 200, &json!({"ok":true, "schema":schema::viewport_view(&pane.view)}));
                 return;
@@ -149,9 +149,10 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
                             if let Some(rest) = other.strip_prefix("page_open:")
                                 && let Some((nb_id, idx_str)) = rest.split_once(':')
                                     && let Ok(idx) = idx_str.parse::<usize>() {
-                                        pane.view.selected_notebook = Some(nb_id.to_string());
                                         if let Some(nb) = notebook::get_notebook(nb_id)
                                             && let Some(page) = nb.pages.get(idx) {
+                                                pane.view.selected_book = None;
+                                                pane.view.selected_notebook = Some(nb_id.to_string());
                                                 pane.view.selected_page = Some(page.id.clone());
                                                 pane.view.notice = Some(format!(
                                                     "📖 {} — {}",

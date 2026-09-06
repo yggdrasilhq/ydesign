@@ -225,6 +225,33 @@ pub fn list_notebooks(mode: Option<&str>) -> Vec<Notebook> {
     out
 }
 
+/// Books group the legacy chapter records without changing their deep-link IDs.
+pub struct Book {
+    pub id: String,
+    pub title: String,
+    pub chapters: Vec<Notebook>,
+}
+
+pub fn books(mode: Option<&str>) -> Vec<Book> {
+    let mut books = vec![Book {
+        id: "yggui".into(), title: "Yggui — the design language".into(),
+        chapters: Vec::new(),
+    }];
+    for chapter in list_notebooks(mode) {
+        let project = chapter.id.strip_prefix("project/")
+            .and_then(|rest| rest.split_once('/')).map(|(id, _)| id.to_owned());
+        let id = project.as_ref().map(|p| format!("project/{p}")).unwrap_or_else(|| "yggui".into());
+        let index = if let Some(index) = books.iter().position(|b| b.id == id) {
+            index
+        } else {
+            books.push(Book { id, title: project.unwrap(), chapters: Vec::new() });
+            books.len() - 1
+        };
+        books[index].chapters.push(chapter);
+    }
+    books
+}
+
 /// True when the viewport should append the LIVE widget appendix after the
 /// page's markdown — the "mini-webapp in the notebook" half. Only the pages
 /// that exist to exhibit real controls compose; a pure reading page never

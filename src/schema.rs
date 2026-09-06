@@ -14,6 +14,8 @@ pub const MODE_EXAMPLES: &str = notebook::MODE_EXAMPLES;
 
 #[derive(Debug, Clone)]
 pub struct View {
+    pub selected_book: Option<String>,
+    pub expanded_books: std::collections::BTreeSet<String>,
     pub mode: String,
     pub selected_notebook: Option<String>,
     pub selected_page: Option<String>,
@@ -27,6 +29,8 @@ pub struct View {
 impl Default for View {
     fn default() -> Self {
         Self {
+            selected_book: Some("yggui".into()),
+            expanded_books: ["yggui".into()].into_iter().collect(),
             mode: MODE_GUIDE.to_string(),
             // ydesign opens on Start here — the language itself is the home
             // page, and there is no nameless view you reach by having
@@ -43,6 +47,21 @@ impl Default for View {
 }
 
 impl View {
+    pub fn book_action(&mut self, action: &str) -> bool {
+        let Some((verb, id)) = action.split_once(':') else { return false };
+        if !matches!(verb, "book_open" | "book_toggle")
+            || !notebook::books(Some(&self.mode)).iter().any(|book| book.id == id) {
+            return false;
+        }
+        if verb == "book_open" {
+            self.selected_book = Some(id.into());
+            self.expanded_books.insert(id.into());
+            self.notice = None;
+        } else if !self.expanded_books.remove(id) {
+            self.expanded_books.insert(id.into());
+        }
+        true
+    }
     pub fn study_action(&mut self, action: &str) -> bool {
         match action {
             "study:next" => self.lesson_step = (self.lesson_step + 1) % 3,
@@ -68,6 +87,8 @@ impl View {
             return false;
         }
         self.mode = mode.to_string();
+        self.selected_book = Some("yggui".into());
+        self.expanded_books.insert("yggui".into());
         let home = if mode == MODE_EXAMPLES {
             "examples"
         } else {
@@ -81,25 +102,8 @@ impl View {
 }
 
 #[cfg(test)]
-mod study_tests {
-    use super::*;
-    #[test]
-    fn study_changes_visible_state_and_resets_without_external_actions() {
-        let mut view = View::default();
-        view.selected_notebook = Some("complex-sidebars".into());
-        let before = viewport_view(&view);
-        assert!(view.study_action("study:open"));
-        assert_ne!(before, viewport_view(&view));
-        assert!(view.study_action("study:fill"));
-        assert_eq!(view.study_actions, 1);
-        assert!(view.study_action("study:back"));
-        assert!(!view.study_detail);
-        assert!(!view.study_action("fill-real-vault"));
-        assert!(view.study_action("study:reset"));
-        assert_eq!(view.study_actions, 0);
-        assert!(view.study_proposed);
-    }
-}
+#[path = "schema_tests.rs"]
+mod study_tests;
 
 fn section(text: impl Into<String>, card: bool) -> Value {
     json!({"kind": "section", "text": text.into(), "card": card})
@@ -125,16 +129,26 @@ pub fn rail_view(view: &View) -> Value {
         widgets.push(json!({"kind": "label", "text": notice, "muted": true}));
     }
 
-    widgets.push(section("Notebooks", false));
-    for nb in notebook::list_notebooks(Some(&view.mode)) {
-        let selected = view.selected_notebook.as_deref() == Some(&nb.id);
+    widgets.push(section("Design books", false));
+    for book in notebook::books(Some(&view.mode)) {
+        let expanded = view.expanded_books.contains(&book.id);
         widgets.push(json!({
-            "kind": "list-row",
-            "id": format!("notebook:{}", nb.id),
-            "title": nb.title,
-            "selected": selected,
-            "row_action": format!("page_open:{}:0", nb.id),
+            "kind":"list-row", "id":format!("book:{}",book.id),
+            "title":book.title, "depth":0, "expanded":expanded,
+            "selected":view.selected_book.as_deref()==Some(book.id.as_str()),
+            "row_action":format!("book_open:{}",book.id),
+            "expand_action":format!("book_toggle:{}",book.id),
         }));
+        if expanded {
+            for nb in book.chapters {
+                widgets.push(json!({
+                    "kind":"list-row", "id":format!("notebook:{}",nb.id),
+                    "title":nb.title, "depth":1,
+                    "selected":view.selected_book.is_none() && view.selected_notebook.as_deref()==Some(nb.id.as_str()),
+                    "row_action":format!("page_open:{}:0",nb.id),
+                }));
+            }
+        }
     }
 
     json!({
@@ -153,6 +167,20 @@ pub fn rail_view(view: &View) -> Value {
 
 pub fn viewport_view(view: &View) -> Value {
     let mut widgets = Vec::new();
+
+    if let Some(book_id) = &view.selected_book
+        && let Some(book) = notebook::books(Some(&view.mode)).into_iter().find(|b| &b.id == book_id) {
+        widgets.push(json!({"kind":"markdown","id":"book-opening","source":format!(
+            "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nRead in order or open a chapter below. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
+            book.title)}));
+        for (index, chapter) in book.chapters.iter().enumerate() {
+            widgets.push(json!({"kind":"list-row","id":format!("contents:{}",chapter.id),
+                "title":format!("{:02}  {}",index+1,chapter.title),
+                "subtitle":chapter.description.lines().next().unwrap_or(""),
+                "row_action":format!("page_open:{}:0",chapter.id)}));
+        }
+        return json!({"title":book.title,"titlebar_switch":titlebar_switch_spec(&view.mode),"widgets":widgets});
+    }
 
     if let Some(nb_id) = view.selected_notebook.clone()
         && let Some(nb) = notebook::get_notebook(&nb_id) {
