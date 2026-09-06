@@ -66,8 +66,6 @@ groups into labeled menus. Do not shrink labels or targets until they are hard
 to read. Test long translated labels, disabled Save, keyboard focus, 200% zoom,
 and repeated commands with the panel pinned and collapsed.
 
-## Try the decision
-
 ## Review a ribbon by doing a job
 
 Use an invented document with unsaved text. Keep the window size, theme and

@@ -74,8 +74,6 @@ recorded current path using the same starting state. Never optimize click
 count by removing an intentional confirmation or by making the row's action
 ambiguous. Destructive work stays separated from frequent work.
 
-## Check the difficult states
-
 ## Work through one account, not a gallery of controls
 
 Fixture: two invented accounts at example.test, Personal and Work. Give both
