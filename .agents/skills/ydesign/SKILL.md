@@ -22,6 +22,8 @@ forms (03), motion (04), or component gallery (01). Show a large, legible
 specimen and a meaningful state transition. Explain the rejected pattern and
 the reason it fails. Label proposals separately from measured implementation.
 
+- The app's row header is the notebook's table of contents; a page explains ONE component as a mini interactive app. A notebook is a book for humans and a template/steer for agents: named values, enforceable rules, a live specimen (or a link to the app that carries it).
+
 Use the yggui-app-control named shadow for desktop evidence. Record build,
 viewport, state, target geometry and faithful pixels. Use invented fixture
 data in published examples; private captures stay out of the repo. Do not

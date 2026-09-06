@@ -79,3 +79,22 @@ errors, asset boundaries and rendering. Visual verification must include a
 real notebook page, an external project page, a meaningful specimen state
 change, and a narrow/zoomed reading. Proposed designs remain proposals until
 their component implementation receives its own pixel and interaction proof.
+## The notebook shape (owner specification, 2026-09-07)
+
+A notebook is **a book for humans and a template/steer for agents**. In the
+app this means:
+
+- The **row header is the table of contents**: one row group per notebook
+  page, ordered as the reading order of the book.
+- **A page explains one component** (or one decision) as a mini interactive
+  app: a legible specimen first, its state transitions second, the rejected
+  pattern third, and the explicit choices a reviewer can comment on as
+  "proposed for comment" items.
+- Pages are written to be **executed by agents**: every value is named,
+  every rule is enforceable (grep-able bans, one-owner statements), and the
+  specimen names the app section that proves it live.
+- A page that cannot host a live specimen links the app that carries it
+  (component testbeds) rather than describing an unrenderable picture.
+
+When the spec and an existing page disagree, the page is the defect: fix the
+page in the same change that lands the spec.
