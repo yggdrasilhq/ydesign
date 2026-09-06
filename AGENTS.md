@@ -11,6 +11,13 @@ and `docs/` carries its `SPDX-License-Identifier: CC-BY-SA-4.0` banner.
 
 ## The product rule
 
+The current product target is docs/living-design-books.md: one row group per
+book, contents in its header, component chapters as real Dioxus mini-apps.
+The schema-only CLI described above is the legacy implementation. Do not
+mistake its state-counter exercises for completed reference components.
+Maintain its no-linking boundary while designing an explicitly separate demo
+target and supported host mounting path.
+
 The notebooks ARE the product. Their authority comes from being correct and
 from being *live*: the examples pages append real painted widgets, so an
 agent can screenshot the page and compare any surface against it. When you
