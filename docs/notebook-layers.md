@@ -84,8 +84,8 @@ their component implementation receives its own pixel and interaction proof.
 A notebook is **a book for humans and a template/steer for agents**. In the
 app this means:
 
-- The **row header is the table of contents**: one row group per notebook
-  page, ordered as the reading order of the book.
+- A notebook is **one row group per book**. Its header opens the front matter
+  and table of contents; ordered child rows open its component chapters.
 - **A page explains one component** (or one decision) as a mini interactive
   app: a legible specimen first, its state transitions second, the rejected
   pattern third, and the explicit choices a reviewer can comment on as
@@ -93,8 +93,14 @@ app this means:
 - Pages are written to be **executed by agents**: every value is named,
   every rule is enforceable (grep-able bans, one-owner statements), and the
   specimen names the app section that proves it live.
-- A page that cannot host a live specimen links the app that carries it
-  (component testbeds) rather than describing an unrenderable picture.
+- Every component chapter must host an actual interactive Dioxus mini-app with
+  deterministic demo data and reusable component source. A still image,
+  callback counter or external testbed link does not satisfy that requirement.
+
+The full contract is [Living design books](living-design-books.md), including
+chapter rhythm, source inspection, human critique and conversion acceptance.
+The older schema-only implementation remains a migration baseline, not the
+definition of the finished product.
 
 When the spec and an existing page disagree, the page is the defect: fix the
 page in the same change that lands the spec.

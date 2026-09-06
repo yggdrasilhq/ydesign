@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Spec — ydesign, the design-language app
 
+**Current target:** [Living design books](living-design-books.md), owner
+direction 2026-09-07. One group per book, header as contents, chapter rows
+with real Dioxus mini-apps and reusable source. The schema-only architecture
+and echoed-control acceptance below describe the legacy v1 implementation,
+not sufficient acceptance for the new product.
+
 The 2026-09-05 extension in [Notebook layers](notebook-layers.md) defines
 project scaffolding, registration, inheritance and the visual teaching contract.
 
@@ -8,7 +14,7 @@ Recorded 2026-08-28, owner-directed. ydesign is the yggui base design
 language made visible: a libyggterm document-surface app whose notebooks are
 the base design system the fleet's Web/GUI projects consult.
 
-## What it is
+## Legacy v1 implementation
 
 - A Tier A schema app shaped on ytop: OSC 7717 `sidebar ; declare`, loopback
   control server (`GET /ping`, `GET /pane/{design,rail}`, `POST /action`),
@@ -22,7 +28,7 @@ the base design system the fleet's Web/GUI projects consult.
   composed widgets below their prose so the page is a screenshot-able
   specimen, not a description.
 
-## What it does NOT cover
+## Legacy v1 boundaries
 
 - It does not render anything itself. It authors schemas; yggterm paints.
 - DESIGN.md routes readers and describes workflow. Notebooks own the visual
@@ -54,7 +60,7 @@ the base design system the fleet's Web/GUI projects consult.
 - Publishes nothing owner-only: fixtures in the notebooks are invented, and
   analytical examples cite generic sources.
 
-## Acceptance
+## Legacy v1 acceptance (insufficient for living books)
 
 - `cargo test`: shelf shape, unique ids, banner stripping, licence-split
   constants, wire envelope compatibility.
