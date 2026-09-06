@@ -7,7 +7,7 @@
 //! platform.
 
 use anyhow::Result;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::path::{Path, PathBuf};
 
 fn manifest_value(binary: &Path) -> Value {
@@ -28,14 +28,19 @@ fn manifest_value(binary: &Path) -> Value {
 fn write_to(apps_dir: &Path, binary: &Path) -> Result<PathBuf> {
     std::fs::create_dir_all(apps_dir)?;
     let path = apps_dir.join("ydesign.json");
-    std::fs::write(&path, serde_json::to_string_pretty(&manifest_value(binary))?)?;
+    std::fs::write(
+        &path,
+        serde_json::to_string_pretty(&manifest_value(binary))?,
+    )?;
     Ok(path)
 }
 
 /// Best-effort on every run; a failure must never stop the app.
 pub fn write_best_effort() {
     let Some(home) = dirs::home_dir() else { return };
-    let Ok(binary) = std::env::current_exe() else { return };
+    let Ok(binary) = std::env::current_exe() else {
+        return;
+    };
     let _ = write_to(&home.join(".yggterm").join("apps"), &binary);
 }
 

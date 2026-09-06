@@ -27,8 +27,14 @@ pub const ALWAYS_VISIBLE: &[&str] = &["start-here", "roadmap"];
 /// subresources from the shell's own origin; the first build of this
 /// exhibited as bare caption chips where the screenshots should have been).
 pub const ASSETS: &[(&str, &[u8])] = &[
-    ("ribbon-study.svg", include_bytes!("../assets/ribbon-study.svg")),
-    ("vault-study.svg", include_bytes!("../assets/vault-study.svg")),
+    (
+        "ribbon-study.svg",
+        include_bytes!("../assets/ribbon-study.svg"),
+    ),
+    (
+        "vault-study.svg",
+        include_bytes!("../assets/vault-study.svg"),
+    ),
     (
         "catalogue-emd-reader.png",
         include_bytes!("../assets/catalogue-emd-reader.png"),
@@ -52,7 +58,11 @@ pub fn resolve_asset_paths(markdown: &str) -> String {
         if out.contains(&placeholder) {
             let data_url = format!(
                 "data:{};base64,{}",
-                if name.ends_with(".svg") { "image/svg+xml" } else { "image/png" },
+                if name.ends_with(".svg") {
+                    "image/svg+xml"
+                } else {
+                    "image/png"
+                },
                 base64::engine::general_purpose::STANDARD.encode(bytes)
             );
             out = out.replace(&placeholder, &data_url);
@@ -101,10 +111,34 @@ pub fn base_notebooks() -> Vec<Notebook> {
         .map(|d| d.as_millis() as u64)
         .unwrap_or(0);
     let shipped: &[(&str, &str, &str, &str, &str)] = &[
-        ("foundations", MODE_GUIDE, "Foundations — the visual language", "Color, typography, material and relationships.", include_str!("../notebooks/11-foundations.md")),
-        ("ribbons", MODE_GUIDE, "Ribbons — commands in context", "Rejected and proposed anatomy, command grouping and keyboard intent.", include_str!("../notebooks/09-ribbons.md")),
-        ("complex-sidebars", MODE_GUIDE, "Complex sidebars — task and identity", "A vault study: identity, progressive disclosure and common action paths.", include_str!("../notebooks/10-complex-sidebars.md")),
-        ("inheritance", MODE_GUIDE, "Inheritance — the base chain", "Dioxus, yggui and app notebook ownership.", include_str!("../Inheritance.md")),
+        (
+            "foundations",
+            MODE_GUIDE,
+            "Foundations — the visual language",
+            "Color, typography, material and relationships.",
+            include_str!("../notebooks/11-foundations.md"),
+        ),
+        (
+            "ribbons",
+            MODE_GUIDE,
+            "Ribbons — commands in context",
+            "Rejected and proposed anatomy, command grouping and keyboard intent.",
+            include_str!("../notebooks/09-ribbons.md"),
+        ),
+        (
+            "complex-sidebars",
+            MODE_GUIDE,
+            "Complex sidebars — task and identity",
+            "A vault study: identity, progressive disclosure and common action paths.",
+            include_str!("../notebooks/10-complex-sidebars.md"),
+        ),
+        (
+            "inheritance",
+            MODE_GUIDE,
+            "Inheritance — the base chain",
+            "Dioxus, yggui and app notebook ownership.",
+            include_str!("../Inheritance.md"),
+        ),
         (
             "start-here",
             MODE_GUIDE,
@@ -203,14 +237,18 @@ pub fn base_notebooks() -> Vec<Notebook> {
 fn strip_licence_banner(source: &str) -> String {
     let mut text = source;
     if let Some(rest) = text.strip_prefix("<!--")
-        && let Some(end) = rest.find("-->") {
-            text = rest[end + 3..].trim_start_matches(['\n', '\r']);
-        }
+        && let Some(end) = rest.find("-->")
+    {
+        text = rest[end + 3..].trim_start_matches(['\n', '\r']);
+    }
     text.to_string()
 }
 
 pub fn get_notebook(id: &str) -> Option<Notebook> {
-    base_notebooks().into_iter().chain(crate::projects::notebooks()).find(|nb| nb.id == id)
+    base_notebooks()
+        .into_iter()
+        .chain(crate::projects::notebooks())
+        .find(|nb| nb.id == id)
 }
 
 /// The shelf for a mode: base notebooks first (never shadowed), then composed
@@ -234,17 +272,28 @@ pub struct Book {
 
 pub fn books(mode: Option<&str>) -> Vec<Book> {
     let mut books = vec![Book {
-        id: "yggui".into(), title: "Yggui — the design language".into(),
+        id: "yggui".into(),
+        title: "Yggui — the design language".into(),
         chapters: Vec::new(),
     }];
     for chapter in list_notebooks(mode) {
-        let project = chapter.id.strip_prefix("project/")
-            .and_then(|rest| rest.split_once('/')).map(|(id, _)| id.to_owned());
-        let id = project.as_ref().map(|p| format!("project/{p}")).unwrap_or_else(|| "yggui".into());
+        let project = chapter
+            .id
+            .strip_prefix("project/")
+            .and_then(|rest| rest.split_once('/'))
+            .map(|(id, _)| id.to_owned());
+        let id = project
+            .as_ref()
+            .map(|p| format!("project/{p}"))
+            .unwrap_or_else(|| "yggui".into());
         let index = if let Some(index) = books.iter().position(|b| b.id == id) {
             index
         } else {
-            books.push(Book { id, title: project.unwrap(), chapters: Vec::new() });
+            books.push(Book {
+                id,
+                title: project.unwrap(),
+                chapters: Vec::new(),
+            });
             books.len() - 1
         };
         books[index].chapters.push(chapter);
@@ -257,7 +306,10 @@ pub fn books(mode: Option<&str>) -> Vec<Book> {
 /// that exist to exhibit real controls compose; a pure reading page never
 /// grows a random control block under it.
 pub fn composes_live_widgets(notebook_id: &str) -> bool {
-    matches!(notebook_id, "gallery" | "examples" | "ribbons" | "complex-sidebars" | "forms" | "motion" | "emd")
+    matches!(
+        notebook_id,
+        "gallery" | "examples" | "ribbons" | "complex-sidebars" | "forms" | "motion" | "emd"
+    )
 }
 
 #[cfg(test)]

@@ -7,12 +7,12 @@
 //! only as text about them.
 
 use crate::notebook::{self, Notebook};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 pub const MODE_GUIDE: &str = notebook::MODE_GUIDE;
 pub const MODE_EXAMPLES: &str = notebook::MODE_EXAMPLES;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct View {
     pub selected_book: Option<String>,
     pub expanded_books: std::collections::BTreeSet<String>,
@@ -26,17 +26,41 @@ pub struct View {
     pub lesson_step: usize,
 }
 
-impl Default for View {
-    fn default() -> Self {
+impl View {
+    /// Every book of this mode, expanded. The shelf opens PRE-POPULATED —
+    /// all row groups and all their chapter rows are on the first paint, and
+    /// collapsing a group is the reader's gesture, not the app's default.
+    /// (Owner direction 2026-09-07: a one-group-at-a-time shelf reads as lazy
+    /// loading, and expanding groups the app already knows about is busywork.)
+    pub fn expanded_all(mode: &str) -> std::collections::BTreeSet<String> {
+        notebook::books(Some(mode))
+            .into_iter()
+            .map(|b| b.id)
+            .collect()
+    }
+
+    /// The view for one mode, at its home page. Every book starts expanded.
+    pub fn for_mode(mode: &str) -> Self {
+        let mode = if mode == MODE_EXAMPLES {
+            MODE_EXAMPLES
+        } else {
+            MODE_GUIDE
+        }
+        .to_string();
+        let home = if mode == MODE_EXAMPLES {
+            "examples"
+        } else {
+            "start-here"
+        };
         Self {
             selected_book: Some("yggui".into()),
-            expanded_books: ["yggui".into()].into_iter().collect(),
-            mode: MODE_GUIDE.to_string(),
-            // ydesign opens on Start here — the language itself is the home
-            // page, and there is no nameless view you reach by having
-            // selected nothing.
-            selected_notebook: Some("start-here".to_string()),
-            selected_page: Some("start-here-page".to_string()),
+            expanded_books: Self::expanded_all(&mode),
+            mode,
+            // ydesign opens on its home page — the language itself is the home
+            // page, and there is no nameless view you reach by having selected
+            // nothing.
+            selected_notebook: Some(home.to_string()),
+            selected_page: Some(format!("{home}-page")),
             notice: None,
             study_proposed: true,
             study_detail: false,
@@ -44,13 +68,59 @@ impl Default for View {
             lesson_step: 0,
         }
     }
-}
 
-impl View {
+    /// The saved reading place, re-validated against the CURRENT shelf: a
+    /// mode, book, notebook or page that no longer exists falls back to the
+    /// mode's home, and saved expansions are clipped to books that exist.
+    /// Nothing about a renamed or removed notebook can strand the app on a
+    /// stale id.
+    pub fn restore(saved: &crate::persist::SavedView) -> Self {
+        let mut view = Self::for_mode(&saved.mode);
+        if let Some(book) = &saved.selected_book
+            && notebook::books(Some(&view.mode))
+                .iter()
+                .any(|b| &b.id == book)
+        {
+            view.selected_book = Some(book.clone());
+        }
+        if saved.selected_book.is_none()
+            && let Some(nb_id) = &saved.selected_notebook
+            && let Some(nb) = notebook::get_notebook(nb_id)
+        {
+            let page = saved
+                .selected_page
+                .as_ref()
+                .and_then(|p| nb.pages.iter().find(|pg| &pg.id == p))
+                .or_else(|| nb.pages.first());
+            if let Some(page) = page {
+                // A restored PAGE is the viewport's selection; the book
+                // contents must not win (viewport_view checks the book first,
+                // exactly like the page_open action).
+                view.selected_book = None;
+                view.selected_notebook = Some(nb.id.clone());
+                view.selected_page = Some(page.id.clone());
+            }
+        }
+        view.expanded_books = saved
+            .expanded_books
+            .iter()
+            .cloned()
+            .collect::<std::collections::BTreeSet<_>>()
+            .intersection(&Self::expanded_all(&view.mode))
+            .cloned()
+            .collect();
+        view
+    }
+
     pub fn book_action(&mut self, action: &str) -> bool {
-        let Some((verb, id)) = action.split_once(':') else { return false };
+        let Some((verb, id)) = action.split_once(':') else {
+            return false;
+        };
         if !matches!(verb, "book_open" | "book_toggle")
-            || !notebook::books(Some(&self.mode)).iter().any(|book| book.id == id) {
+            || !notebook::books(Some(&self.mode))
+                .iter()
+                .any(|book| book.id == id)
+        {
             return false;
         }
         if verb == "book_open" {
@@ -74,12 +144,23 @@ impl View {
                 self.study_detail = false;
                 self.study_actions = 0;
                 self.lesson_step = 0;
-            },
+            }
             _ => return false,
         }
-        self.notice = Some(format!("Study: {} · {} · {} simulated commands",
-            if self.study_proposed { "proposed" } else { "rejected" },
-            if self.study_detail { "entry details" } else { "list" }, self.study_actions));
+        self.notice = Some(format!(
+            "Study: {} · {} · {} simulated commands",
+            if self.study_proposed {
+                "proposed"
+            } else {
+                "rejected"
+            },
+            if self.study_detail {
+                "entry details"
+            } else {
+                "list"
+            },
+            self.study_actions
+        ));
         true
     }
     pub fn select_mode(&mut self, mode: &str) -> bool {
@@ -88,7 +169,9 @@ impl View {
         }
         self.mode = mode.to_string();
         self.selected_book = Some("yggui".into());
-        self.expanded_books.insert("yggui".into());
+        // A mode switch is a fresh reading: the whole shelf of that mode
+        // opens populated, exactly like a cold start.
+        self.expanded_books = Self::expanded_all(mode);
         let home = if mode == MODE_EXAMPLES {
             "examples"
         } else {
@@ -98,6 +181,12 @@ impl View {
         self.selected_page = Some(format!("{home}-page"));
         self.notice = None;
         true
+    }
+}
+
+impl Default for View {
+    fn default() -> Self {
+        Self::for_mode(MODE_GUIDE)
     }
 }
 
@@ -169,55 +258,61 @@ pub fn viewport_view(view: &View) -> Value {
     let mut widgets = Vec::new();
 
     if let Some(book_id) = &view.selected_book
-        && let Some(book) = notebook::books(Some(&view.mode)).into_iter().find(|b| &b.id == book_id) {
+        && let Some(book) = notebook::books(Some(&view.mode))
+            .into_iter()
+            .find(|b| &b.id == book_id)
+    {
         widgets.push(json!({"kind":"markdown","id":"book-opening","source":format!(
             "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nRead in order or open a chapter below. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
             book.title)}));
         for (index, chapter) in book.chapters.iter().enumerate() {
-            widgets.push(json!({"kind":"list-row","id":format!("contents:{}",chapter.id),
+            widgets.push(
+                json!({"kind":"list-row","id":format!("contents:{}",chapter.id),
                 "title":format!("{:02}  {}",index+1,chapter.title),
                 "subtitle":chapter.description.lines().next().unwrap_or(""),
-                "row_action":format!("page_open:{}:0",chapter.id)}));
+                "row_action":format!("page_open:{}:0",chapter.id)}),
+            );
         }
         return json!({"title":book.title,"titlebar_switch":titlebar_switch_spec(&view.mode),"widgets":widgets});
     }
 
     if let Some(nb_id) = view.selected_notebook.clone()
-        && let Some(nb) = notebook::get_notebook(&nb_id) {
-            let page = nb
-                .pages
-                .iter()
-                .find(|p| Some(&p.id) == view.selected_page.as_ref())
-                .or_else(|| nb.pages.first())
-                .cloned();
-            if let Some(page) = page {
-                widgets.push(json!({
-                    "kind": "markdown",
-                    "id": format!("book_page:{}", page.id),
-                    "source": notebook::resolve_asset_paths(&page.markdown),
-                }));
-                // ── The exhibition half ─────────────────────────────────────
-                // A design language is argued from pixels, so the pages that
-                // exist to exhibit components append the REAL widgets below
-                // the prose. Screenshot the page; the controls in it are the
-                // host's own, painted by the same code every app inherits.
-                if notebook::composes_live_widgets(&nb.id) {
-                    for widget in exhibition_widgets(&nb, view) {
-                        widgets.push(widget);
-                    }
+        && let Some(nb) = notebook::get_notebook(&nb_id)
+    {
+        let page = nb
+            .pages
+            .iter()
+            .find(|p| Some(&p.id) == view.selected_page.as_ref())
+            .or_else(|| nb.pages.first())
+            .cloned();
+        if let Some(page) = page {
+            widgets.push(json!({
+                "kind": "markdown",
+                "id": format!("book_page:{}", page.id),
+                "source": notebook::resolve_asset_paths(&page.markdown),
+            }));
+            // ── The exhibition half ─────────────────────────────────────
+            // A design language is argued from pixels, so the pages that
+            // exist to exhibit components append the REAL widgets below
+            // the prose. Screenshot the page; the controls in it are the
+            // host's own, painted by the same code every app inherits.
+            if notebook::composes_live_widgets(&nb.id) {
+                for widget in exhibition_widgets(&nb, view) {
+                    widgets.push(widget);
                 }
-                return json!({
-                    "title": format!("{} — {}", nb.title, page.title),
-                    "titlebar_switch": titlebar_switch_spec(&view.mode),
-                    "widgets": widgets,
-                    "footer": [json!({
-                        "kind": "label",
-                        "text": "ydesign · the base design language · notebooks are CC-BY-SA-4.0",
-                        "muted": true
-                    })]
-                });
             }
+            return json!({
+                "title": format!("{} — {}", nb.title, page.title),
+                "titlebar_switch": titlebar_switch_spec(&view.mode),
+                "widgets": widgets,
+                "footer": [json!({
+                    "kind": "label",
+                    "text": "ydesign · the base design language · notebooks are CC-BY-SA-4.0",
+                    "muted": true
+                })]
+            });
         }
+    }
 
     // No selection: the empty state names the shelf instead of painting a
     // blank sheet. Reaching it in practice is a bug — the view always opens
@@ -249,9 +344,21 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
     let mut widgets = Vec::new();
     if matches!(nb.id.as_str(), "forms" | "motion" | "emd") {
         let states = match nb.id.as_str() {
-            "forms" => ["Draft · delivery address changed. Save is available and Cancel restores the saved value.", "Needs correction · enter a valid email address. Keep the draft and put the error beside its field.", "Saved · the confirmed value is visible. The form no longer claims unsaved changes."],
-            "motion" => ["Ready · no work is running, so there is no progress indicator.", "Working · total unknown. Keep one stable job label; do not invent a percentage.", "Complete · replace the working state with the result in the same place."],
-            _ => ["Reading · a heading and a paragraph establish the hierarchy.", "Editing · the draft belongs to the selected block; switching blocks must not apply it to another one.", "Committed · render the accepted Markdown and preserve the reading position."],
+            "forms" => [
+                "Draft · delivery address changed. Save is available and Cancel restores the saved value.",
+                "Needs correction · enter a valid email address. Keep the draft and put the error beside its field.",
+                "Saved · the confirmed value is visible. The form no longer claims unsaved changes.",
+            ],
+            "motion" => [
+                "Ready · no work is running, so there is no progress indicator.",
+                "Working · total unknown. Keep one stable job label; do not invent a percentage.",
+                "Complete · replace the working state with the result in the same place.",
+            ],
+            _ => [
+                "Reading · a heading and a paragraph establish the hierarchy.",
+                "Editing · the draft belongs to the selected block; switching blocks must not apply it to another one.",
+                "Committed · render the accepted Markdown and preserve the reading position.",
+            ],
         };
         widgets.push(json!({"kind":"markdown", "id":"lesson-state", "source":format!("## State walkthrough\n\n{}\n\nThis interactive walkthrough models the state contract; it is not a live form, animation or block editor.",states[view.lesson_step])}));
         widgets.push(json!({"kind":"list-row", "id":"lesson-next", "title":"Next state", "row_action":"study:next"}));
