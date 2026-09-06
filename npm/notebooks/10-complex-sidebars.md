@@ -74,7 +74,41 @@ recorded current path using the same starting state. Never optimize click
 count by removing an intentional confirmation or by making the row's action
 ambiguous. Destructive work stays separated from frequent work.
 
-## Check the difficult states
+## Work through one account, not a gallery of controls
+
+Fixture: two invented accounts at example.test, Personal and Work. Give both
+the same site mark; give them different account names and credential labels.
+This is the recognition test: the favicon narrows the site, while the account
+line distinguishes which identity will be used. Never rely on color alone.
+
+1. Open matching accounts. Locate Work without opening either entry.
+2. Open Work's details, then go Back. The same result, search text and scroll
+   position must remain, with focus on Work rather than the top of the rail.
+3. Invoke Fill explicitly. Report success only after the fill operation
+   confirms its outcome. A request being sent is not completion.
+4. Simulate failure. Keep the selected account and offer the relevant retry
+   or alternative; do not return to an empty list or lose the page context.
+5. Change the page's origin while details are open. Re-evaluate where Fill
+   would act; never silently apply an old match to a new destination.
+
+This is a proposed acceptance walkthrough, not a claim that the miniature
+implements browser matching, credential storage or authentication. The
+miniature covers list/details/back and an invented action counter only.
+
+| State | Helpful next action | Avoid |
+| --- | --- | --- |
+| No matching account | Say which site was searched; offer All items or Add | A blank rail or a large passkey setup tutorial |
+| Vault locked | One clear Unlock action; preserve the pending task | Displaying an apparently usable Fill control |
+| Missing favicon | Stable letter fallback plus visible site text | A broken image or a credential icon masquerading as site identity |
+| Long account name | Preserve the distinguishing part; expose the full name in details | Shrinking all account text to fit the longest entry |
+| Unsaved edit, Back requested | Explicitly resolve the draft before leaving | Silent discard or a surprise save |
+| Sync failed | Distinguish saved locally from synchronized; offer retry | A generic success label that conceals the failure |
+
+Account data and icons must not introduce a new privacy leak. Reuse the
+browser's existing site-icon policy/cache rather than contacting an arbitrary
+third-party favicon service as a side effect of opening the vault.
+
+## Verification, not decoration
 
 Try two accounts on one site, a missing favicon, a long email, no matches,
 a locked vault, stale sync, a failed fill, keyboard-only use, 200% zoom and a
