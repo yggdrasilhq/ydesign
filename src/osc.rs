@@ -62,5 +62,9 @@ pub fn emit_declare(session: &str, control: &str, document_version: &str) {
 }
 
 pub fn emit_close(session: &str) {
-    emit("sidebar", "close", &json!({ "session": session }).to_string());
+    emit(
+        "sidebar",
+        "close",
+        &json!({ "session": session }).to_string(),
+    );
 }

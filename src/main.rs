@@ -11,16 +11,20 @@
 
 mod manifest;
 mod notebook;
-mod projects;
 mod osc;
+mod persist;
+mod projects;
 mod schema;
 mod server;
+mod trace;
 
 use anyhow::Result;
 use clap::Parser;
-use std::sync::atomic::{AtomicBool, Ordering};
+use serde_json::json;
 use std::sync::Arc;
-use std::time::Duration;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{Duration, Instant};
+use ytrace::Clock;
 
 /// The declare cadence. yggterm expires a contribution after ~15s of silence,
 /// so a killed app never leaves an overlay behind; ~4s is the contract's rate.
@@ -39,9 +43,10 @@ struct Args {
     #[arg(long, global = true)]
     config: Option<std::path::PathBuf>,
     /// Shelf mode: "guide" (the design language) or "examples" (canonical
-    /// surfaces rebuilt as live schemas).
-    #[arg(long, value_parser = ["guide", "examples"], default_value = "guide")]
-    mode: String,
+    /// surfaces rebuilt as live schemas). Given explicitly, overrides the
+    /// saved last-opened mode; otherwise the saved mode is restored.
+    #[arg(long, value_parser = ["guide", "examples"])]
+    mode: Option<String>,
     /// Print one shelf reading and exit, even inside yggterm.
     #[arg(long)]
     once: bool,
@@ -61,7 +66,11 @@ struct Args {
 #[derive(clap::Subcommand)]
 enum Command {
     /// Create design notebooks without overwriting existing files, and register the repo.
-    Init { repo: std::path::PathBuf, #[arg(long)] id: String },
+    Init {
+        repo: std::path::PathBuf,
+        #[arg(long)]
+        id: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -70,7 +79,20 @@ fn main() -> Result<()> {
     if let Some(Command::Init { repo, id }) = args.command {
         return projects::init(&repo, &id, &config);
     }
+    let tracer = trace::init();
+    let boot = Instant::now();
+
+    let shelf_load = Instant::now();
     projects::load(&config)?;
+    let notebooks = projects::notebooks().len();
+    tracer.emit_span(
+        "startup",
+        "phase",
+        "shelf_load",
+        Clock::Wall,
+        shelf_load.elapsed().as_millis() as f64,
+        json!({"project_notebooks": notebooks}),
+    );
     manifest::write_best_effort();
 
     if let Some(id) = args.notebook {
@@ -88,14 +110,36 @@ fn main() -> Result<()> {
                  printing the shelf instead of opening a surface."
             );
         }
-        return server::print_once(&args.mode, "", args.json);
+        let saved_mode = persist::load().map(|saved| saved.mode);
+        let mode = args
+            .mode
+            .or(saved_mode)
+            .unwrap_or_else(|| schema::MODE_GUIDE.to_string());
+        return server::print_once(&mode, "", args.json);
     }
 
-    let control = server::spawn()?;
-    {
-        let mut pane = control.state.lock().unwrap();
-        pane.view.select_mode(&args.mode);
+    // The last opened state restores the reading place — mode, open page,
+    // expanded groups — so a cold start reopens where the reader left off.
+    // An explicit `--mode` still wins over the saved mode.
+    let saved = persist::load();
+    let mut view = saved
+        .as_ref()
+        .map(schema::View::restore)
+        .unwrap_or_default();
+    if let Some(mode) = &args.mode {
+        view.select_mode(mode);
     }
+
+    let spawn_started = Instant::now();
+    let control = server::spawn(view)?;
+    tracer.emit_span(
+        "startup",
+        "phase",
+        "server_spawn",
+        Clock::Wall,
+        spawn_started.elapsed().as_millis() as f64,
+        json!({}),
+    );
 
     let running = Arc::new(AtomicBool::new(true));
     {
@@ -107,11 +151,27 @@ fn main() -> Result<()> {
         })?;
     }
 
+    let mut first_declare = true;
     while running.load(Ordering::SeqCst) {
         let stamp = control.state.lock().unwrap().stamp;
         osc::emit_declare(&session, &control.url, &stamp.to_string());
+        if first_declare {
+            trace::phase(
+                "first_declare",
+                &boot,
+                json!({"version": stamp.to_string()}),
+            );
+            first_declare = false;
+        } else {
+            trace::event(
+                "declare",
+                "heartbeat",
+                json!({"version": stamp.to_string()}),
+            );
+        }
         std::thread::sleep(HEARTBEAT);
     }
     osc::emit_close(&session);
+    trace::event("close", "emitted", json!({}));
     Ok(())
 }
