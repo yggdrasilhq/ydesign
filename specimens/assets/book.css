@@ -35,3 +35,47 @@ footer label{display:block;margin:16px 0 8px}
 textarea{width:100%;min-height:96px;padding:12px;font:inherit;line-height:1.5;border:1px solid #b8c9cd;border-radius:6px}
 @media(max-width:640px){.book{padding:32px 24px}.tools{margin-bottom:28px}.chapter-link{gap:12px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+/* studies */
+.study-switcher{display:flex;gap:8px;margin:20px 0 8px;flex-wrap:wrap}
+.study-tab[aria-current=page]{background:#eaf3f1;border-color:#216d81;font-weight:600}
+.scenario{font-size:13px;color:#52666f;font-variant-numeric:tabular-nums}
+fieldset.radio-row{border:0;padding:0;margin:0 20px 12px 0}
+fieldset.radio-row legend{font-size:13px;color:#52666f;padding:0}
+/* ribbon */
+.ribbon-tabs{display:flex;gap:2px;border-bottom:1px solid #dce5e5}
+.ribbon-tab{border:0;background:none;border-radius:6px 6px 0 0;min-height:36px;padding:6px 14px}
+.ribbon-tab[aria-selected=true]{box-shadow:inset 0 -2px 0 #216d81;background:#eaf3f1;font-weight:600}
+.ribbon-band{display:flex;gap:28px;align-items:flex-start;padding:14px 16px;border:1px solid #dce5e5;border-top:0;border-radius:0 0 6px 6px;background:#fbfdfd}
+.ribbon-group{display:flex;flex-direction:column;gap:6px}
+.ribbon-commands{display:flex;gap:8px;align-items:center}
+.ribbon-commands .find-field{min-height:34px;padding:6px 10px;border:1px solid #b8c9cd;border-radius:6px;font:inherit}
+.ribbon-caption{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#52666f}
+.command.primary{background:#216d81;border-color:#17545f;color:#fff}
+.command.primary:hover{background:#17545f}
+.ribbon.rejected .ribbon-panel{display:inline-flex;gap:10px;align-items:center;margin:16px 0;padding:18px 22px;border-radius:14px;background:#fff;box-shadow:0 18px 40px rgba(24,35,47,.22);border:0}
+.ribbon.rejected .command.primary{background:#b3556d;border-color:#96415a}
+.panel-note{font-size:13px;color:#52666f;max-width:52ch}
+.document-area{margin:20px 0}
+.document-area textarea{width:100%;padding:12px;font:inherit;line-height:1.6;border:1px solid #b8c9cd;border-radius:6px}
+.log{font-size:13px;color:#52666f;line-height:1.7}
+/* vault */
+.vault-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.vault-search input{flex:1;min-width:220px;min-height:38px;padding:8px 12px;border:1px solid #b8c9cd;border-radius:6px;font:inherit}
+.vault-list{list-style:none;padding:0;margin:0}
+.vault-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid transparent;border-radius:8px;padding:10px 12px;background:none}
+.vault-row:hover{background:#f0f6f5}
+.vault-mark{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;background:#dcebe9;font-weight:650}
+.vault-copy{display:flex;flex-direction:column;min-width:0}
+.vault-site{font-weight:600;font-size:14.5px}
+.vault-user{font-size:13px;color:#52666f;overflow-wrap:anywhere}
+.vault-credential{font-size:12px;color:#52666f}
+.vault-fill{min-height:32px;padding:4px 12px}
+.vault-empty{padding:14px;color:#52666f;font-size:14px}
+.vault-details{border:1px solid #dce5e5;border-radius:8px;padding:18px}
+.vault-facts{display:grid;gap:8px;margin:14px 0}
+.vault-facts div{display:flex;gap:12px}
+.vault-facts dt{min-width:150px;color:#52666f;font-size:13px}
+.vault-facts dd{margin:0;font-size:14px;overflow-wrap:anywhere}
+.outcome{font-size:14px;margin-top:14px}
+.outcome-ok{color:#1c7a4f}
+.outcome-fail{color:#b03030}

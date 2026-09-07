@@ -1,27 +1,116 @@
 use dioxus::prelude::*;
-use ydesign_specimens::{ChapterList, ListDensity, Study, fixtures};
+use ydesign_specimens::{
+    fixtures, ribbon_fixture, vault_fixture, Anatomy, ChapterList, CommandKind, FillOutcome,
+    ListDensity, RibbonStudy, Study, VaultStudy,
+};
 
 fn main() { dioxus::launch(App); }
 
+#[derive(Clone, Copy, PartialEq)]
+enum StudyKind {
+    List,
+    Ribbon,
+    Vault,
+}
+
+impl StudyKind {
+    fn label(self) -> &'static str {
+        match self { StudyKind::List => "List views", StudyKind::Ribbon => "Ribbons", StudyKind::Vault => "Complex sidebars" }
+    }
+    fn eyebrow(self) -> &'static str {
+        match self {
+            StudyKind::List => "WORKING STUDY 01",
+            StudyKind::Ribbon => "WORKING STUDY 02",
+            StudyKind::Vault => "WORKING STUDY 03",
+        }
+    }
+    fn title(self) -> &'static str {
+        match self {
+            StudyKind::List => "A list worth reading.",
+            StudyKind::Ribbon => "Commands that belong to the workspace.",
+            StudyKind::Vault => "The next action, made obvious.",
+        }
+    }
+    fn lede(self) -> &'static str {
+        match self {
+            StudyKind::List => "One column. Clear chapter identities. Enough room to read before choosing.",
+            StudyKind::Ribbon => "Tabs name tasks, groups gather commands, and Save stays one click when pinned.",
+            StudyKind::Vault => "Recognize the identity, act without precision pointing, and return with your place intact.",
+        }
+    }
+}
+
 #[component]
 fn App() -> Element {
+    let mut study = use_signal(|| StudyKind::List);
+    rsx! {
+        style { {include_str!("../assets/book.css")} }
+        main { class: "book",
+            header {
+                p { class: "eyebrow", "LIVING DESIGN BOOKS · STAGING TARGET" }
+                h1 { "ydesign working studies." }
+                p { class: "lede", "Three interactive component studies with deterministic fixtures, a complete reset, and a critique reference. The shared renderers they teach remain their owners' pending changes." }
+                nav { class: "study-switcher", aria_label: "Studies",
+                    for kind in [StudyKind::List, StudyKind::Ribbon, StudyKind::Vault] {
+                        button {
+                            class: "study-tab",
+                            aria_current: if study() == kind { "page" } else { "false" },
+                            onclick: move |_| study.set(kind),
+                            "{kind.label()}"
+                        }
+                    }
+                }
+            }
+            match study() {
+                StudyKind::List => rsx! { ListStudyPage {} },
+                StudyKind::Ribbon => rsx! { RibbonStudyPage {} },
+                StudyKind::Vault => rsx! { VaultStudyPage {} },
+            }
+        }
+    }
+}
+
+#[component]
+fn Critique(value: String, oninput: EventHandler<String>, review_text: String) -> Element {
+    rsx! {
+        footer {
+            details {
+                summary { "Critique this study" }
+                label { r#for: "critique", "What helped or obstructed your task?" }
+                textarea { id: "critique", value: "{value}", oninput: move |e| oninput.call(e.value()) }
+                p { "Draft only: not posted or saved. Copy the review text manually to share it. Reset clears the draft." }
+                pre { class: "review", "{review_text}" }
+            }
+        }
+    }
+}
+
+#[component]
+fn StudyHeader(kind: StudyKind) -> Element {
+    rsx! {
+        p { class: "eyebrow", "{kind.eyebrow()}" }
+        h2 { "{kind.title()}" }
+        p { class: "lede", "{kind.lede()}" }
+        p { class: "status", "Interactive Dioxus study · invented data · staging target, not the shared renderer" }
+    }
+}
+
+// ─── Study 01 — list views ──────────────────────────────────────────────────
+
+#[component]
+fn ListStudyPage() -> Element {
     let mut study = use_signal(Study::default);
     let mut inspect = use_signal(|| false);
     let state = study.read().clone();
     let selected = fixtures(state.long_labels).into_iter()
         .find(|c| Some(&c.id) == state.selected.as_ref());
+    let review = state.review_text();
     rsx! {
-        style { {include_str!("../assets/book.css")} }
-        main { class: if state.narrow { "book narrow" } else { "book" },
-            header {
-                p { class: "eyebrow", "YGGUI / WORKING STUDY 01" }
-                h1 { "A list worth reading." }
-                p { class: "lede", "One column. Clear chapter identities. Enough room to read before choosing." }
-                p { class: "status", "Interactive Dioxus proposal · invented data · not yet embedded in the notebook host" }
-                div { class: "tools",
-                    button { onclick: move |_| inspect.toggle(), aria_expanded: "{inspect}", "Inspect study" }
-                    button { onclick: move |_| { study.write().reset(); inspect.set(false); }, "Reset" }
-                }
+        section { class: "reading", aria_label: "List study",
+            StudyHeader { kind: StudyKind::List }
+            div { class: "tools",
+                button { onclick: move |_| inspect.toggle(), aria_expanded: "{inspect}", "Inspect study" }
+                button { onclick: move |_| { study.write().reset(); inspect.set(false); }, "Reset" }
             }
             if inspect() {
                 aside { class: "inspector", aria_label: "Study controls",
@@ -29,13 +118,9 @@ fn App() -> Element {
                     label { input { r#type: "checkbox", checked: state.narrow, onchange: move |e| study.write().narrow = e.checked() } "Narrow column" }
                     label { input { r#type: "checkbox", checked: state.compact, onchange: move |e| study.write().compact = e.checked() } "Compact density" }
                     p { "Compare density, not different data. Narrow column is a layout exercise, not browser zoom proof." }
-                    details {
-                        summary { "Reusable component source" }
-                        pre { code { {include_str!("lib.rs")} } }
-                    }
                 }
             }
-            section { class: "reading", aria_label: "Chapter contents",
+            div { class: "reading", aria_label: "Chapter contents",
                 if let Some(chapter) = selected {
                     button {
                         id: "back-to-contents",
@@ -54,12 +139,12 @@ fn App() -> Element {
                         "← Contents"
                     }
                     article {
-                        h2 { "{chapter.title}" }
+                        h3 { "{chapter.title}" }
                         p { "{chapter.description}" }
                         p { "This destination proves the list's navigation contract. Return to contents to inspect the same entry and fixture state." }
                     }
                 } else {
-                    h2 { "Contents" }
+                    h3 { "Contents" }
                     ChapterList {
                         chapters: fixtures(state.long_labels),
                         current: state.last_opened.clone(),
@@ -68,15 +153,276 @@ fn App() -> Element {
                     }
                 }
             }
-            footer {
-                details {
-                    summary { "Critique this study" }
-                    label { r#for: "critique", "What helped or obstructed your task?" }
-                    textarea { id: "critique", value: "{state.critique}", oninput: move |e| study.write().critique = e.value() }
-                    p { "Draft only: not posted or saved. Copy the review text manually to share it. Reset clears the draft." }
-                    pre { class: "review", "{state.review_text()}" }
+        }
+        Critique {
+            value: state.critique.clone(),
+            oninput: move |v: String| study.write().critique = v,
+            review_text: review,
+        }
+    }
+}
+
+// ─── Study 02 — ribbons ─────────────────────────────────────────────────────
+
+#[component]
+fn RibbonStudyPage() -> Element {
+    let mut study = use_signal(RibbonStudy::new);
+    let mut inspect = use_signal(|| false);
+    let state = study.read().clone();
+    let review = state.review_text();
+    let rejected = state.variant == Anatomy::Rejected;
+    let show_band = state.pinned || state.expanded;
+    rsx! {
+        section { class: "reading", aria_label: "Ribbon study",
+            StudyHeader { kind: StudyKind::Ribbon }
+            div { class: "tools",
+                button { onclick: move |_| inspect.toggle(), aria_expanded: "{inspect}", "Inspect study" }
+                button { onclick: move |_| { study.write().reset(); inspect.set(false); }, "Reset" }
+            }
+            if inspect() {
+                aside { class: "inspector", aria_label: "Study controls",
+                    fieldset { class: "radio-row",
+                        legend { "Anatomy" }
+                        label { input { r#type: "radio", name: "anatomy", checked: !rejected, onchange: move |_| study.write().set_variant(Anatomy::Proposed) } "Proposed: grouped band" }
+                        label { input { r#type: "radio", name: "anatomy", checked: rejected, onchange: move |_| study.write().set_variant(Anatomy::Rejected) } "Rejected: floating panel" }
+                    }
+                    label { input { r#type: "checkbox", checked: state.pinned, onchange: move |e| study.write().set_pinned(e.checked()) } "Pin the ribbon (reserves its space)" }
+                    if !state.pinned {
+                        button { onclick: move |_| study.write().toggle_overlay(),
+                            if state.expanded { "Close temporary panel" } else { "Open temporary panel" }
+                        }
+                    }
+                    p { "Switching anatomy resets to that anatomy's default — the two are never silently compared from different states." }
                 }
             }
+            div { class: if rejected { "ribbon rejected" } else { "ribbon" },
+                div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs",
+                    for (id, label) in ribbon_tabs() {
+                        button {
+                            class: "ribbon-tab",
+                            role: "tab",
+                            aria_selected: if state.active_tab == id { "true" } else { "false" },
+                            onclick: move |_| { let _ = study.write().select_tab(id); },
+                            "{label}"
+                        }
+                    }
+                }
+                if show_band {
+                    if rejected {
+                        div { class: "ribbon-panel rejected-panel", role: "group", aria_label: "Commands (rejected composition)",
+                            for (id, label, kind) in flat_commands() {
+                                button {
+                                    class: if kind == CommandKind::Primary { "command primary" } else { "command" },
+                                    onclick: move |_| ribbon_command(&mut study, id),
+                                    "{label}"
+                                }
+                            }
+                            span { class: "panel-note", "Four commands, no groups, floating — the panel reads as a dialog over the text." }
+                        }
+                    } else {
+                        div { class: "ribbon-band", role: "group", aria_label: "Grouped commands",
+                            for group in state.active_tab_groups() {
+                                div { class: "ribbon-group",
+                                    div { class: "ribbon-commands",
+                                        for command in group.commands {
+                                            button {
+                                                class: if command.kind == CommandKind::Primary { "command primary" } else if command.kind == CommandKind::Toggle { "command toggle" } else { "command" },
+                                                onclick: move |_| ribbon_command(&mut study, command.id),
+                                                "{command.label}"
+                                            }
+                                        }
+                                        if group.label == "Find" {
+                                            input {
+                                                class: "find-field",
+                                                r#type: "search",
+                                                placeholder: "Find in document",
+                                                aria_label: "Find in document",
+                                                value: "{state.find_query}",
+                                                oninput: move |e| study.write().set_find_query(e.value()),
+                                            }
+                                        }
+                                    }
+                                    span { class: "ribbon-caption", "{group.label}" }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    p { class: "panel-note", "The ribbon is collapsed. Its commands are inside the closed panel — try Save and watch the two-click path cost." }
+                }
+            }
+            div { class: "document-area",
+                label { r#for: "ribbon-doc", "Document (invented fixture)" }
+                textarea {
+                    id: "ribbon-doc",
+                    rows: "6",
+                    value: "{state.document}",
+                    oninput: move |e| study.write().edit_document(e.value()),
+                }
+                p { class: "status",
+                    if state.saved { "Saved." } else { "Unsaved changes." }
+                }
+            }
+            ul { class: "log", aria_live: "polite",
+                for line in state.log.iter().rev().take(6) {
+                    li { "{line}" }
+                }
+            }
+        }
+        Critique {
+            value: state.critique.clone(),
+            oninput: move |v: String| study.write().critique = v,
+            review_text: review,
+        }
+    }
+}
+
+fn ribbon_tabs() -> Vec<(&'static str, &'static str)> {
+    ribbon_fixture().into_iter().map(|t| (t.id, t.label)).collect()
+}
+
+fn flat_commands() -> Vec<(&'static str, &'static str, CommandKind)> {
+    let mut out = Vec::new();
+    for tab in ribbon_fixture() {
+        for group in tab.groups {
+            for c in group.commands {
+                out.push((c.id, c.label, c.kind));
+            }
+        }
+    }
+    out
+}
+
+fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
+    match id {
+        "save" => {
+            // The save guard must drop before the refusal is logged.
+            let result = { study.write().save() };
+            if let Err(reason) = result {
+                study.write().log.push(reason.into());
+            }
+            spawn(async move {
+                let script = "requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('ribbon-doc')?.focus()));";
+                let _ = document::eval(script).await;
+            });
+        }
+        "spellcheck" => study.write().log.push("Spelling toggled (a toggle command, not a state jump).".into()),
+        other => study.write().log.push(format!("{other} opened its group workflow (Find and Replace stay together).").into()),
+    }
+}
+
+// ─── Study 03 — complex sidebars (the vault) ────────────────────────────────
+
+#[component]
+fn VaultStudyPage() -> Element {
+    let mut study = use_signal(VaultStudy::default);
+    let mut inspect = use_signal(|| false);
+    let state = study.read().clone();
+    let review = state.review_text();
+    let visible = state.visible();
+    let visible_is_empty = visible.is_empty();
+    let selected = state.selected.as_ref()
+        .and_then(|id| vault_fixture().into_iter().find(|a| &a.id == id));
+    rsx! {
+        section { class: "reading", aria_label: "Vault study",
+            StudyHeader { kind: StudyKind::Vault }
+            div { class: "tools",
+                button { onclick: move |_| inspect.toggle(), aria_expanded: "{inspect}", "Inspect study" }
+                button { onclick: move |_| { study.write().reset(); inspect.set(false); }, "Reset" }
+            }
+            if inspect() {
+                aside { class: "inspector", aria_label: "Study controls",
+                    label { input { r#type: "checkbox", checked: state.simulate_failure, onchange: move |e| study.write().simulate_failure = e.checked() } "Simulate a failed fill" }
+                    p { "Scenario: two accounts on example.test (the recognition test), a non-matching pair, one long address. Fill reports its outcome; failure keeps the selection and the page." }
+                }
+            }
+            p { class: "scenario", aria_label: "Current page", "Current page: example.test" }
+            if let Some(account) = selected {
+                section {
+                    class: "vault-details",
+                    aria_label: "Account details",
+                    onkeydown: move |evt: KeyboardEvent| {
+                        if evt.key() == Key::Escape { study.write().back(); }
+                    },
+                    button {
+                        id: "back-to-vault-list",
+                        onclick: move |_| {
+                            let id = study.read().last_selected.clone().unwrap_or_default();
+                            study.write().back();
+                            spawn(async move {
+                                let script = format!("requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('vault-row-{id}')?.focus()));");
+                                let _ = document::eval(&script).await;
+                            });
+                        },
+                        "← Back to accounts"
+                    }
+                    p { class: "status", "Escape also returns, with focus restored to the entry you came from." }
+                    h3 { "{account.site}" }
+                    dl { class: "vault-facts",
+                        div { dt { "Account" } dd { "{account.user}" } }
+                        div { dt { "Credential" } dd { "{account.credential.label()}" } }
+                        div { dt { "Matches this page" } dd { if account.matches_current_site { "Yes" } else { "No" } } }
+                    }
+                    button { class: "command primary", onclick: move |_| { study.write().fill(account.id); }, "Fill on this page" }
+                }
+            } else {
+                div { class: "vault-search",
+                    input {
+                        r#type: "search",
+                        placeholder: "Search accounts",
+                        aria_label: "Search accounts",
+                        value: "{state.query}",
+                        oninput: move |e| study.write().search(e.value()),
+                    }
+                    if state.needs_all_items_route() {
+                        button { class: "command", onclick: move |_| study.write().show_all(), "No matches for this site — show all items" }
+                    }
+                }
+                ul { class: "vault-list", aria_label: "Accounts",
+                    for account in visible {
+                        li {
+                            button {
+                                id: "vault-row-{account.id}",
+                                class: "vault-row",
+                                onclick: move |_| { let _ = study.write().open(account.id); },
+                                span { class: "vault-mark", aria_hidden: "true", "{account.mark()}" }
+                                span { class: "vault-copy",
+                                    span { class: "vault-site", "{account.site}" }
+                                    span { class: "vault-user", "{account.user}" }
+                                }
+                                span { class: "vault-credential", "{account.credential.label()}" }
+                                if account.matches_current_site {
+                                    button {
+                                        class: "command vault-fill",
+                                        title: "Fill this account into the page",
+                                        onclick: move |evt: MouseEvent| {
+                                            evt.stop_propagation();
+                                            study.write().fill(account.id);
+                                        },
+                                        "Fill"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if visible_is_empty {
+                        li { class: "vault-empty", "No account matches this page. Search, or take the explicit all-items route above — never a blank rail." }
+                    }
+                }
+            }
+            if let Some(outcome) = &state.outcome {
+                p { class: "outcome", aria_live: "polite",
+                    match outcome {
+                        FillOutcome::Filled(text) => rsx! { span { class: "outcome-ok", "✓ {text}" } },
+                        FillOutcome::Failed(text) => rsx! { span { class: "outcome-fail", "✗ {text}" } },
+                    }
+                }
+            }
+        }
+        Critique {
+            value: state.critique.clone(),
+            oninput: move |v: String| study.write().critique = v,
+            review_text: review,
         }
     }
 }

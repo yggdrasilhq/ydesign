@@ -1,7 +1,10 @@
 # List view working study
 
-This is the first Dioxus mini-app target for the living design books. It is a
-staging surface, not yet mounted inside the notebook host.
+This crate is the living design books' staging target: three interactive
+component studies (list views, ribbons, complex sidebars) with deterministic
+fixtures, complete resets and a critique reference. The registry binding
+chapter IDs to studies is specimens.json. None are mounted inside the
+notebook host yet.
 
 `src/lib.rs` exports the proposed reusable `ChapterList`. It receives chapters,
 current identity, density and an open callback; it owns neither fixture data

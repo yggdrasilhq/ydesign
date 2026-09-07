@@ -1,0 +1,36 @@
+{
+  "book": "ydesign",
+  "edition": "2026-09-07-r1",
+  "specimen_target": {
+    "kind": "dioxus-web",
+    "source": "ydesign/specimens (this crate)",
+    "run": "bash scripts/build-specimens.sh",
+    "url": "built by ygg-ci; served from specimens target when a host mounts it"
+  },
+  "specimens": [
+    {
+      "id": "ydesign/list-views@2026-09-07-r1",
+      "chapter": "15-list-views",
+      "component": "ChapterList",
+      "scenarios": ["editorial", "compact", "long-labels", "narrow"],
+      "source": ["specimens/src/lib.rs", "specimens/src/main.rs"],
+      "reset": "restores fixtures, navigation and critique draft"
+    },
+    {
+      "id": "ydesign/ribbons@2026-09-07-r1",
+      "chapter": "09-ribbons",
+      "component": "RibbonStudy (proposed grouped band vs rejected floating panel)",
+      "scenarios": ["pinned-save", "collapsed-two-click-save", "tab-switch-carries-find", "variant-reset"],
+      "source": ["specimens/src/lib.rs", "specimens/src/main.rs"],
+      "reset": "restores anatomy default, document fixture, find query, log and critique draft"
+    },
+    {
+      "id": "ydesign/complex-sidebars@2026-09-07-r1",
+      "chapter": "10-complex-sidebars",
+      "component": "VaultStudy (search, list, details, back, simulated fill)",
+      "scenarios": ["recognition-two-accounts", "details-back-focus", "fill-outcome", "failed-fill-keeps-context", "no-match-all-items", "long-address-wrap"],
+      "source": ["specimens/src/lib.rs", "specimens/src/main.rs"],
+      "reset": "restores query, selection, outcome, failure toggle and critique draft"
+    }
+  ]
+}

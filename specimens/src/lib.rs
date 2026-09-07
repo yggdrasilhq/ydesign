@@ -1,4 +1,11 @@
-//! Reusable proposed list component. Demo state is kept outside the component.
+//! Reusable proposed list, ribbon and vault components. Demo state is kept
+//! outside the components.
+//!
+//! These are the living-books conversion studies for the Ribbons and Complex
+//! sidebars books: real interactive Dioxus mini-apps with deterministic
+//! fixtures, a complete reset and a critique reference. They are staging
+//! targets — the shared renderers they teach (ribbon renderer, vault row
+//! renderer) remain their owners' pending changes.
 use dioxus::prelude::*;
 
 #[derive(Clone, PartialEq)]
@@ -92,15 +99,363 @@ impl Study {
     pub fn back(&mut self) { self.selected = None; }
     pub fn reset(&mut self) { *self = Self::default(); }
     pub fn review_text(&self) -> String {
-        format!("Book: yggui\nSpecimen: list-views/v1-proposal\nScenario: long={}, compact={}, narrow={}\nChapter: {}\nObservation: {}",
+        format!("Book: ydesign\nSpecimen: list-views/v1-proposal\nScenario: long={}, compact={}, narrow={}\nChapter: {}\nObservation: {}",
             self.long_labels, self.compact, self.narrow,
             self.last_opened.as_deref().unwrap_or("contents"), self.critique)
+    }
+}
+
+// ─── Ribbon — commands that belong to the workspace ─────────────────────────
+
+/// The two compositions the Ribbons book compares. Switching resets to the
+/// variant's default state; nothing silent is carried across.
+#[derive(Clone, Copy, PartialEq, Default)]
+#[derive(Debug)]
+pub enum Anatomy {
+    #[default]
+    Proposed,
+    Rejected,
+}
+
+#[derive(Clone, Copy, PartialEq, Default)]
+pub enum CommandKind {
+    #[default]
+    Ordinary,
+    Primary,
+    Toggle,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RibbonCommand {
+    pub id: &'static str,
+    pub label: &'static str,
+    pub kind: CommandKind,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RibbonGroup {
+    pub label: &'static str,
+    pub commands: Vec<RibbonCommand>,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RibbonTab {
+    pub id: &'static str,
+    pub label: &'static str,
+    pub groups: Vec<RibbonGroup>,
+}
+
+/// Deterministic fixture. The proposed anatomy groups by the person's task
+/// (document · find), one primary command only. The rejected anatomy renders
+/// the same commands as a sparse floating panel.
+pub fn ribbon_fixture() -> Vec<RibbonTab> {
+    vec![
+        RibbonTab {
+            id: "home",
+            label: "Home",
+            groups: vec![
+                RibbonGroup { label: "Document", commands: vec![
+                    RibbonCommand { id: "save", label: "Save", kind: CommandKind::Primary },
+                ]},
+                RibbonGroup { label: "Find", commands: vec![
+                    RibbonCommand { id: "find", label: "Find", kind: CommandKind::Ordinary },
+                    RibbonCommand { id: "replace", label: "Replace", kind: CommandKind::Ordinary },
+                ]},
+            ],
+        },
+        RibbonTab {
+            id: "review",
+            label: "Review",
+            groups: vec![
+                RibbonGroup { label: "Proofing", commands: vec![
+                    RibbonCommand { id: "spellcheck", label: "Spelling", kind: CommandKind::Toggle },
+                ]},
+            ],
+        },
+    ]
+}
+
+#[derive(Clone, PartialEq)]
+pub struct RibbonStudy {
+    pub variant: Anatomy,
+    pub pinned: bool,
+    /// The temporary overlay of a collapsed ribbon; meaningful only when
+    /// unpinned. Choosing Save while it is closed is the two-click path.
+    pub expanded: bool,
+    pub active_tab: String,
+    pub document: String,
+    pub saved: bool,
+    /// The find query survives tab changes in the proposed anatomy — a query
+    /// that disappears on tab change is a reject condition in the book.
+    pub find_query: String,
+    pub log: Vec<String>,
+    pub critique: String,
+}
+
+impl RibbonStudy {
+    pub fn document_fixture() -> &'static str {
+        "Quarterly notes (invented)\n\nThe fixture text exists so Save has a real\njob: type, save, and watch the caret stay put."
+    }
+
+    pub fn new() -> Self {
+        Self {
+            variant: Anatomy::Proposed,
+            pinned: true,
+            expanded: true,
+            active_tab: "home".into(),
+            document: Self::document_fixture().into(),
+            saved: true,
+            find_query: String::new(),
+            log: vec!["Pinned ribbon, Home tab, document saved.".into()],
+            critique: String::new(),
+        }
+    }
+
+    pub fn active_tab_groups(&self) -> Vec<RibbonGroup> {
+        ribbon_fixture()
+            .into_iter()
+            .find(|t| t.id == self.active_tab)
+            .map(|t| t.groups)
+            .unwrap_or_default()
+    }
+
+    /// Switching variants resets to that anatomy's default and says so —
+    /// never silently compare different starting states.
+    pub fn set_variant(&mut self, variant: Anatomy) {
+        if self.variant == variant { return; }
+        *self = Self::new();
+        self.variant = variant;
+        if variant == Anatomy::Rejected {
+            self.pinned = false;
+            self.expanded = false;
+            self.log = vec!["Rejected anatomy: sparse floating panel, collapsed by default.".into()];
+        }
+    }
+
+    pub fn set_pinned(&mut self, pinned: bool) {
+        self.pinned = pinned;
+        // Pinned reserves its own space; collapsed opens only temporarily.
+        self.expanded = pinned;
+        self.log.push(if pinned {
+            "Pinned: the band reserves space above the document.".into()
+        } else {
+            "Collapsed: the band is closed; opening it is temporary.".into()
+        });
+    }
+
+    pub fn toggle_overlay(&mut self) {
+        if self.pinned { return; }
+        self.expanded = !self.expanded;
+        self.log.push(if self.expanded {
+            "Panel opened over the document (temporary overlay).".into()
+        } else {
+            "Panel closed; focus returns to the editor.".into()
+        });
+    }
+
+    pub fn select_tab(&mut self, id: &str) -> bool {
+        if ribbon_fixture().iter().all(|t| t.id != id) { return false; }
+        if self.active_tab == id { return true; }
+        self.active_tab = id.into();
+        self.log.push(if self.find_query.is_empty() {
+            format!("Tab → {id}.")
+        } else {
+            format!("Tab → {id}; the find query “{}” is carried, not dropped.", self.find_query)
+        });
+        true
+    }
+
+    pub fn edit_document(&mut self, text: String) {
+        if text != self.document {
+            self.document = text;
+            self.saved = false;
+        }
+    }
+
+    pub fn set_find_query(&mut self, q: String) {
+        self.find_query = q;
+    }
+
+    /// Save. Returns Err(reason) when the anatomy makes it a two-click path —
+    /// the study refuses and names it, the way the review table says a design
+    /// must not silently widen.
+    pub fn save(&mut self) -> Result<(), &'static str> {
+        if !self.pinned && !self.expanded {
+            return Err("Save is inside the closed panel — expand first (two clicks), or pin the ribbon.");
+        }
+        self.saved = true;
+        self.log.push(format!(
+            "Saved ({} click path); focus returns to the document.",
+            if self.pinned { "one" } else { "overlay" }
+        ));
+        Ok(())
+    }
+
+    pub fn reset(&mut self) { *self = Self::new(); }
+
+    pub fn review_text(&self) -> String {
+        format!("Book: ydesign\nSpecimen: ribbons/v1-study\nScenario: variant={:?}, pinned={}, tab={}\nFixture: {}-char invented document\nObservation: {}",
+            self.variant, self.pinned, self.active_tab,
+            self.document.chars().count(), self.critique)
+    }
+}
+
+impl Default for RibbonStudy {
+    fn default() -> Self { Self::new() }
+}
+
+// ─── Vault — a complex sidebar that makes the next action obvious ───────────
+
+#[derive(Clone, Copy, PartialEq, Default)]
+pub enum Credential {
+    #[default]
+    Password,
+    Passkey,
+}
+
+impl Credential {
+    pub fn label(self) -> &'static str {
+        match self { Credential::Password => "Password", Credential::Passkey => "Passkey" }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct VaultAccount {
+    pub id: &'static str,
+    pub site: &'static str,
+    pub user: &'static str,
+    pub credential: Credential,
+    /// Whether this account matches the page the person is on (example.test
+    /// in the fixture scenario).
+    pub matches_current_site: bool,
+}
+
+impl VaultAccount {
+    /// The letter fallback is the identity slot's answer to a missing
+    /// favicon: stable, never a credential icon masquerading as site identity.
+    pub fn mark(&self) -> char {
+        self.site.chars().next().unwrap_or('?').to_ascii_uppercase()
+    }
+}
+
+/// Deterministic fixture per the Complex sidebars walkthrough: two accounts
+/// on one site (the recognition test), a non-matching pair, one long address.
+pub fn vault_fixture() -> Vec<VaultAccount> {
+    vec![
+        VaultAccount { id: "personal", site: "example.test", user: "reader@example.test", credential: Credential::Passkey, matches_current_site: true },
+        VaultAccount { id: "work", site: "example.test", user: "w.svenson@example.test", credential: Credential::Password, matches_current_site: true },
+        VaultAccount { id: "archive", site: "other.test", user: "very.long.mailbox.name.for.the.wrap-test@archive.other.test", credential: Credential::Password, matches_current_site: false },
+        VaultAccount { id: "shop", site: "shop.test", user: "orders@example.test", credential: Credential::Passkey, matches_current_site: false },
+    ]
+}
+
+/// Outcome of a simulated fill. The request being sent is not completion —
+/// the study reports a result, and failure keeps every bit of context.
+#[derive(Clone, PartialEq)]
+#[derive(Debug)]
+pub enum FillOutcome {
+    Filled(String),
+    Failed(String),
+}
+
+#[derive(Clone, Default, PartialEq)]
+pub struct VaultStudy {
+    pub query: String,
+    pub selected: Option<String>,
+    pub last_selected: Option<String>,
+    pub show_all: bool,
+    pub simulate_failure: bool,
+    pub outcome: Option<FillOutcome>,
+    pub critique: String,
+}
+
+impl VaultStudy {
+    /// Visible rows: accounts matching the current site first; the query
+    /// narrows by site or user. An empty result is a state with a next action
+    /// (All items), never a blank rail.
+    pub fn visible(&self) -> Vec<VaultAccount> {
+        let q = self.query.trim().to_lowercase();
+        let all = vault_fixture();
+        if q.is_empty() {
+            return if self.show_all {
+                all
+            } else {
+                all.into_iter().filter(|a| a.matches_current_site).collect()
+            };
+        }
+        let hit: Vec<VaultAccount> = all.iter()
+            .filter(|a| a.site.to_lowercase().contains(&q) || a.user.to_lowercase().contains(&q))
+            .cloned()
+            .collect();
+        if hit.is_empty() && self.show_all {
+            all
+        } else {
+            hit
+        }
+    }
+
+    /// The explicit escape route shown when the narrowed list is empty.
+    pub fn needs_all_items_route(&self) -> bool {
+        let q = self.query.trim().to_lowercase();
+        !q.is_empty() && vault_fixture().iter()
+            .all(|a| !a.site.to_lowercase().contains(&q) && !a.user.to_lowercase().contains(&q))
+    }
+
+    pub fn search(&mut self, q: String) {
+        self.query = q;
+        self.outcome = None;
+    }
+
+    pub fn show_all(&mut self) {
+        self.show_all = true;
+        self.outcome = None;
+    }
+
+    pub fn open(&mut self, id: &str) -> bool {
+        if self.visible().iter().all(|a| a.id != id) { return false; }
+        self.selected = Some(id.into());
+        self.last_selected = Some(id.into());
+        true
+    }
+
+    /// Back from details: the query, the narrowed list and the return target
+    /// survive — only the details view closes.
+    pub fn back(&mut self) { self.selected = None; }
+
+    /// Fill is explicit and reports its outcome; failure keeps the selection
+    /// and the page context (never returns to an empty list).
+    pub fn fill(&mut self, id: &str) -> Option<FillOutcome> {
+        let account = vault_fixture().into_iter().find(|a| a.id == id)?;
+        if !account.matches_current_site {
+            self.outcome = Some(FillOutcome::Failed(format!(
+                "{} does not match this page; Fill stays unavailable.",
+                account.site
+            )));
+            return self.outcome.clone();
+        }
+        self.selected = Some(id.into());
+        self.last_selected = Some(id.into());
+        self.outcome = Some(if self.simulate_failure {
+            FillOutcome::Failed("The page did not accept the fill; the entry is kept and the page is unchanged.".into())
+        } else {
+            FillOutcome::Filled(format!("Filled {} into {}.", account.user, account.site))
+        });
+        self.outcome.clone()
+    }
+
+    pub fn reset(&mut self) { *self = Self::default(); }
+
+    pub fn review_text(&self) -> String {
+        format!("Book: ydesign\nSpecimen: complex-sidebars/v1-study\nScenario: query={:?}, show_all={}, simulate_failure={}\nAccount: {}\nObservation: {}",
+            self.query, self.show_all, self.simulate_failure,
+            self.last_selected.as_deref().unwrap_or("none"), self.critique)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn navigation_preserves_fixture_and_reset_restores_every_field() {
         let mut state = Study { long_labels: true, narrow: true, ..Study::default() };
@@ -115,11 +470,117 @@ mod tests {
         state.reset();
         assert!(state == Study::default());
     }
+
     #[test]
     fn fixture_ids_survive_long_label_variant() {
         assert_eq!(fixtures(false).iter().map(|c| &c.id).collect::<Vec<_>>(),
             fixtures(true).iter().map(|c| &c.id).collect::<Vec<_>>());
         assert_eq!(fixtures(false).len(), 12);
         assert!(fixtures(false).iter().any(|c| c.description.is_empty()));
+    }
+
+    #[test]
+    fn save_is_one_click_when_pinned_and_refused_when_the_panel_is_closed() {
+        let mut pinned = RibbonStudy::new();
+        assert!(pinned.pinned);
+        pinned.edit_document("typed more".into());
+        assert!(!pinned.saved);
+        assert!(pinned.save().is_ok());
+        assert!(pinned.saved);
+        assert!(pinned.log.last().unwrap().contains("one click"));
+
+        let mut collapsed = RibbonStudy::new();
+        collapsed.set_variant(Anatomy::Rejected);
+        assert!(!collapsed.pinned && !collapsed.expanded);
+        let refused = collapsed.save().unwrap_err();
+        assert!(refused.contains("two clicks"));
+        assert!(collapsed.saved, "a refused save must not mark the document unsaved");
+        assert!(collapsed.log.last().unwrap().contains("expand first") || collapsed.log.len() == 1,
+            "the refusal is logged, not silently swallowed");
+        collapsed.toggle_overlay();
+        assert!(collapsed.expanded);
+        assert!(collapsed.save().is_ok());
+    }
+
+    #[test]
+    fn switching_variants_resets_to_that_default_and_says_so() {
+        let mut s = RibbonStudy::new();
+        s.set_find_query("spacing".into());
+        assert!(s.select_tab("review"));
+        s.set_variant(Anatomy::Rejected);
+        assert_eq!(s.variant, Anatomy::Rejected);
+        assert!(!s.pinned && !s.expanded);
+        assert!(s.find_query.is_empty());
+        assert_eq!(s.active_tab, "home");
+        assert!(s.log[0].contains("Rejected anatomy"));
+    }
+
+    #[test]
+    fn the_find_query_survives_a_tab_change() {
+        let mut s = RibbonStudy::new();
+        s.set_find_query("tracking".into());
+        assert!(s.select_tab("review"));
+        assert_eq!(s.find_query, "tracking");
+        assert!(s.log.last().unwrap().contains("carried"));
+        assert!(!s.select_tab("no-such-tab"));
+    }
+
+    #[test]
+    fn editing_marks_the_document_unsaved_and_reset_restores_the_fixture() {
+        let mut s = RibbonStudy::new();
+        s.edit_document(RibbonStudy::document_fixture().into());
+        assert!(s.saved, "typing the identical text is not a modification");
+        s.edit_document("changed".into());
+        assert!(!s.saved);
+        s.reset();
+        assert!(s.saved && s.document == RibbonStudy::document_fixture());
+    }
+
+    #[test]
+    fn vault_details_back_preserves_search_and_return_target() {
+        let mut v = VaultStudy::default();
+        v.search("example".into());
+        assert!(v.open("work"));
+        v.back();
+        assert!(v.selected.is_none());
+        assert_eq!(v.last_selected.as_deref(), Some("work"));
+        assert_eq!(v.query, "example");
+    }
+
+    #[test]
+    fn vault_fill_reports_outcome_and_failure_keeps_context() {
+        let mut v = VaultStudy::default();
+        v.open("work");
+        let ok = v.fill("work").unwrap();
+        assert!(matches!(ok, FillOutcome::Filled(_)));
+        v.simulate_failure = true;
+        let failed = v.fill("work").unwrap();
+        assert!(matches!(failed, FillOutcome::Failed(_)));
+        assert_eq!(v.selected.as_deref(), Some("work"), "failure keeps the selection");
+        assert!(!v.visible().is_empty(), "failure never empties the rail");
+    }
+
+    #[test]
+    fn vault_non_matching_site_cannot_fill_and_empty_search_offers_all_items() {
+        let mut v = VaultStudy::default();
+        assert_eq!(v.fill("archive"),
+            Some(FillOutcome::Failed("other.test does not match this page; Fill stays unavailable.".into())));
+        v.search("nothing-matches-this".into());
+        assert!(v.visible().is_empty());
+        assert!(v.needs_all_items_route());
+        v.show_all();
+        assert_eq!(v.visible().len(), vault_fixture().len());
+    }
+
+    #[test]
+    fn vault_fixture_covers_the_walkthrough_and_reset_restores_every_field() {
+        let f = vault_fixture();
+        assert_eq!(f.iter().filter(|a| a.matches_current_site).count(), 2, "two accounts on one site");
+        assert!(f.iter().any(|a| a.user.chars().count() > 30), "a long address for the wrap test");
+        assert!(f.iter().all(|a| !a.user.is_empty()));
+        let mut v = VaultStudy::default();
+        v.search("shop".into()); v.open("shop"); v.fill("shop"); v.critique = "note".into();
+        v.reset();
+        assert!(v == VaultStudy::default());
     }
 }

@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Ribbons — commands that belong to the workspace
 
-**edition 2026-09-07 · rev 1**
+**edition 2026-09-07 · rev 2**
 
 A ribbon helps someone recognize a command without remembering its name.
 Tabs name tasks; groups gather related commands; familiar commands stay in
@@ -93,10 +93,37 @@ other two. Capture the tab focus ring and the document's first line as well as
 the resting ribbon. A keyboard test passes only when the intended command ran
 and focus returned to the correct place, not when a key event was accepted.
 
+## The specimen
+
+**Specimen** `ydesign/ribbons@2026-09-07-r1` — registry: `specimens/specimens.json`;
+source: `specimens/src/lib.rs` (`RibbonStudy`) + `specimens/src/main.rs`;
+build: `bash scripts/build-specimens.sh`.
+
+The staging study implements the book's own review table as state, not prose:
+
+- **Save, then keep typing.** Pinned: Save is one click, the document flips
+  to saved, and focus returns to the text. Collapsed: Save is REFUSED with
+  the reason named ("expand first — two clicks"), the way the review table
+  says a design must not silently widen.
+- **Find, then replace.** Find and Replace share one group; the find query is
+  a real field that SURVIVES a tab change — a query that disappears on tab
+  change is a reject condition, and the study carries it and says so in the
+  log.
+- **Discover an unfamiliar command.** The proposed band renders group
+  captions under grouped commands; the rejected variant renders the same
+  commands as a sparse floating panel with two saturated buttons.
+- **Switching variants resets** to that anatomy's default and logs it — never
+  a silent comparison from different starting states. Reset restores the
+  document fixture, saved state, find query, log and critique draft.
+
+An in-host schema exercise (rows below this prose) answers clicks the same
+way for readers inside yggterm; it is the row-renderer's exercise, not the
+band's.
+
 ## Exercise limits
 
-The live specimen below switches between the rejected and proposed anatomy
-and records an example command. It teaches the state and grouping choices;
-the figure is an explanatory composition, not the shared ribbon renderer.
-Reset restores the starting state. Acceptance of the actual ribbon still
-requires a faithful capture and keyboard test in its consumer.
+The studies are staging targets: they teach the composition and state
+contract with real components and deterministic fixtures, but they are not
+the shared ribbon renderer. Acceptance of the actual ribbon still requires a
+faithful capture and keyboard test in its consumer; the shared renderer
+change remains pending on its owner, tracked in the chapter inventory.
