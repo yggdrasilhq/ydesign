@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Complex sidebars — make the next action obvious
 
-**edition 2026-09-07 · rev 1**
+**edition 2026-09-07 · rev 2**
 
 Someone opens a vault to sign in, choose another account, copy a field, or
 change an entry. They should see the right identity quickly, act without
@@ -95,7 +95,9 @@ line distinguishes which identity will be used. Never rely on color alone.
 
 This is a proposed acceptance walkthrough, not a claim that the miniature
 implements browser matching, credential storage or authentication. The
-miniature covers list/details/back and an invented action counter only.
+staging study covers search, the matching-first list, the All-items route,
+details/back with focus restoration, and fill with a reported outcome — it
+does not touch a real vault, clipboard or network.
 
 | State | Helpful next action | Avoid |
 | --- | --- | --- |
@@ -110,6 +112,29 @@ Account data and icons must not introduce a new privacy leak. Reuse the
 browser's existing site-icon policy/cache rather than contacting an arbitrary
 third-party favicon service as a side effect of opening the vault.
 
+## The specimen
+
+**Specimen** `ydesign/complex-sidebars@2026-09-07-r1` — registry:
+`specimens/specimens.json`; source: `specimens/src/lib.rs` (`VaultStudy`) +
+`specimens/src/main.rs`; build: `bash scripts/build-specimens.sh`.
+
+The staging study runs the walkthrough with invented entries only. The
+fixtures are the recognition test itself: two accounts on example.test
+(Personal with a passkey, Work with a password), a non-matching pair, and a
+deliberately long address for the wrap test. Identity is the letter-fallback
+mark plus visible site and account text — never a credential icon standing in
+for the site. Fill appears only on accounts matching the current page, reports
+its outcome in an aria-live line, and a simulated failure keeps the selection
+and the page while naming what happened. Details replace the list with a
+labeled Back (Escape works too) that restores the search, the narrowed list
+and focus to the entry you came from. A search that matches nothing offers
+the explicit All-items route instead of a blank rail. Reset restores the
+query, selection, outcome, failure toggle and critique draft.
+
+An in-host schema exercise (rows inside yggterm) mirrors the open/return
+moves with the shared row renderer; it is the rail's exercise, not the
+vault's.
+
 ## Verification, not decoration
 
 Try two accounts on one site, a missing favicon, a long email, no matches,
@@ -118,7 +143,8 @@ narrow rail. Readability, target size and focus matter for everyone: fatigue,
 trackpad imprecision and divided attention are ordinary operating conditions.
 Search and per-site matching should reduce choices before typography is shrunk.
 
-The miniature below uses invented entries only. Switch the study, open an
-entry, return, or invoke simulated Fill. It records the outcome without
-touching a real vault or clipboard. Shared row rendering and actual vault
-flows require their own implementation and live proof.
+The staging study covers the listed-or-stated states above that a UI study
+can carry (matching, no-match, failed fill, long names, keyboard and focus);
+locked-vault, stale-sync and unsaved-edit states remain prose until their
+component study grows them. Shared row rendering and actual vault flows
+require their own implementation and live proof.
