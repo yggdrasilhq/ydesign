@@ -79,3 +79,9 @@ fieldset.radio-row legend{font-size:13px;color:#52666f;padding:0}
 .outcome{font-size:14px;margin-top:14px}
 .outcome-ok{color:#1c7a4f}
 .outcome-fail{color:#b03030}
+
+.vault-row div.vault-row{display:grid}
+.vault-open{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid transparent;border-radius:8px;padding:10px 12px;background:none;min-width:0}
+.vault-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.vault-row .vault-fill{min-height:36px}
+.vault-mark.favicon{border-radius:7px;border:1px solid rgba(24,35,47,.12)}

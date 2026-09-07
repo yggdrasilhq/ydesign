@@ -121,15 +121,20 @@ third-party favicon service as a side effect of opening the vault.
 The staging study runs the walkthrough with invented entries only. The
 fixtures are the recognition test itself: two accounts on example.test
 (Personal with a passkey, Work with a password), a non-matching pair, and a
-deliberately long address for the wrap test. Identity is the letter-fallback
-mark plus visible site and account text — never a credential icon standing in
-for the site. Fill appears only on accounts matching the current page, reports
-its outcome in an aria-live line, and a simulated failure keeps the selection
-and the page while naming what happened. Details replace the list with a
-labeled Back (Escape works too) that restores the search, the narrowed list
-and focus to the entry you came from. A search that matches nothing offers
-the explicit All-items route instead of a blank rail. Reset restores the
-query, selection, outcome, failure toggle and critique draft.
+deliberately long address for the wrap test. Identity slots come in BOTH
+states — a stable invented favicon square for two accounts, the letter
+fallback for the other two — never a credential icon standing in for the
+site. Row semantics are clean: the row is a noninteractive container with a
+separate Open region and a separate Fill button, so clicking Fill never also
+opens the entry. Matches are DERIVED from the current page: an inspector
+control changes the origin, every match and Fill offer re-evaluate, and a
+stale match is refused rather than silently applied. Fill reports its outcome
+in an aria-live line; a simulated failure keeps the selection and the page
+while naming what happened. Details replace the list with a labeled Back, and
+keyboard Escape shares the SAME restoration path — the search, the narrowed
+list, and focus on the entry you came from. A search that matches nothing
+offers the explicit All-items route instead of a blank rail. Reset restores
+the query, origin, selection, outcome, failure toggle and critique draft.
 
 An in-host schema exercise (rows inside yggterm) mirrors the open/return
 moves with the shared row renderer; it is the rail's exercise, not the
