@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Motion & feedback
 
+**edition 2026-09-07 · rev 1**
+
 Motion is functional, not decorative. The workspace should feel tighter and
 more exact after a transition, not more playful. State changes are crisp;
 nothing rubbers, bounces, or lags.

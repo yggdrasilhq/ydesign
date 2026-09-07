@@ -1,2 +1,0 @@
-Reply refetch_rail on document-pane actions
-The mirror arm of the refetch contract: a document action (mode switch, contents row) moves rail rows too, so the reply now asks the GUI to repaint the shelf immediately instead of waiting for the next ping-discovered version edge. Pairs with the host-side refetch_rail handling landing in yggterm lane/perf/ui-block-probes.

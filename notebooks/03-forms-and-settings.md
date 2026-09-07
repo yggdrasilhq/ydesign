@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Forms & settings
 
+**edition 2026-09-07 · rev 1**
+
 Forms are where a design language is most visible and most often broken,
 because a form is nothing but decisions repeated: every field, every label,
 every button is a fresh chance to drift. The rules here collapse those

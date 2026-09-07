@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Inheritance
 
+**edition 2026-09-07 · rev 1**
+
 Layer: yggui base design notebooks, published by ydesign.
 
 Parent: Dioxus components (component and event substrate). The yggui layer

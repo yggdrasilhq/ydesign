@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Foundations — calm chrome, clear content
 
+**edition 2026-09-07 · rev 1**
+
 The shell should make work feel continuous. Its pale blue-grey base and faint
 blue-to-green tint connect tabs and rails; an opaque reading surface gives
 text a stable background. Save gradients for the surrounding workspace. The
