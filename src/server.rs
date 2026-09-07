@@ -69,6 +69,10 @@ impl PaneState {
             // schema is already in the reply) and load-bearing when it came
             // from the rail — the viewport must turn the page NOW.
             "refetch_document": pane_id != "design",
+            // The mirror arm: a document-pane action (mode switch, contents
+            // row) moves rail rows too — repaint the shelf now instead of
+            // at the next ping-discovered version edge.
+            "refetch_rail": pane_id != "rail",
         })
     }
 }
@@ -407,8 +411,10 @@ mod tests {
         assert!(noop.get("refetch_document").is_none());
         let from_document = pane.action_reply("design", true);
         assert!(from_document["schema"].is_object());
-        // The reply schema already repaints the posting document pane.
+        // The reply schema already repaints the posting document pane, and
+        // the shelf repaints from the mirror arm instead of a ping edge.
         assert_eq!(from_document["refetch_document"], false);
+        assert_eq!(from_document["refetch_rail"], true);
     }
 
     #[test]
