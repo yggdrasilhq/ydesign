@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # List views — one reading grid, distinct purposes
 
+**edition 2026-09-07 · rev 1**
+
 Status: a proposed Dioxus component and working demo now live in
 `specimens/src/lib.rs` and `specimens/src/main.rs`. The current book contents
 is the live failure example. The demo is a standalone staging target; this

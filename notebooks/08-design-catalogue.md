@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # The catalogue — the design, exhibited
 
+**edition 2026-09-07 · rev 1**
+
 A design manual is read with the eyes. Every pattern below is a REAL pixel
 from the running fleet — not a mockup — with the choices that shaped it. When
 you build a surface, find its pattern here first and match what you see.

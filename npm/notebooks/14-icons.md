@@ -1,11 +1,42 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Icons — the one icon source
 
-Every surface reaches for the same glyphs through **one crate**; this page is
-its contract and its specimen index. Label: **measured** for the recipe,
-**enforced** for the one-owner rule.
+**edition 2026-09-07 · rev 1**
 
-## The crispness recipe (measured)
+Every surface reaches for the same glyphs through **one crate**; this page is
+its contract and its specimen index. The recipe is **observed** (measured from
+the rendered references); the one-owner rule is a **verified** invariant —
+grep-able, not aspirational. This book absorbs the former *Iconography*
+notebook (2026-09-06), which measured the gap and proposed the crate; the
+crate has since landed, so that notebook's proposal section is history and its
+evidence table lives here.
+
+## Why not a font (the decision behind "iconfont")
+
+The owner's verdict that started this book: "yggui needs to have an iconfont.
+The icons of ZCode look crisp. But the yggterm iconography leaves much to be
+desired." The want behind "iconfont" is *one place, one name, crisp
+everywhere* — and that want is satisfied by a **crate of inline-svg constants
+plus one sizing convention**, not by a font. A font can't do multi-tone, scales
+poorly in wasm, hurts screen readers, and forces a glyph→codepoint
+memorisation layer. The crate gets all of the want with none of those costs.
+
+## What each surface renders (observed 2026-09-06, before the crate)
+
+| Surface | Icon system before | Evidence |
+|---|---|---|
+| libyggterm `yggui` core | unicode text glyphs — `↑ ↓ → ← ×` | grep: zero `<svg`, zero `viewBox` |
+| `chrome.rs` window controls | text glyph strings | chrome.rs |
+| yggui-chat (jyas webapp) | 13 lucide constants as complete inline svgs, stroke 1.5, currentColor | `src/icons.rs` |
+| practice-rs webapp | none — glyph/text only | zero `viewBox` in app sources |
+| **ZCode** | bespoke inlined set: lucide fragments recombined + bespoke glyphs, 16px, stroke **1.5**, round caps, currentColor, fill none; plus lucide-react for plugin icons | zcodereversed mining |
+| t3code | lucide-react stock (stroke 2.0 default) | package.json |
+
+The arrows row was the visible defect — `↑↓→←×` render with the ambient text
+font, so weight, width and vertical centering change per platform/font. That
+was most of what "leaves much to be desired" was.
+
+## The crispness recipe (observed)
 
 lucide's 24-grid paths, rendered at the wrapper size, with three departures
 from stock usage that make icons read crisp at UI sizes:
@@ -22,7 +53,7 @@ from stock usage that make icons read crisp at UI sizes:
 
 | Piece | The rule it owns |
 |---|---|
-| `yggui-icons` consts (`ARROW_UP`, `COPY`, …) | The only icon source. A new inline `<svg` in an app layer is the defect this crate exists to prevent — grep-able |
+| `yggui-icons` consts (`ARROW_UP`, `COPY`, …; lucide-kebab → `SCREAMING_SNAKE`) | The only icon source. A new inline `<svg` in an app layer is the defect this crate exists to prevent — grep-able |
 | `Icon { icon, size }` | The wrapper geometry: flex-centered, exact px, `flex:none`, `color:inherit` |
 | `glyph()`-style text fallbacks | Kept for a11y labels and tests; the RENDER is always the icon |
 
@@ -39,4 +70,5 @@ arrow in a control is a finding, not a style.
 
 The icon row and every icon-bearing control in the component testbed app
 render from the crate at 1.5 stroke; the composer, sidebar rows and rail
-sections show them in context at 14–16px.
+sections show them in context at 14–16px. Chapter status and the owed pixel
+pass are tracked in the [chapter inventory](chapter-inventory.md).

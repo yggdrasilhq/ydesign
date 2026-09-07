@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # ZCode reversed — components & colour (measured reference)
 
+**edition 2026-09-07 · rev 1**
+
 Two measured design references now exist as repos, and one living dioxus
 testbed proves they port. This notebook is the *reading guide* to them; the
 repos are the evidence.

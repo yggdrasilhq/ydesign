@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Worked examples — mini-webapps
 
+**edition 2026-09-07 · rev 1**
+
 Design prose is not proof. This page rebuilds the canonical surfaces as real
 schemas: the widgets below the prose are painted by the host with the same
 code every app inherits. Open this page, screenshot it, and put your own

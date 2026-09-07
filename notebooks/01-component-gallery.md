@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Component gallery
 
+**edition 2026-09-07 · rev 1**
+
 Every component an app may reach for, and the one-owner rule each encodes.
 Below the prose, this page appends **live specimens** — real widgets painted
 by the host — so the comparison against your own surface is a screenshot away.
@@ -24,6 +26,7 @@ encoding, and second encodings drift.
 | `pill_toolbar` | Floating translucent toolbar (find, steppers) costing no layout | Owns shape/material only — no state, ever |
 | `split_button` | One sticky primary action + caret menu | Menu surface opaque; per-item accent allowed |
 | `otp` | 6-cell code entry with native paste bridge | — |
+| `icons` (`yggui-icons`) | lucide ISC path constants at stroke 1.5 + the `Icon` wrapper | The only icon source. A new inline `<svg>` in an app layer — or a unicode `↑↓→←×` in a control — is the defect; see *Icons* |
 | `motion` | Easing curves + durations | Motion is functional; desktop-fast, never rubbery |
 | `theme` | Gradient-theme plumbing over `YgguiThemeSpec` | Stable path: no compositor blur, no alpha-only chrome |
 
