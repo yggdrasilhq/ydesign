@@ -1,0 +1,14 @@
+[package]
+name = "ydesign-specimens"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+dioxus = { version = "=0.7.9", features = ["web"] }
+
+[features]
+default = ["web"]
+web = []
+
+[workspace]

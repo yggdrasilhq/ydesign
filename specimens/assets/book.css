@@ -1,0 +1,37 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#24343b;background:#edf3f2;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0}
+.book{max-width:1040px;min-height:100vh;margin:0 auto;padding:64px 72px;background:#fff}
+.book.narrow{max-width:520px;padding:40px 24px}
+.eyebrow{font-size:12px;letter-spacing:.13em;font-weight:650;color:#526b6e}
+h1{font-size:clamp(32px,4vw,48px);letter-spacing:-.035em;line-height:1.1;margin:22px 0}
+.lede{font-size:19px;line-height:1.6;max-width:56ch}
+.status{font-size:13px;line-height:1.5;color:#52666f}
+.tools{display:flex;gap:12px;margin:24px 0 40px}
+button,summary{font:inherit;cursor:pointer}
+button{min-height:40px;border:1px solid #b8c9cd;border-radius:6px;background:#fff;color:inherit;padding:8px 14px}
+button:hover{background:#edf5f3}
+button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #216d81;outline-offset:3px}
+h2{font-size:25px;letter-spacing:-.02em;margin:0 0 20px}
+.chapter-list{list-style:none;padding:0;margin:0}
+.chapter-list li{margin:0}
+.chapter-link{display:grid;grid-template-columns:2.5ch minmax(0,1fr);gap:16px;width:100%;text-align:left;border:0;border-radius:4px;padding:12px 0;line-height:1.45}
+.ordinal{font-variant-numeric:tabular-nums;color:#52666f;font-size:14px;padding-top:3px}
+.chapter-copy{display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
+.chapter-title{font-size:17px;font-weight:600}
+.chapter-description{font-size:14px;color:#52666f;font-weight:400}
+.compact .chapter-link{padding:8px 0}
+.compact .chapter-title{font-size:14px}
+.compact .chapter-description{font-size:12px}
+.chapter-link[aria-current=page]{background:#eaf3f1}
+.inspector{padding:20px;margin-bottom:32px;background:#f2f6f5;border-radius:6px}
+.inspector label{display:inline-flex;gap:8px;align-items:center;margin:0 20px 12px 0;min-height:32px}
+.inspector p,footer p{font-size:13px;line-height:1.5;color:#52666f}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:auto;font-size:12px;line-height:1.6}
+article{padding:28px 0;line-height:1.7}
+footer{margin-top:40px;padding-top:24px;border-top:1px solid #dce5e5}
+summary{min-height:40px;padding:8px 0}
+footer label{display:block;margin:16px 0 8px}
+textarea{width:100%;min-height:96px;padding:12px;font:inherit;line-height:1.5;border:1px solid #b8c9cd;border-radius:6px}
+@media(max-width:640px){.book{padding:32px 24px}.tools{margin-bottom:28px}.chapter-link{gap:12px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}

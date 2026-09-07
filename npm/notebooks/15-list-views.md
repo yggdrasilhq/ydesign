@@ -1,9 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # List views — one reading grid, distinct purposes
 
-Status: design diagnosis and proposed contract. The current book contents is
-the live failure example. This chapter is not yet a completed Dioxus specimen.
-Its replacement must use the real shared list component with demo data.
+Status: a proposed Dioxus component and working demo now live in
+`specimens/src/lib.rs` and `specimens/src/main.rs`. The current book contents
+is the live failure example. The demo is a standalone staging target; this
+chapter is not complete until it mounts that component inline and passes
+interaction and pixel review. It is not yet an extracted yggui component.
 
 ## Begin with the contents page
 
