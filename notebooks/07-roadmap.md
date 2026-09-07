@@ -1,9 +1,13 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Roadmap — demanded components
 
+**edition 2026-09-07 · rev 2**
+
 Components the apps have demanded, each with its forcing consumer and the
 layer that grows. This page is the design system's *defect and demand
-ledger*: "the sidebar needs polish" becomes a filed, scoped, owned row.
+ledger*: "the sidebar needs polish" becomes a filed, scoped, owned row. The
+per-chapter conversion status that pairs with it lives in the
+[chapter inventory](chapter-inventory.md).
 
 The admission rule is the platform's own: a component enters the vocabulary
 with a **forcing consumer**, and becomes a schema kind when a **second**
@@ -27,7 +31,9 @@ The contents-page list mismatch is diagnosed in **List views**: Markdown and
 document rows use independent width/margin rules, iconless rows reserve an
 empty icon slot, and rail-density typography is applied to editorial content.
 The required repair is a shared context-aware list layout, not a TOC offset.
-Its actual Dioxus specimen and renderer repair remain pending.
+The reusable Dioxus component ships as a staging target (`specimens/`,
+deterministic fixtures, reset, critique draft); the renderer repair in
+yggterm-shell and the specimen's inline mounting remain pending.
 
 | Finding | Owner and acceptance | State |
 |---|---|---|
@@ -43,23 +49,30 @@ captures stay outside this public repository; published studies use invented dat
 ## The first filed defects
 
 The design system opens its ledger with the two defects that motivated it.
-Both are recorded, not fixed, so the fix lands with pixel proof at the
-component layer:
+Fixes land with pixel proof at the component layer, and the ledger rows move
+when they do:
 
 1. **Settings-rail top rows** — explanatory prose sat *beside* the toggles as
    multi-line paragraphs: control row proportions broken, toggle stranded in
    dead space. Fix = the **short-phrase rule** (one muted phrase, under the
    control, never a paragraph beside it). See *Forms & settings*.
-2. **A browser tab rail's header** — the profile pill and `+` ride the
+   **FIXED 2026-08-28** (yggterm `lane/design/settings-short-phrases` → main
+   `eb46e4dd`): all five rows carry the ≤9-word phrase under the control,
+   explanations moved to row tooltips; the accepted before/after pair is the
+   catalogue's forms-rail exhibit.
+2. **A browser tab rail's header** — the profile pill and `+` rode the
    heading as solid accent fills, stacked under the nav row and omnibox:
-   three bands of loud before any row. Fix = the **header anatomy** standard
-   (title row → tool row → section heading) with header actions at ICON
-   weight — muted, accent on hover only (`session_row_action_button_style`),
-   matching the yedit files header; the accent budget belongs to the rows'
-   own states. Code: yggterm-shell `right_rail.rs` `WebTabsRailBody`
-   (RailHeader actions, ~line 1554). ⚠ Owned by yggterm (WebTabs rail is
-   yggterm chrome), but coordinate with any active ychrome-ux lane before
-   touching it. See *Sidebars*.
+   three bands of loud before any row. Prescription = the **header anatomy**
+   standard (title row → tool row → section heading) with header actions at
+   ICON weight — muted, accent on hover only
+   (`session_row_action_button_style`); the accent budget belongs to the
+   rows' own states. **PARTIALLY LANDED on yggterm main** (verified in
+   `right_rail.rs` `WebTabsRailBody`, 2026-09-07): the floating solid-accent
+   `+` is gone — group-scoped, icon-weight, on the group head row — and rows
+   render from one arm of the shared renderer. The profile pill remains at
+   badge accent BY RECORDED DESIGN (the owner specified profile switching as
+   the rail's dropdown anchor). Owed: a header-anatomy pixel pair for the
+   full rhythm, judged under the standard. See *Sidebars*.
 
 ## How this page grows
 

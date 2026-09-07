@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Complex sidebars — make the next action obvious
 
+**edition 2026-09-07 · rev 1**
+
 Someone opens a vault to sign in, choose another account, copy a field, or
 change an entry. They should see the right identity quickly, act without
 precision pointing, and return to the page with their place intact.

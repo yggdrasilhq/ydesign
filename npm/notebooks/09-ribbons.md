@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Ribbons — commands that belong to the workspace
 
+**edition 2026-09-07 · rev 1**
+
 A ribbon helps someone recognize a command without remembering its name.
 Tabs name tasks; groups gather related commands; familiar commands stay in
 predictable places. The document remains the main event.

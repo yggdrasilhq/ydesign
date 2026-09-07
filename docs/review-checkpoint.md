@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Design review checkpoint
 
+**edition 2026-09-07 · rev 2**
+
+The per-chapter conversion ledger is [chapter inventory](chapter-inventory.md);
+a review moves the rows it advances, in the same commit as the work.
+
 ## Delivered baseline
 
 The shelf includes base design notebooks and registered external app layers.

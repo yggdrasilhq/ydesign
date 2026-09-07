@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Start here — the base design language
 
+**edition 2026-09-07 · rev 1**
+
 ydesign is the *base* design language of the yggdrasil app fleet, shipped as
 live notebooks. "Base" because every app builds over it. The layering is the
 whole point:
@@ -59,6 +61,55 @@ and never from a description. The instruments:
 When DESIGN.md duplicates a visual decision, move that decision and its
 rationale into the appropriate notebook and leave a pointer.
 
+## Evidence labels and editions
+
+Every book opens with an `edition <date> · rev <n>` line; a critique names the
+edition it reviewed, and an accepted critique bumps the rev and links its
+verification. Every claim carries one of four labels, used identically in
+every book and project layer:
+
+| Label | Claim |
+|---|---|
+| **observed** | Measured from a real surface — a screenshot, a probe, a grep — with the instrument named. |
+| **reconstructed** | Redrawn to teach, with invented content; useful ideas, not proof. |
+| **proposed** | Offered for comment; becomes a decision only when its component change lands with its own proof. |
+| **verified** | Re-checked against the artifact on a stated date (who ran what, what it showed). |
+
+A chapter that cannot name its label is asserting by tone — refuse it in
+review. The per-chapter conversion status (front matter, legacy illustration,
+working specimen, reviewed reference) lives in the
+[chapter inventory](chapter-inventory.md); no chapter may claim a status the
+inventory does not grant it.
+
+## The collection, in reading order
+
+Read in this order; each book assumes the ones before it:
+
+1. **Foundations** — semantic colour, typography, relationships: the visual
+   language under everything.
+2. **Component gallery** — every component an app may reach for, and the
+   one-owner rule each encodes.
+3. **The catalogue** — the design exhibited: real pixels with the choices
+   behind them.
+4. **Sidebars** — the row engine, status vocabulary, partitioning, header
+   anatomy.
+5. **Forms & settings** — section cards, the one field skin, the short-phrase
+   rule.
+6. **Motion & feedback** — toasts and anchors, the stage curtain, the shared
+   blink clock.
+7. **emd & notebooks** — the extended-markdown contracts and authoring rules.
+8. **Ribbons** — commands that belong to the workspace.
+9. **Complex sidebars** — task-first identity and progressive disclosure.
+10. **List views** — one reading grid, distinct purposes.
+11. **Icons** — the one icon source and the crispness recipe.
+12. **Inheritance** — what the base decides, what an app may override.
+13. **ZCode reversed** — a measured external reference and its Dioxus port
+    path.
+14. **Worked examples** (Examples mode) — canonical surfaces rebuilt as live
+    schemas to screenshot against.
+15. **Roadmap** — the defect and demand ledger; where an agent files before
+    fixing.
+
 ## How other apps consume this
 
 Run `ydesign init <worktree> --id <project>` to create missing scaffolding
@@ -71,15 +122,3 @@ the app: run `ydesign` inside yggterm). A project that defines its own layer
 (L3) writes its own design notebook in its own repo, states what it overrides,
 and defers to this base set for everything it does not. The fallback is
 always the adjacent lower layer — never a local invention.
-
-## What each notebook covers
-
-- **Component gallery** — every component, live, with the one-owner rule it
-  encodes.
-- **Sidebars** — the row engine, densities, status dots, partitioning.
-- **Forms & settings** — section cards, the one field skin, the short-phrase
-  rule.
-- **Motion & feedback** — toasts, the stage curtain, the shared blink clock.
-- **emd & notebooks** — the extended-markdown contracts and authoring rules.
-- **Worked examples** — canonical surfaces rebuilt as live schemas.
-- **Roadmap** — demanded components, each with its forcing consumer.

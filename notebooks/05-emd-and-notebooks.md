@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # emd & notebooks
 
+**edition 2026-09-07 · rev 1**
+
 ![A rendered notebook is a reading surface, not raw syntax](%ASSETS%/catalogue-emd-reader.png)
 
 Author the smallest example that makes the decision visible. Pair an observed

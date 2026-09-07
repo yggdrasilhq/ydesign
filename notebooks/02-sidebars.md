@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Sidebars — the canonical patterns
 
+**edition 2026-09-07 · rev 1**
+
 A sidebar is the most-copied surface in the fleet and the easiest to get
 subtly wrong, because every mistake is small: a pixel of indent here, a dot
 in the wrong column there. The patterns below are the canonical answers.
