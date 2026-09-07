@@ -18,6 +18,11 @@ mistake its state-counter exercises for completed reference components.
 Maintain its no-linking boundary while designing an explicitly separate demo
 target and supported host mounting path.
 
+**Keep the stills.** The creative still studies (SVG/PNG diagrams) that
+explain a chapter stay in the book even after its interactive mini-app lands:
+a still teaches the anatomy at a glance, the mini-app teaches the behavior.
+Every new mini-app chapter gets both. (Owner ruling, 2026-09-08.)
+
 The notebooks ARE the product. Their authority comes from being correct and
 from being *live*: the examples pages append real painted widgets, so an
 agent can screenshot the page and compare any surface against it. When you
