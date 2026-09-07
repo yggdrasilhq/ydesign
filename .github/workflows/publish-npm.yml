@@ -1,0 +1,26 @@
+name: publish npm
+
+# The npm-token errand ends here: the npm token lives as the yggdrasilhq org
+# secret NPM_TOKEN; this workflow publishes the npm face of ydesign without
+# any seat ever holding the secret. Manual dispatch or a version tag.
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+      - name: Sync the npm face (notebooks + version from Cargo.toml)
+        run: bash scripts/sync-npm.sh
+      - name: Publish
+        run: npm publish --access public
+        working-directory: npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
