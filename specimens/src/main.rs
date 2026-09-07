@@ -39,7 +39,9 @@ fn App() -> Element {
                 if let Some(chapter) = selected {
                     button {
                         id: "back-to-contents",
-                        autofocus: true,
+                        onmounted: move |event| async move {
+                            let _ = event.set_focus(true).await;
+                        },
                         onclick: move |_| {
                             let id = study.read().last_opened.clone().unwrap_or_default();
                             study.write().back();

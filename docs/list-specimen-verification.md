@@ -21,8 +21,10 @@ Observed interaction results:
 
 These actions were driven through DOM controls and their resulting state
 read back. They verify component callbacks and programmatic focus return,
-not a complete keyboard-only sequence. The narrow-column control does not
-prove a 390px browser viewport or 200% browser zoom. Those checks remain open.
+not a complete keyboard-only sequence. A subsequent actual 390 × 844 viewport
+rendered at DPR 1 with a matching 390 × 844 screenshot; document scroll width
+and book width were both 390px, and the pixels were reviewed without horizontal
+overflow. The 200% browser zoom check remains open.
 
 The page is still a standalone staging target. It is not yet the embedded
 notebook specimen or the shared host's repaired list renderer. Critique is an
