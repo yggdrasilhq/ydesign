@@ -244,11 +244,9 @@ pub fn rail_view(view: &View) -> Value {
         "title": "Ydesign",
         "titlebar_switch": titlebar_switch_spec(&view.mode),
         "widgets": widgets,
-        "footer": [json!({
-            "kind": "label",
-            "text": "Base design language · shipped notebooks v0.1",
-            "muted": true
-        })]
+        // The pinned status line is gone (owner, 2026-09-08): the shelf reads
+        // as the books themselves, with no standing caption under them.
+        "footer": []
     })
 }
 
