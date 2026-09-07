@@ -15,6 +15,7 @@ mod osc;
 mod persist;
 mod projects;
 mod schema;
+mod shelf_wiring_tests;
 mod server;
 mod trace;
 
