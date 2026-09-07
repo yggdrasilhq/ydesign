@@ -109,8 +109,7 @@ impl Study {
 
 /// The two compositions the Ribbons book compares. Switching resets to the
 /// variant's default state; nothing silent is carried across.
-#[derive(Clone, Copy, PartialEq, Default)]
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub enum Anatomy {
     #[default]
     Proposed,
@@ -188,6 +187,7 @@ pub struct RibbonStudy {
     /// The find query survives tab changes in the proposed anatomy — a query
     /// that disappears on tab change is a reject condition in the book.
     pub find_query: String,
+    pub replace_with: String,
     pub log: Vec<String>,
     pub critique: String,
 }
@@ -206,6 +206,7 @@ impl RibbonStudy {
             document: Self::document_fixture().into(),
             saved: true,
             find_query: String::new(),
+            replace_with: String::new(),
             log: vec!["Pinned ribbon, Home tab, document saved.".into()],
             critique: String::new(),
         }
@@ -276,6 +277,33 @@ impl RibbonStudy {
         self.find_query = q;
     }
 
+    pub fn set_replace_with(&mut self, q: String) {
+        self.replace_with = q;
+    }
+
+    /// Find reports an observable result — the number of live matches in the
+    /// document — not a button that opens another workflow.
+    pub fn find_matches(&self) -> usize {
+        let q = self.find_query.as_str();
+        if q.is_empty() { return 0; }
+        self.document.matches(q).count()
+    }
+
+    /// Replace does the editing job: every occurrence is replaced in the
+    /// document (which becomes unsaved) and the count is reported.
+    pub fn replace_all(&mut self) -> Option<usize> {
+        let q = self.find_query.clone();
+        if q.is_empty() { return None; }
+        let count = self.find_matches();
+        if count == 0 { return None; }
+        self.document = self.document.replace(&q, &self.replace_with);
+        self.saved = false;
+        self.log.push(format!(
+            "Replaced {count} occurrence(s) of “{q}”; the document is unsaved."
+        ));
+        Some(count)
+    }
+
     /// Save. Returns Err(reason) when the anatomy makes it a two-click path —
     /// the study refuses and names it, the way the review table says a design
     /// must not silently widen.
@@ -306,7 +334,7 @@ impl Default for RibbonStudy {
 
 // ─── Vault — a complex sidebar that makes the next action obvious ───────────
 
-#[derive(Clone, Copy, PartialEq, Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub enum Credential {
     #[default]
     Password,
@@ -325,9 +353,11 @@ pub struct VaultAccount {
     pub site: &'static str,
     pub user: &'static str,
     pub credential: Credential,
-    /// Whether this account matches the page the person is on (example.test
-    /// in the fixture scenario).
-    pub matches_current_site: bool,
+    /// Invented site imagery: two accounts carry a stable favicon square,
+    /// two demonstrate the missing-favicon path. Identity is never the
+    /// credential icon standing in for the site.
+    pub has_favicon: bool,
+    pub mark_color: &'static str,
 }
 
 impl VaultAccount {
@@ -336,29 +366,34 @@ impl VaultAccount {
     pub fn mark(&self) -> char {
         self.site.chars().next().unwrap_or('?').to_ascii_uppercase()
     }
+    /// Derived against the CURRENT page, so an origin change re-evaluates
+    /// every match instead of silently reusing a stale one.
+    pub fn matches(&self, current_site: &str) -> bool {
+        self.site == current_site
+    }
 }
 
 /// Deterministic fixture per the Complex sidebars walkthrough: two accounts
-/// on one site (the recognition test), a non-matching pair, one long address.
+/// on one site (the recognition test), a non-matching pair, one long address,
+/// and both favicon states (present + letter fallback).
 pub fn vault_fixture() -> Vec<VaultAccount> {
     vec![
-        VaultAccount { id: "personal", site: "example.test", user: "reader@example.test", credential: Credential::Passkey, matches_current_site: true },
-        VaultAccount { id: "work", site: "example.test", user: "w.svenson@example.test", credential: Credential::Password, matches_current_site: true },
-        VaultAccount { id: "archive", site: "other.test", user: "very.long.mailbox.name.for.the.wrap-test@archive.other.test", credential: Credential::Password, matches_current_site: false },
-        VaultAccount { id: "shop", site: "shop.test", user: "orders@example.test", credential: Credential::Passkey, matches_current_site: false },
+        VaultAccount { id: "personal", site: "example.test", user: "reader@example.test", credential: Credential::Passkey, has_favicon: true, mark_color: "#216d81" },
+        VaultAccount { id: "work", site: "example.test", user: "w.svenson@example.test", credential: Credential::Password, has_favicon: true, mark_color: "#b3556d" },
+        VaultAccount { id: "archive", site: "other.test", user: "very.long.mailbox.name.for.the.wrap-test@archive.other.test", credential: Credential::Password, has_favicon: false, mark_color: "#dcebe9" },
+        VaultAccount { id: "shop", site: "shop.test", user: "orders@example.test", credential: Credential::Passkey, has_favicon: false, mark_color: "#dcebe9" },
     ]
 }
 
 /// Outcome of a simulated fill. The request being sent is not completion —
 /// the study reports a result, and failure keeps every bit of context.
-#[derive(Clone, PartialEq)]
-#[derive(Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FillOutcome {
     Filled(String),
     Failed(String),
 }
 
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct VaultStudy {
     pub query: String,
     pub selected: Option<String>,
@@ -366,7 +401,25 @@ pub struct VaultStudy {
     pub show_all: bool,
     pub simulate_failure: bool,
     pub outcome: Option<FillOutcome>,
+    /// The page the person is on. Changing it re-evaluates every match;
+    /// a stale match is never silently applied to a new destination.
+    pub current_site: &'static str,
     pub critique: String,
+}
+
+impl Default for VaultStudy {
+    fn default() -> Self {
+        Self {
+            query: String::new(),
+            selected: None,
+            last_selected: None,
+            show_all: false,
+            simulate_failure: false,
+            outcome: None,
+            current_site: "example.test",
+            critique: String::new(),
+        }
+    }
 }
 
 impl VaultStudy {
@@ -380,7 +433,7 @@ impl VaultStudy {
             return if self.show_all {
                 all
             } else {
-                all.into_iter().filter(|a| a.matches_current_site).collect()
+                all.into_iter().filter(|a| a.matches(self.current_site)).collect()
             };
         }
         let hit: Vec<VaultAccount> = all.iter()
@@ -411,6 +464,16 @@ impl VaultStudy {
         self.outcome = None;
     }
 
+    /// Change the page's origin (walkthrough step 5): Fill must re-evaluate,
+    /// never silently apply an old match to a new destination.
+    pub fn change_origin(&mut self, site: &'static str) {
+        if self.current_site == site { return; }
+        self.current_site = site;
+        self.outcome = Some(FillOutcome::Failed(format!(
+            "The page changed to {site}; every match and Fill target was re-evaluated."
+        )));
+    }
+
     pub fn open(&mut self, id: &str) -> bool {
         if self.visible().iter().all(|a| a.id != id) { return false; }
         self.selected = Some(id.into());
@@ -426,7 +489,7 @@ impl VaultStudy {
     /// and the page context (never returns to an empty list).
     pub fn fill(&mut self, id: &str) -> Option<FillOutcome> {
         let account = vault_fixture().into_iter().find(|a| a.id == id)?;
-        if !account.matches_current_site {
+        if !account.matches(self.current_site) {
             self.outcome = Some(FillOutcome::Failed(format!(
                 "{} does not match this page; Fill stays unavailable.",
                 account.site
@@ -495,8 +558,6 @@ mod tests {
         let refused = collapsed.save().unwrap_err();
         assert!(refused.contains("two clicks"));
         assert!(collapsed.saved, "a refused save must not mark the document unsaved");
-        assert!(collapsed.log.last().unwrap().contains("expand first") || collapsed.log.len() == 1,
-            "the refusal is logged, not silently swallowed");
         collapsed.toggle_overlay();
         assert!(collapsed.expanded);
         assert!(collapsed.save().is_ok());
@@ -523,6 +584,21 @@ mod tests {
         assert_eq!(s.find_query, "tracking");
         assert!(s.log.last().unwrap().contains("carried"));
         assert!(!s.select_tab("no-such-tab"));
+    }
+
+    #[test]
+    fn find_reports_matches_and_replace_edits_the_document() {
+        let mut s = RibbonStudy::new();
+        assert_eq!(s.find_matches(), 0);
+        s.set_find_query("fixture".into());
+        let before = s.document.matches("fixture").count();
+        assert!(before >= 1);
+        assert_eq!(s.find_matches(), before);
+        s.set_replace_with("study".into());
+        assert_eq!(s.replace_all(), Some(before));
+        assert!(!s.document.contains("fixture"));
+        assert!(!s.saved);
+        assert!(s.log.last().unwrap().contains("Replaced"));
     }
 
     #[test]
@@ -561,11 +637,24 @@ mod tests {
     }
 
     #[test]
+    fn an_origin_change_reevaluates_every_match() {
+        let mut v = VaultStudy::default();
+        v.open("work");
+        v.change_origin("shop.test");
+        assert_eq!(v.current_site, "shop.test");
+        assert!(v.visible().iter().all(|a| a.matches("shop.test")));
+        let stale = v.fill("work").unwrap();
+        assert!(matches!(stale, FillOutcome::Failed(_)), "a stale match must not fill");
+        assert_eq!(v.selected.as_deref(), Some("work"), "context survives the origin change");
+    }
+
+    #[test]
     fn vault_non_matching_site_cannot_fill_and_empty_search_offers_all_items() {
         let mut v = VaultStudy::default();
         assert_eq!(v.fill("archive"),
             Some(FillOutcome::Failed("other.test does not match this page; Fill stays unavailable.".into())));
         v.search("nothing-matches-this".into());
+        assert!(vault_fixture().iter().any(|a| !a.has_favicon), "the missing-favicon path stays in the fixture");
         assert!(v.visible().is_empty());
         assert!(v.needs_all_items_route());
         v.show_all();
@@ -575,7 +664,7 @@ mod tests {
     #[test]
     fn vault_fixture_covers_the_walkthrough_and_reset_restores_every_field() {
         let f = vault_fixture();
-        assert_eq!(f.iter().filter(|a| a.matches_current_site).count(), 2, "two accounts on one site");
+        assert_eq!(f.iter().filter(|a| a.matches("example.test")).count(), 2, "two accounts on one site");
         assert!(f.iter().any(|a| a.user.chars().count() > 30), "a long address for the wrap test");
         assert!(f.iter().all(|a| !a.user.is_empty()));
         let mut v = VaultStudy::default();

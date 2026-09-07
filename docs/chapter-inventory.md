@@ -19,7 +19,10 @@ that changed the chapter.
 Labels on evidence everywhere else mean: **observed** (measured from a real
 surface), **reconstructed** (redrawn to teach; invented content), **proposed**
 (a design offered for comment), **verified** (a claim re-checked against the
-artifact on a stated date).
+artifact on a stated date). Per the 2026-09-07 advisor review: these labels
+attach to individual CLAIMS, not merely to sections — prose that asserts
+without a label is asserting by tone, and a reviewer may demand the label on
+any sentence.
 
 Edition stamps: every book carries `edition <date> · rev <n>` under its
 heading. A critique names the edition it reviews; an accepted critique bumps
@@ -31,21 +34,21 @@ the rev and links the verification.
 |---|---|---|---|
 | Start here | layer ladder, consultation, pixel habit, status labels, reading order | `front matter` | — |
 | Foundations | semantic colour, typography, relationships | `front matter` (token SSOT: `npm/design-tokens.json`) | — |
-| Component gallery | yggui + schema + emd index; live row appendix | `front matter` + `working specimen` (list-row rows) | Remaining vocabulary is indexed, not exhibited; per-component chapters graduate into their own books |
+| Component gallery | yggui + schema + emd index; live row appendix | `front matter` + `legacy illustration` (the appendix is host-painted schema rows, not a component mini-app) | Remaining vocabulary is indexed, not exhibited; per-component chapters graduate into their own books |
 | Catalogue | forms rail, emd reader, live editor, notebook page | `front matter` + observed pixels | Screenshots are evidence, not specimens; they seed future chapters |
 | Sidebars | row vocabulary · status vocabulary · partitioning · header anatomy · chrome behaviour · proving | `working specimen` (row engine, via the live row appendix and Worked examples) · rest `legacy illustration` | vault-study.svg is reconstructed; partition/header chapters want in-host specimens |
-| Forms & settings | section cards · short-phrase rule · one field skin · stored value · control choices | short-phrase rule `reviewed reference` (the fixed yggterm Settings rail; accepted before/after pair 2026-08-28) · rest `legacy illustration` | Field skin and stored-value want a live field specimen |
+| Forms & settings | section cards · short-phrase rule · one field skin · stored value · control choices | short-phrase rule `legacy illustration` + `observed` evidence (the fix landed on the real yggterm rail with an accepted before/after pair 2026-08-28 — but no book-hosted specimen or edition-linked critique, so not `reviewed reference`) · rest `legacy illustration` | Field skin and stored-value want a live field specimen |
 | Motion & feedback | durations · toasts · stage curtain · blink clock · auto-hide chrome · proving | `legacy illustration` (with observed evidence recorded in yggterm's history) | Motion needs its burst-screenshot specimen per rule |
 | emd & notebooks | the model · contracts · worked example · notebooks pattern · left-ruler demand | worked example `working specimen` (the fence renders live) · rest `front matter` | Left-ruler: demanded, see Roadmap |
-| Worked examples (Examples mode) | Live Sessions anatomy · partitioned sidebar · the comparison loop | `working specimen` (schema rows, host-painted) | Schema-level, not component-level; conversion waits for the mounting path |
+| Worked examples (Examples mode) | Live Sessions anatomy · partitioned sidebar · the comparison loop | `legacy illustration` (host-painted schema state exercises, per the advisor review — not component mini-apps) | Conversion waits for the mounting path |
 | Roadmap | demands, review additions, filed defects | `front matter` (ledger) | — |
-| Ribbons | rejected vs proposed anatomy · keyboard · review jobs · specimen | `working specimen` (staging: `specimens/` RibbonStudy — pinned/collapsed save paths, carried find query, variant reset; registry `specimens/specimens.json`) · in-host rows `legacy illustration` | Shared ribbon renderer change; then the consumer capture + keyboard test |
-| Complex sidebars | identity anatomy · one job per level · action counting · walkthrough · specimen · verification | `working specimen` (staging: `specimens/` VaultStudy — search, matching-first list, details/back focus, fill outcome, failed fill keeps context; registry `specimens/specimens.json`) · measured row 264×38 recorded | Shared row renderer + real vault flows; locked/sync/unsaved states still prose |
+| Ribbons | rejected vs proposed anatomy · keyboard · review jobs · specimen | `working specimen` (staging: `specimens/` RibbonStudy — pinned one-click save with caret-preservation proof, collapsed refusal, live Find count + real Replace, arrow-key tabs, carried find query, fair same-commands comparison, variant reset; registry `specimens/specimens.json`) · in-host rows `legacy illustration` | Shared ribbon renderer change; then the consumer capture |
+| Complex sidebars | identity anatomy · one job per level · action counting · walkthrough · specimen · verification | `working specimen` (staging: `specimens/` VaultStudy — derived-origin matching with an origin-change control, favicon + letter-fallback identity, non-nested row semantics, Escape sharing the Back focus path, fill outcome, failed fill keeps context; registry `specimens/specimens.json`) · measured row 264×38 recorded | Shared row renderer + real vault flows; locked/sync/unsaved states stay explicitly out of the specimen's claims |
 | List views | contents-page failure · three lists · editorial anatomy · interaction · mini-app · gates | `working specimen` (staging: `specimens/` ChapterList, deterministic fixtures + reset + critique draft) · in-host page `legacy illustration` | Mount the specimen inline; the renderer repair in yggterm-shell is the owner's pending change |
 | Icons | crispness recipe · the crate · arrows defect · specimens | `working specimen` (renders from `yggui-icons` in the host gallery) | Reviewed pending: a pixel pass at 12/14/16/20 px |
 | Inheritance | the base chain, override scope | `front matter` (governance) | — |
 | ZCode reversed | what ZCode is · measured anatomy · colour system · Dioxus path | `working specimen` (external: mini-lab.gour.top, registry `zcodereversed/design/specimens.json`) · colour/anatomy claims `observed` | External while the mounting path is unresolved; reviewed pending per chapter |
-| (retired) Iconfont → Icons | — | merged into **Icons** 2026-09-07 | The iconfont proposal became the `yggui-icons` crate; the decision record lives in Icons §"Why not a font" |
+| (retired) Iconfont → Icons | — | merged into **Icons** 2026-09-07 | The proposal became the `yggui-icons` crate; the decision record lives in Icons §"Why not a font". The retired `iconfont` id is deep-link-safe: stale ids fall back to the mode home (schema-tested) |
 
 ## Registered project layers (L3, read through the registry)
 

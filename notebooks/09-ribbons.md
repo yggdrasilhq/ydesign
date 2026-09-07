@@ -101,17 +101,23 @@ build: `bash scripts/build-specimens.sh`.
 
 The staging study implements the book's own review table as state, not prose:
 
-- **Save, then keep typing.** Pinned: Save is one click, the document flips
-  to saved, and focus returns to the text. Collapsed: Save is REFUSED with
-  the reason named ("expand first — two clicks"), the way the review table
-  says a design must not silently widen.
-- **Find, then replace.** Find and Replace share one group; the find query is
-  a real field that SURVIVES a tab change — a query that disappears on tab
-  change is a reject condition, and the study carries it and says so in the
-  log.
-- **Discover an unfamiliar command.** The proposed band renders group
-  captions under grouped commands; the rejected variant renders the same
-  commands as a sparse floating panel with two saturated buttons.
+- **Save, then keep typing.** Pinned: Save is one click; the study then
+  refocuses the document, restores the exact caret position, and LOGS the
+  observed position — a focus proof, not a claim. Collapsed: Save is REFUSED
+  with the reason named ("expand first — two clicks"), the way the review
+  table says a design must not silently widen.
+- **Find, then replace.** Find and Replace share one group and do the real
+  job: Find reports its live match count in the document; Replace rewrites
+  every occurrence, marks the document unsaved, and reports the count. The
+  find query SURVIVES a tab change — a query that disappears on tab change
+  is a reject condition, and the study carries it and says so in the log.
+- **Keyboard.** Arrow keys move between tabs; Tab/Enter reach every command;
+  Escape closes the temporary panel; focus returns to the editor and the
+  caret position is restored and reported (verified in the study's log).
+- **Discover an unfamiliar command.** The rejected variant renders the SAME
+  active-tab commands as the proposed band — ungrouped, floating, two
+  saturated buttons — so the comparison differs by composition alone, from
+  the same starting state.
 - **Switching variants resets** to that anatomy's default and logs it — never
   a silent comparison from different starting states. Reset restores the
   document fixture, saved state, find query, log and critique draft.

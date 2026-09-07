@@ -196,7 +196,15 @@ fn RibbonStudyPage() -> Element {
                 }
             }
             div { class: if rejected { "ribbon rejected" } else { "ribbon" },
-                div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs",
+                div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs (arrow keys move)",
+                    tabindex: "0",
+                    onkeydown: move |evt: KeyboardEvent| {
+                        match evt.key() {
+                            Key::ArrowRight => { ribbon_step(&mut study, 1); }
+                            Key::ArrowLeft => { ribbon_step(&mut study, -1); }
+                            _ => {}
+                        }
+                    },
                     for (id, label) in ribbon_tabs() {
                         button {
                             class: "ribbon-tab",
@@ -210,14 +218,16 @@ fn RibbonStudyPage() -> Element {
                 if show_band {
                     if rejected {
                         div { class: "ribbon-panel rejected-panel", role: "group", aria_label: "Commands (rejected composition)",
-                            for (id, label, kind) in flat_commands() {
-                                button {
-                                    class: if kind == CommandKind::Primary { "command primary" } else { "command" },
-                                    onclick: move |_| ribbon_command(&mut study, id),
-                                    "{label}"
+                            for group in state.active_tab_groups() {
+                                for command in group.commands {
+                                    button {
+                                        class: if command.kind == CommandKind::Primary { "command primary" } else { "command" },
+                                        onclick: move |_| ribbon_command(&mut study, command.id),
+                                        "{command.label}"
+                                    }
                                 }
                             }
-                            span { class: "panel-note", "Four commands, no groups, floating — the panel reads as a dialog over the text." }
+                            span { class: "panel-note", "The SAME commands, ungrouped and floating — only the composition differs." }
                         }
                     } else {
                         div { class: "ribbon-band", role: "group", aria_label: "Grouped commands",
@@ -240,6 +250,23 @@ fn RibbonStudyPage() -> Element {
                                                 value: "{state.find_query}",
                                                 oninput: move |e| study.write().set_find_query(e.value()),
                                             }
+                                            button {
+                                                class: "command",
+                                                onclick: move |_| {
+                                                    let n = study.read().find_matches();
+                                                    study.write().log.push(format!("Find: {n} match(es) in the document."));
+                                                },
+                                                "Find ({state.find_matches()})"
+                                            }
+                                            input {
+                                                class: "find-field",
+                                                r#type: "text",
+                                                placeholder: "Replace with",
+                                                aria_label: "Replace with",
+                                                value: "{state.replace_with}",
+                                                oninput: move |e| study.write().set_replace_with(e.value()),
+                                            }
+                                            button { class: "command", onclick: move |_| { study.write().replace_all(); }, "Replace all" }
                                         }
                                     }
                                     span { class: "ribbon-caption", "{group.label}" }
@@ -277,23 +304,22 @@ fn RibbonStudyPage() -> Element {
     }
 }
 
+/// Arrow keys move between tabs; the roving order is the fixture order.
+fn ribbon_step(study: &mut Signal<RibbonStudy>, dir: i32) {
+    let tabs = ["home", "review"];
+    let current = study.read().active_tab.clone();
+    let index = tabs.iter().position(|t| *t == current).unwrap_or(0);
+    let next = ((index as i32 + dir).rem_euclid(tabs.len() as i32)) as usize;
+    let _ = study.write().select_tab(tabs[next]);
+}
+
 fn ribbon_tabs() -> Vec<(&'static str, &'static str)> {
     ribbon_fixture().into_iter().map(|t| (t.id, t.label)).collect()
 }
 
-fn flat_commands() -> Vec<(&'static str, &'static str, CommandKind)> {
-    let mut out = Vec::new();
-    for tab in ribbon_fixture() {
-        for group in tab.groups {
-            for c in group.commands {
-                out.push((c.id, c.label, c.kind));
-            }
-        }
-    }
-    out
-}
-
 fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
+    // Signals are Copy: own a copy for the spawned task so no borrow escapes.
+    let mut owned = *study;
     match id {
         "save" => {
             // The save guard must drop before the refusal is logged.
@@ -301,9 +327,17 @@ fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
             if let Err(reason) = result {
                 study.write().log.push(reason.into());
             }
+            // The focus proof: refocus the document, restore the exact caret
+            // position, and report it — an observed result, not a claim.
             spawn(async move {
-                let script = "requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('ribbon-doc')?.focus()));";
-                let _ = document::eval(script).await;
+                let script = "requestAnimationFrame(() => requestAnimationFrame(() => { const el = document.getElementById('ribbon-doc'); if (el) { const pos = el.selectionStart ?? 0; el.focus(); el.setSelectionRange(pos, pos); window.__ribbonCaret = pos; } }));";
+                let _ = document::eval(&script).await;
+                let pos = document::eval("window.__ribbonCaret ?? -1").await.ok()
+                    .and_then(|v| v.as_i64())
+                    .unwrap_or(-1);
+                if pos >= 0 {
+                    owned.write().log.push(format!("Focus is back in the document; caret preserved at {pos}."));
+                }
             });
         }
         "spellcheck" => study.write().log.push("Spelling toggled (a toggle command, not a state jump).".into()),
@@ -312,6 +346,17 @@ fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
 }
 
 // ─── Study 03 — complex sidebars (the vault) ────────────────────────────────
+
+/// Keyboard and pointer Back share ONE restoration path: close details and
+/// return focus to the entry the reader came from.
+fn vault_back(study: &mut Signal<VaultStudy>) {
+    let id = study.read().last_selected.clone().unwrap_or_default();
+    study.write().back();
+    spawn(async move {
+        let script = format!("requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('vault-row-{id}')?.focus()));");
+        let _ = document::eval(&script).await;
+    });
+}
 
 #[component]
 fn VaultStudyPage() -> Element {
@@ -333,7 +378,13 @@ fn VaultStudyPage() -> Element {
             if inspect() {
                 aside { class: "inspector", aria_label: "Study controls",
                     label { input { r#type: "checkbox", checked: state.simulate_failure, onchange: move |e| study.write().simulate_failure = e.checked() } "Simulate a failed fill" }
-                    p { "Scenario: two accounts on example.test (the recognition test), a non-matching pair, one long address. Fill reports its outcome; failure keeps the selection and the page." }
+                    fieldset { class: "radio-row",
+                        legend { "Current page origin" }
+                        for site in ["example.test", "shop.test", "other.test"] {
+                            label { input { r#type: "radio", name: "origin", checked: state.current_site == site, onchange: move |_| study.write().change_origin(site) } "{site}" }
+                        }
+                    }
+                    p { "Scenario: two accounts on example.test (the recognition test), a non-matching pair, one long address, favicon and letter-fallback marks. Changing the origin re-evaluates every match. Fill reports its outcome; failure keeps the selection and the page." }
                 }
             }
             p { class: "scenario", aria_label: "Current page", "Current page: example.test" }
@@ -342,18 +393,14 @@ fn VaultStudyPage() -> Element {
                     class: "vault-details",
                     aria_label: "Account details",
                     onkeydown: move |evt: KeyboardEvent| {
-                        if evt.key() == Key::Escape { study.write().back(); }
+                        if evt.key() == Key::Escape {
+                            evt.stop_propagation();
+                            vault_back(&mut study);
+                        }
                     },
                     button {
                         id: "back-to-vault-list",
-                        onclick: move |_| {
-                            let id = study.read().last_selected.clone().unwrap_or_default();
-                            study.write().back();
-                            spawn(async move {
-                                let script = format!("requestAnimationFrame(() => requestAnimationFrame(() => document.getElementById('vault-row-{id}')?.focus()));");
-                                let _ = document::eval(&script).await;
-                            });
-                        },
+                        onclick: move |_| vault_back(&mut study),
                         "← Back to accounts"
                     }
                     p { class: "status", "Escape also returns, with focus restored to the entry you came from." }
@@ -361,9 +408,13 @@ fn VaultStudyPage() -> Element {
                     dl { class: "vault-facts",
                         div { dt { "Account" } dd { "{account.user}" } }
                         div { dt { "Credential" } dd { "{account.credential.label()}" } }
-                        div { dt { "Matches this page" } dd { if account.matches_current_site { "Yes" } else { "No" } } }
+                        div { dt { "Matches this page" } dd { if account.matches(study.read().current_site) { "Yes" } else { "No" } } }
                     }
-                    button { class: "command primary", onclick: move |_| { study.write().fill(account.id); }, "Fill on this page" }
+                    if account.matches(study.read().current_site) {
+                        button { class: "command primary", onclick: move |_| { study.write().fill(account.id); }, "Fill on this page" }
+                    } else {
+                        p { class: "status", "{account.site} does not match this page; Fill is not offered here." }
+                    }
                 }
             } else {
                 div { class: "vault-search",
@@ -381,24 +432,29 @@ fn VaultStudyPage() -> Element {
                 ul { class: "vault-list", aria_label: "Accounts",
                     for account in visible {
                         li {
-                            button {
-                                id: "vault-row-{account.id}",
-                                class: "vault-row",
-                                onclick: move |_| { let _ = study.write().open(account.id); },
-                                span { class: "vault-mark", aria_hidden: "true", "{account.mark()}" }
-                                span { class: "vault-copy",
-                                    span { class: "vault-site", "{account.site}" }
-                                    span { class: "vault-user", "{account.user}" }
+                            div { class: "vault-row",
+                                button {
+                                    id: "vault-row-{account.id}",
+                                    class: "vault-open",
+                                    title: "Open {account.site} details",
+                                    onclick: move |_| { let _ = study.write().open(account.id); },
+                                    span {
+                                        class: if account.has_favicon { "vault-mark favicon" } else { "vault-mark" },
+                                        style: if account.has_favicon { "background:{account.mark_color}" } else { "" },
+                                        aria_hidden: "true",
+                                        if account.has_favicon { "" } else { "{account.mark()}" }
+                                    }
+                                    span { class: "vault-copy",
+                                        span { class: "vault-site", "{account.site}" }
+                                        span { class: "vault-user", "{account.user}" }
+                                    }
+                                    span { class: "vault-credential", "{account.credential.label()}" }
                                 }
-                                span { class: "vault-credential", "{account.credential.label()}" }
-                                if account.matches_current_site {
+                                if account.matches(study.read().current_site) {
                                     button {
                                         class: "command vault-fill",
                                         title: "Fill this account into the page",
-                                        onclick: move |evt: MouseEvent| {
-                                            evt.stop_propagation();
-                                            study.write().fill(account.id);
-                                        },
+                                        onclick: move |_| { study.write().fill(account.id); },
                                         "Fill"
                                     }
                                 }
