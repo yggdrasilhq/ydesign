@@ -112,6 +112,13 @@ pub fn base_notebooks() -> Vec<Notebook> {
         .unwrap_or(0);
     let shipped: &[(&str, &str, &str, &str, &str)] = &[
         (
+            "list-views",
+            MODE_GUIDE,
+            "List views — alignment and reading rhythm",
+            "Editorial contents, navigation rails and operational rows: one family, distinct purposes.",
+            include_str!("../notebooks/15-list-views.md"),
+        ),
+        (
             "foundations",
             MODE_GUIDE,
             "Foundations — the visual language",

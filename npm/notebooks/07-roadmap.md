@@ -23,6 +23,12 @@ it first — visibly, here, so the next app finds it instead of reinventing it.
 
 ## Notebook review additions
 
+The contents-page list mismatch is diagnosed in **List views**: Markdown and
+document rows use independent width/margin rules, iconless rows reserve an
+empty icon slot, and rail-density typography is applied to editorial content.
+The required repair is a shared context-aware list layout, not a TOC offset.
+Its actual Dioxus specimen and renderer repair remain pending.
+
 | Finding | Owner and acceptance | State |
 |---|---|---|
 | Detached ribbon panel, dark tab slab and weak command groups | Shared ribbon renderer; continuous shell tabs, explicit pinned/temporary modes, grouped commands, keyboard and pixel proof | Proposed anatomy in Ribbons; component change pending |
