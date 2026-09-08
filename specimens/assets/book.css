@@ -112,31 +112,47 @@ fieldset.radio-row legend{font-size:13px;color:#52666f;padding:0}
 .document-area{margin:20px 0}
 .document-area textarea{width:100%;padding:12px;font:inherit;line-height:1.6;border:1px solid #b8c9cd;border-radius:6px}
 .log{font-size:13px;color:#52666f;line-height:1.7}
-/* vault */
-
-.vault-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.vault-search input{flex:1;min-width:220px;min-height:38px;padding:8px 12px;border:1px solid #b8c9cd;border-radius:6px;font:inherit}
+/* vault — designed by gpt-6-astra (consult 0004, LOW, 39.1k tok incl. the
+   mock render): hairline-separated rows (no cards), 32px identity marks with
+   letter fallback, credential chips, accent Fill, dashed-rule failure outcome
+   that reads as kept context. Mock: mock.png beside the chain entry.
+   zcode/GLM wired it to the study classes. */
+.reading{--ink:#24343b;--muted:#52666f;--hover:#f3f6f5;--accent:#265f63;--paper:#fff;--line:color-mix(in srgb,var(--ink) 16%,var(--paper));--soft:color-mix(in srgb,var(--accent) 9%,var(--paper));--pressed:color-mix(in srgb,var(--accent) 16%,var(--paper));--accent-hover:color-mix(in srgb,var(--accent) 86%,var(--ink));--accent-press:color-mix(in srgb,var(--accent) 65%,var(--ink))}
+.vault-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.vault-search input{width:100%;min-width:0;min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);font:inherit;color:inherit}
+.vault-search input::placeholder{color:var(--muted);opacity:1}
+.vault-search input:focus{outline:2px solid var(--accent);outline-offset:2px}
 .vault-list{list-style:none;padding:0;margin:0}
-.vault-row{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid transparent;border-radius:8px;padding:10px 12px;background:none}
-.vault-row:hover{background:#f0f6f5}
-.vault-mark{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;background:#dcebe9;font-weight:650}
-.vault-copy{display:flex;flex-direction:column;min-width:0}
-.vault-site{font-weight:600;font-size:14.5px}
-.vault-user{font-size:13px;color:#52666f;overflow-wrap:anywhere}
-.vault-credential{font-size:12px;color:#52666f}
-.vault-fill{min-height:32px;padding:4px 12px}
-.vault-empty{padding:14px;color:#52666f;font-size:14px}
-.vault-details{border:1px solid #dce5e5;border-radius:8px;padding:18px}
-.vault-facts{display:grid;gap:8px;margin:14px 0}
-.vault-facts div{display:flex;gap:12px}
-.vault-facts dt{min-width:150px;color:#52666f;font-size:13px}
-.vault-facts dd{margin:0;font-size:14px;overflow-wrap:anywhere}
-.outcome{font-size:14px;margin-top:14px}
-.outcome-ok{color:#1c7a4f}
-.outcome-fail{color:#b03030}
-
-.vault-row div.vault-row{display:grid}
-.vault-open{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid transparent;border-radius:8px;padding:10px 12px;background:none;min-width:0}
-.vault-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
-.vault-row .vault-fill{min-height:36px}
-.vault-mark.favicon{border-radius:7px;border:1px solid rgba(24,35,47,.12)}
+.vault-list>li+li{border-top:1px solid var(--line)}
+.vault-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px 0;border-radius:7px}
+.vault-open{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:9px;align-items:start;min-width:0;width:100%;padding:10px 6px;border:0;border-radius:6px;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer;min-height:36px;touch-action:manipulation}
+.vault-open:hover,.command:hover,#back-to-vault-list:hover{background:var(--hover)}
+.vault-open:active,.command:active,#back-to-vault-list:active{background:var(--pressed);box-shadow:inset 0 0 0 1px var(--line)}
+.vault-open:focus-visible,#back-to-vault-list:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vault-mark{display:grid;place-items:center;width:32px;height:32px;border-radius:6px;background:var(--soft);color:var(--accent);font-size:17px;font-weight:650}
+.vault-mark.favicon{overflow:hidden;background:var(--paper);box-shadow:inset 0 0 0 1px var(--line)}
+.vault-mark img{display:block;width:32px;height:32px;object-fit:contain}
+.vault-copy{display:flex;flex-direction:column;min-width:0;gap:3px}
+.vault-site{font-size:14px;font-weight:650;overflow-wrap:anywhere}
+.vault-user{font-size:12px;color:var(--muted);overflow-wrap:anywhere;white-space:normal}
+.vault-credential{font-size:10px;font-weight:550;color:var(--muted);background:var(--hover);border-radius:3px;padding:2px 5px;margin-top:2px}
+.command.primary,.command.vault-fill{color:var(--paper);background:var(--accent);border-color:transparent}
+.command.primary:hover,.command.vault-fill:hover{background:var(--accent-hover)}
+.command.primary:active,.command.vault-fill:active{background:var(--accent-press)}
+.vault-fill{align-self:center;padding-inline:12px}
+.vault-empty{padding:14px 12px;border-left:2px solid var(--line);background:var(--hover);color:var(--muted);font-size:13px}
+.vault-empty strong{color:var(--ink);font-weight:600;display:block}
+.vault-details{padding:16px;border:1px solid var(--line);border-radius:8px}
+#back-to-vault-list{border-color:transparent;padding-left:0;color:var(--accent);background:none;font-size:12px;font-weight:600;min-height:36px}
+.status{color:var(--muted);font-size:12px;margin:6px 0 0;overflow-wrap:anywhere}
+.vault-details h3{font-size:20px;letter-spacing:-.025em;margin:20px 0 14px;overflow-wrap:anywhere}
+.vault-facts{margin:0 0 18px;display:grid;gap:12px}
+.vault-facts div{display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px}
+.vault-facts dt{color:var(--muted);font-size:12px}
+.vault-facts dd{margin:0;font-size:13px;overflow-wrap:anywhere}
+.vault-details .primary{width:100%;min-height:40px}
+.outcome{font-size:12px;padding:10px 12px;margin:14px 0 0;overflow-wrap:anywhere}
+.outcome-ok{color:var(--accent);background:var(--soft);border-left:2px solid var(--accent)}
+.outcome-fail{color:var(--ink);background:var(--hover);border-left:2px dashed var(--muted)}
+.outcome-fail strong{font-weight:650}
+@media(max-width:360px){.vault-open{gap:6px}.vault-facts div{grid-template-columns:1fr;gap:3px}}

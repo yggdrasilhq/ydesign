@@ -475,7 +475,7 @@ fn VaultStudyPage() -> Element {
                         }
                     }
                     if visible_is_empty {
-                        li { class: "vault-empty", "No account matches this page. Search, or take the explicit all-items route above — never a blank rail." }
+                        li { class: "vault-empty", strong { "No account matches this page." } "Search, or take the explicit all-items route above — never a blank rail." }
                     }
                 }
             }
