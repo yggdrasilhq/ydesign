@@ -24,9 +24,14 @@ h1{font-size:var(--contents-heading-size);font-weight:700;line-height:1.2;letter
 .status{font-size:13px;line-height:1.5;color:#52666f}
 .tools{display:flex;gap:12px;margin:24px 0 40px}
 button,summary{font:inherit;cursor:pointer}
-button{min-height:40px;border:1px solid #b8c9cd;border-radius:6px;background:#fff;color:inherit;padding:8px 14px}
-button:hover{background:#edf5f3}
-button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #216d81;outline-offset:3px}
+/* Button base — derived from Astra's recorded command treatment (chain 0003,
+   component-class:editor-ribbon) WITHOUT a live consult: the first latent-only
+   derivation. 36px target, 3px radius, token tones over the established
+   palette; component-specific rules (ribbon commands, vault, sessions) refine. */
+button{min-height:36px;border:1px solid color-mix(in srgb,#52666f 44%,#fff);border-radius:3px;background:#fff;color:inherit;padding:6px 13px;font-weight:500;touch-action:manipulation}
+button:hover{background:#f3f6f5}
+button:active{background:color-mix(in srgb,#265f63 13%,#fff)}
+button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #265f63;outline-offset:1px}
 h2{font-size:25px;letter-spacing:-.02em;margin:0 0 20px}
 /* Editorial contents list — the consultant's rules, one shared grid:
    the container owns horizontal alignment; rows carry no gutters of their
