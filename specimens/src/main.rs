@@ -195,8 +195,8 @@ fn RibbonStudyPage() -> Element {
                     p { "Switching anatomy resets to that anatomy's default — the two are never silently compared from different states." }
                 }
             }
-            div { class: if rejected { "ribbon rejected" } else { "ribbon" },
-                div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs (arrow keys move)",
+            div { class: if rejected { "ribbon rejected" } else if state.pinned { "ribbon pinned" } else { "ribbon temporary" },
+                                    div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs (arrow keys move)",
                     tabindex: "0",
                     onkeydown: move |evt: KeyboardEvent| {
                         match evt.key() {
@@ -215,6 +215,15 @@ fn RibbonStudyPage() -> Element {
                         }
                     }
                 }
+                if !rejected && !state.pinned {
+                    button {
+                        class: "command",
+                        aria_expanded: "{state.expanded}",
+                        aria_controls: "ribbon-band",
+                        onclick: move |_| study.write().toggle_overlay(),
+                        if state.expanded { "Hide commands" } else { "Show commands" }
+                    }
+                }
                 if show_band {
                     if rejected {
                         div { class: "ribbon-panel rejected-panel", role: "group", aria_label: "Commands (rejected composition)",
@@ -230,13 +239,14 @@ fn RibbonStudyPage() -> Element {
                             span { class: "panel-note", "The SAME commands, ungrouped and floating — only the composition differs." }
                         }
                     } else {
-                        div { class: "ribbon-band", role: "group", aria_label: "Grouped commands",
+                        div { class: "ribbon-band", id: "ribbon-band", role: "group", aria_label: "Grouped commands",
                             for group in state.active_tab_groups() {
                                 div { class: "ribbon-group",
                                     div { class: "ribbon-commands",
                                         for command in group.commands {
                                             button {
                                                 class: if command.kind == CommandKind::Primary { "command primary" } else if command.kind == CommandKind::Toggle { "command toggle" } else { "command" },
+                                                aria_pressed: if state.toggled.iter().any(|t| t == command.id) { "true" } else { "false" },
                                                 onclick: move |_| ribbon_command(&mut study, command.id),
                                                 "{command.label}"
                                             }
@@ -340,7 +350,10 @@ fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
                 }
             });
         }
-        "spellcheck" => study.write().log.push("Spelling toggled (a toggle command, not a state jump).".into()),
+        "spellcheck" => {
+            study.write().toggle_command("spellcheck");
+            study.write().log.push("Spelling toggled (a toggle command, not a state jump).".into())
+        }
         other => study.write().log.push(format!("{other} opened its group workflow (Find and Replace stay together).").into()),
     }
 }

@@ -153,12 +153,12 @@ pub fn ribbon_fixture() -> Vec<RibbonTab> {
             id: "home",
             label: "Home",
             groups: vec![
-                RibbonGroup { label: "Document", commands: vec![
-                    RibbonCommand { id: "save", label: "Save", kind: CommandKind::Primary },
-                ]},
                 RibbonGroup { label: "Find", commands: vec![
                     RibbonCommand { id: "find", label: "Find", kind: CommandKind::Ordinary },
                     RibbonCommand { id: "replace", label: "Replace", kind: CommandKind::Ordinary },
+                ]},
+                RibbonGroup { label: "Document", commands: vec![
+                    RibbonCommand { id: "save", label: "Save", kind: CommandKind::Primary },
                 ]},
             ],
         },
@@ -184,6 +184,8 @@ pub struct RibbonStudy {
     pub active_tab: String,
     pub document: String,
     pub saved: bool,
+    /// Real on/off state for Toggle commands; aria_pressed renders it.
+    pub toggled: Vec<String>,
     /// The find query survives tab changes in the proposed anatomy — a query
     /// that disappears on tab change is a reject condition in the book.
     pub find_query: String,
@@ -205,6 +207,7 @@ impl RibbonStudy {
             active_tab: "home".into(),
             document: Self::document_fixture().into(),
             saved: true,
+            toggled: Vec::new(),
             find_query: String::new(),
             replace_with: String::new(),
             log: vec!["Pinned ribbon, Home tab, document saved.".into()],
@@ -242,6 +245,16 @@ impl RibbonStudy {
         } else {
             "Collapsed: the band is closed; opening it is temporary.".into()
         });
+    }
+
+    /// Toggle commands carry real state; the design renders ON as an accent
+    /// tint with an inset rule, OFF as the routine command.
+    pub fn toggle_command(&mut self, id: &str) {
+        if let Some(pos) = self.toggled.iter().position(|t| t == id) {
+            self.toggled.remove(pos);
+        } else {
+            self.toggled.push(id.to_string());
+        }
     }
 
     pub fn toggle_overlay(&mut self) {
