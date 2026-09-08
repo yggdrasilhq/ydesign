@@ -1,11 +1,26 @@
+/* Specimen demo styles. The editorial contents list (and the container place
+   it stages) is the consultant's design: gpt-6-astra via codex exec, LOW
+   effort, 2026-09-08 — wireframe + tokens returned verbatim, wired to these
+   class names by zcode/GLM. Consult chain: lores/chain-of-thought/
+   0002-ydesign-toc-list-astra.md; board: research/advisors. */
 :root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#24343b;background:#edf3f2;font-synthesis:none}
 *{box-sizing:border-box}
 body{margin:0}
-.book{max-width:1040px;min-height:100vh;margin:0 auto;padding:64px 72px;background:#fff}
-.book.narrow{max-width:520px;padding:40px 24px}
+/* The container owns width, gutter and every editorial token. The list
+   component never adds a second max-width. */
+.book{
+  --contents-width:880px;--contents-gutter:28px;--contents-paper:#fff;
+  --contents-ink:#24343b;--contents-muted:#52666f;--contents-accent:#265f63;--contents-hover:#f3f6f5;
+  --contents-heading-size:clamp(1.75rem,4vw,2rem);--contents-body-size:1rem;
+  --contents-title-size:1.125rem;--contents-description-size:.9375rem;--contents-ordinal-size:.8125rem;
+  --contents-heading-gap:16px;--contents-list-gap:18px;
+  --chapter-padding-block:14px;--chapter-copy-gap:4px;--chapter-ordinal-width:2.25ch;--chapter-column-gap:16px;
+  --chapter-current-rule-width:2px;--chapter-current-rule-gap:.25em;
+  max-width:var(--contents-width);min-height:100vh;margin:0 auto;padding:48px var(--contents-gutter);background:var(--contents-paper);color:var(--contents-ink)}
+.book.narrow{--contents-gutter:24px;max-width:520px;padding:40px var(--contents-gutter)}
 .eyebrow{font-size:12px;letter-spacing:.13em;font-weight:650;color:#526b6e}
-h1{font-size:clamp(32px,4vw,48px);letter-spacing:-.035em;line-height:1.1;margin:22px 0}
-.lede{font-size:19px;line-height:1.6;max-width:56ch}
+h1{font-size:var(--contents-heading-size);font-weight:700;line-height:1.2;letter-spacing:-.025em;margin:22px 0 var(--contents-heading-gap);overflow-wrap:anywhere}
+.lede{font-size:var(--contents-body-size);line-height:1.7;max-width:66ch;color:var(--contents-muted);overflow-wrap:anywhere}
 .status{font-size:13px;line-height:1.5;color:#52666f}
 .tools{display:flex;gap:12px;margin:24px 0 40px}
 button,summary{font:inherit;cursor:pointer}
@@ -13,17 +28,27 @@ button{min-height:40px;border:1px solid #b8c9cd;border-radius:6px;background:#ff
 button:hover{background:#edf5f3}
 button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #216d81;outline-offset:3px}
 h2{font-size:25px;letter-spacing:-.02em;margin:0 0 20px}
-.chapter-list{list-style:none;padding:0;margin:0}
-.chapter-list li{margin:0}
-.chapter-link{display:grid;grid-template-columns:2.5ch minmax(0,1fr);gap:16px;width:100%;text-align:left;border:0;border-radius:4px;padding:12px 0;line-height:1.45}
-.ordinal{font-variant-numeric:tabular-nums;color:#52666f;font-size:14px;padding-top:3px}
-.chapter-copy{display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
-.chapter-title{font-size:17px;font-weight:600}
-.chapter-description{font-size:14px;color:#52666f;font-weight:400}
-.compact .chapter-link{padding:8px 0}
-.compact .chapter-title{font-size:14px}
-.compact .chapter-description{font-size:12px}
-.chapter-link[aria-current=page]{background:#eaf3f1}
+/* Editorial contents list — the consultant's rules, one shared grid:
+   the container owns horizontal alignment; rows carry no gutters of their
+   own, and no icon slot exists to be accidentally empty. */
+.chapter-list{display:grid;list-style:none;margin:var(--contents-list-gap) 0 0;padding:0}
+.chapter-list>li{min-width:0;margin:0;padding:0}
+.chapter-link{display:grid;grid-template-columns:var(--chapter-ordinal-width) minmax(0,1fr);column-gap:var(--chapter-column-gap);align-items:baseline;width:100%;text-align:left;border:0;border-radius:2px;background:none;padding:var(--chapter-padding-block) 0;color:inherit;font:inherit;line-height:1.45}
+.ordinal{color:var(--contents-muted);font-size:var(--contents-ordinal-size);font-weight:400;font-variant-numeric:tabular-nums lining-nums;line-height:1.5;text-align:end}
+.chapter-copy{display:grid;gap:var(--chapter-copy-gap);min-width:0}
+.chapter-title{font-size:var(--contents-title-size);font-weight:700;line-height:1.4;letter-spacing:-.01em;overflow-wrap:anywhere;text-decoration-thickness:1px;text-underline-offset:.2em}
+.chapter-description{max-width:68ch;color:var(--contents-muted);font-size:var(--contents-description-size);line-height:1.6;overflow-wrap:anywhere}
+@media(hover:hover){.chapter-link:hover{background:var(--contents-hover)}
+.chapter-link:hover .chapter-title{color:var(--contents-accent);text-decoration-line:underline}}
+.chapter-link:focus-visible{background:var(--contents-hover);outline:2px solid var(--contents-accent);outline-offset:4px}
+.chapter-link:focus-visible .chapter-title{color:var(--contents-accent);text-decoration-line:underline}
+/* Current chapter reads as where you are: accent ink + rule, never a card. */
+.chapter-link[aria-current=page] .ordinal{color:var(--contents-accent);font-weight:700}
+.chapter-link[aria-current=page] .chapter-title{color:var(--contents-accent);text-decoration-line:underline;text-decoration-thickness:var(--chapter-current-rule-width);text-underline-offset:var(--chapter-current-rule-gap)}
+/* Compact density: same anatomy, quieter and smaller. */
+.chapter-list.compact{--contents-list-gap:12px;--contents-title-size:.875rem;--contents-description-size:.8125rem;--contents-ordinal-size:.75rem;--chapter-padding-block:10px;--chapter-copy-gap:2px;--chapter-column-gap:12px}
+.chapter-list.compact .chapter-link{min-height:44px}
+.chapter-list.compact .chapter-description{line-height:1.5}
 .inspector{padding:20px;margin-bottom:32px;background:#f2f6f5;border-radius:6px}
 .inspector label{display:inline-flex;gap:8px;align-items:center;margin:0 20px 12px 0;min-height:32px}
 .inspector p,footer p{font-size:13px;line-height:1.5;color:#52666f}
@@ -33,7 +58,7 @@ footer{margin-top:40px;padding-top:24px;border-top:1px solid #dce5e5}
 summary{min-height:40px;padding:8px 0}
 footer label{display:block;margin:16px 0 8px}
 textarea{width:100%;min-height:96px;padding:12px;font:inherit;line-height:1.5;border:1px solid #b8c9cd;border-radius:6px}
-@media(max-width:640px){.book{padding:32px 24px}.tools{margin-bottom:28px}.chapter-link{gap:12px}}
+@media(max-width:640px){.book{padding:32px 24px}.tools{margin-bottom:28px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 /* studies */
 .study-switcher{display:flex;gap:8px;margin:20px 0 8px;flex-wrap:wrap}

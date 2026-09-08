@@ -54,12 +54,17 @@ in a documented gutter. Never get the gutter accidentally from a missing icon.
 An absent icon has no reserved slot unless the entire list requires alignment
 with other rows that genuinely have icons.
 
-Initial editorial token proposal: title 17px, description 14px, line-height
-1.45, row block padding 12px, ordinal column 2.5ch, column gap 16px. These
-values are starting points for live critique, not proven universal constants.
-Use shared typography and spacing tokens when implementing them. Long titles
-and descriptions wrap; row height follows content. Do not use ellipsis to
-hide the words that distinguish chapters.
+The editorial tokens are the consultant's, not the wiring seat's
+(gpt-6-astra via codex exec at LOW effort, consulted 2026-09-08; chain entry
+`lores/chain-of-thought/0002-ydesign-toc-list-astra.md`): title 18px/700,
+description 15px, ordinal 13px tabular and right-aligned, list gap 18px,
+row padding 14px block, ordinal column 2.25ch, column gap 16px, accent
+#265f63, hover #f3f6f5. The current chapter reads by accent ink and a 2px
+underline rule — never a card. They live as custom properties in
+`specimens/assets/book.css` and remain starting values for live pixel
+critique, not constants. Long titles and descriptions wrap; row height
+follows content. Do not use ellipsis to hide the words that distinguish
+chapters.
 
 Keep the resting page quiet. Avoid a stack of cards, persistent arrows,
 decorative badges and heavy separators. A subtle hover treatment and a clear
