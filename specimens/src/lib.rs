@@ -686,3 +686,151 @@ mod tests {
         assert!(v == VaultStudy::default());
     }
 }
+
+// ─── Live sessions — the most-watched rail, honest at rest ──────────────────
+
+/// Durability: green = survives the app, blue = lives only while it does,
+/// empty slot = nothing to say. Distinct from the live/idle status dot.
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
+pub enum Durability {
+    #[default]
+    Survives,
+    Transient,
+    None,
+}
+
+impl Durability {
+    pub fn class(self) -> &'static str {
+        match self { Durability::Survives => "survives", Durability::Transient => "transient", Durability::None => "none" }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            Durability::Survives => "survives the app",
+            Durability::Transient => "lives only while the app does",
+            Durability::None => "nothing to say",
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SessionEntry {
+    pub id: &'static str,
+    pub title: &'static str,
+    pub live: bool,
+    pub durability: Durability,
+    pub minutes: usize,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct SessionGroup {
+    pub hash: &'static str,
+    pub count: usize,
+    pub rows: Vec<SessionEntry>,
+}
+
+/// Deterministic fixture per the Worked-examples doctrine: one group header
+/// with a trailing count, and rows covering live/idle, all three durability
+/// states, and a title long enough to force ellipsis.
+pub fn sessions_fixture() -> Vec<SessionGroup> {
+    vec![SessionGroup {
+        hash: "#local",
+        count: 3,
+        rows: vec![
+            SessionEntry { id: "probe", title: "trace-fixing — ytrace probe sweep on the attach path", live: true, durability: Durability::Survives, minutes: 2 },
+            SessionEntry { id: "icons", title: "practice L3 icons", live: true, durability: Durability::Transient, minutes: 14 },
+            SessionEntry { id: "archive", title: "a very long session title that must ellipsize to make room for the verbs and never push the trailing edge around", live: false, durability: Durability::None, minutes: 183 },
+        ],
+    }]
+}
+
+#[derive(Clone, PartialEq, Default)]
+pub struct SessionsStudy {
+    pub selected: Option<String>,
+    pub killed: Vec<String>,
+}
+
+impl SessionsStudy {
+    pub fn select(&mut self, id: &str) { self.selected = Some(id.into()); }
+    /// Kill is a real action with a real outcome; the row leaves the rail and
+    /// the group count follows.
+    pub fn kill(&mut self, id: &str) -> bool {
+        if self.killed.iter().any(|k| k == id) { return false; }
+        self.killed.push(id.into());
+        if self.selected.as_deref() == Some(id) { self.selected = None; }
+        true
+    }
+    pub fn visible(&self) -> Vec<SessionGroup> {
+        sessions_fixture().into_iter().map(|mut g| {
+            g.rows.retain(|r| !self.killed.iter().any(|k| k == r.id));
+            g.count = g.rows.len();
+            g
+        }).filter(|g| !g.rows.is_empty()).collect()
+    }
+    pub fn review_text(&self) -> String {
+        let visible = self.visible();
+        let rows: usize = visible.iter().map(|g| g.rows.len()).sum();
+        format!(
+            "selected: {:?}; killed: {:?}; groups: {}; rows visible: {}",
+            self.selected, self.killed, visible.len(), rows
+        )
+    }
+}
+
+/// One rail of live sessions. The status spine is continuous through every
+/// row; the title track owns the row at rest; actions exist only on
+/// hover/selected/focus-within; the count rides the group header's edge.
+#[component]
+pub fn SessionList(
+    groups: Vec<SessionGroup>,
+    selected: Option<String>,
+    on_select: EventHandler<String>,
+    on_kill: EventHandler<String>,
+) -> Element {
+    rsx! {
+        ul { class: "sess-list", aria_label: "Live sessions",
+            for group in groups.iter() {
+                li { class: "sess-group-header", key: "{group.hash}",
+                span { class: "sess-hash", "#{group.hash.trim_start_matches('#')}" }
+                span { class: "sess-count", "{group.count}" }
+            }
+            for row in group.rows.iter() {
+                li {
+                    key: "{row.id}",
+                    class: "sess-row",
+                    aria_selected: if selected.as_deref() == Some(row.id) { "true" } else { "false" },
+                    tabindex: "0",
+                    onclick: {
+                        let id = row.id;
+                        move |_| on_select.call(id.to_string())
+                    },
+                    span {
+                        class: if row.live { "sess-status live" } else { "sess-status idle" },
+                        aria_label: if row.live { "live" } else { "idle" },
+                    }
+                    span { class: "sess-title", "{row.title}" }
+                    span {
+                        class: "sess-durability {row.durability.class()}",
+                        aria_label: "{row.durability.label()}",
+                    }
+                    span { class: "sess-time", "{row.minutes}m" }
+                    span { class: "sess-actions",
+                        button {
+                            class: "sess-act",
+                            aria_label: "Kill session",
+                            title: "Kill session",
+                            onclick: {
+                                let id = row.id;
+                                move |e: Event<MouseData>| {
+                                    e.stop_propagation();
+                                    on_kill.call(id.to_string());
+                                }
+                            },
+                            "×"
+                        }
+                        }
+                    }
+                }
+            }
+        }
+        }
+    }

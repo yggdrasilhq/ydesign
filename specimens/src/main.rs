@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ydesign_specimens::{
-    fixtures, ribbon_fixture, vault_fixture, Anatomy, ChapterList, CommandKind, FillOutcome,
-    ListDensity, RibbonStudy, Study, VaultStudy,
+    fixtures, ribbon_fixture, vault_fixture, Anatomy, ChapterList, CommandKind,
+    FillOutcome, ListDensity, RibbonStudy, SessionList, SessionsStudy, Study, VaultStudy,
 };
 
 fn main() { dioxus::launch(App); }
@@ -11,17 +11,19 @@ enum StudyKind {
     List,
     Ribbon,
     Vault,
+    Sessions,
 }
 
 impl StudyKind {
     fn label(self) -> &'static str {
-        match self { StudyKind::List => "List views", StudyKind::Ribbon => "Ribbons", StudyKind::Vault => "Complex sidebars" }
+        match self { StudyKind::List => "List views", StudyKind::Ribbon => "Ribbons", StudyKind::Vault => "Complex sidebars", StudyKind::Sessions => "Live sessions" }
     }
     fn eyebrow(self) -> &'static str {
         match self {
             StudyKind::List => "WORKING STUDY 01",
             StudyKind::Ribbon => "WORKING STUDY 02",
             StudyKind::Vault => "WORKING STUDY 03",
+            StudyKind::Sessions => "WORKING STUDY 04",
         }
     }
     fn title(self) -> &'static str {
@@ -29,6 +31,7 @@ impl StudyKind {
             StudyKind::List => "A list worth reading.",
             StudyKind::Ribbon => "Commands that belong to the workspace.",
             StudyKind::Vault => "The next action, made obvious.",
+            StudyKind::Sessions => "The most-watched surface, honest at rest.",
         }
     }
     fn lede(self) -> &'static str {
@@ -36,6 +39,7 @@ impl StudyKind {
             StudyKind::List => "One column. Clear chapter identities. Enough room to read before choosing.",
             StudyKind::Ribbon => "Tabs name tasks, groups gather commands, and Save stays one click when pinned.",
             StudyKind::Vault => "Recognize the identity, act without precision pointing, and return with your place intact.",
+            StudyKind::Sessions => "One status spine, a title track that owns the row, and verbs only when wanted.",
         }
     }
 }
@@ -51,7 +55,7 @@ fn App() -> Element {
                 h1 { "ydesign working studies." }
                 p { class: "lede", "Three interactive component studies with deterministic fixtures, a complete reset, and a critique reference. The shared renderers they teach remain their owners' pending changes." }
                 nav { class: "study-switcher", aria_label: "Studies",
-                    for kind in [StudyKind::List, StudyKind::Ribbon, StudyKind::Vault] {
+                    for kind in [StudyKind::List, StudyKind::Ribbon, StudyKind::Vault, StudyKind::Sessions] {
                         button {
                             class: "study-tab",
                             aria_current: if study() == kind { "page" } else { "false" },
@@ -65,6 +69,7 @@ fn App() -> Element {
                 StudyKind::List => rsx! { ListStudyPage {} },
                 StudyKind::Ribbon => rsx! { RibbonStudyPage {} },
                 StudyKind::Vault => rsx! { VaultStudyPage {} },
+            StudyKind::Sessions => rsx! { SessionsStudyPage {} },
             }
         }
     }
@@ -492,6 +497,38 @@ fn VaultStudyPage() -> Element {
             value: state.critique.clone(),
             oninput: move |v: String| study.write().critique = v,
             review_text: review,
+        }
+    }
+}
+
+// ─── Study 04 — live sessions (the most-watched rail) ───────────────────────
+
+#[component]
+fn SessionsStudyPage() -> Element {
+    let mut study = use_signal(SessionsStudy::default);
+    let mut inspect = use_signal(|| false);
+    let state = study.read().clone();
+    let review = state.review_text();
+    let visible = state.visible();
+    rsx! {
+        section { class: "reading", aria_label: "Live sessions study",
+            StudyHeader { kind: StudyKind::Sessions }
+            div { class: "tools",
+                button { onclick: move |_| inspect.toggle(), aria_expanded: "{inspect}", "Inspect study" }
+                button { onclick: move |_| { study.write().killed.clear(); study.write().selected = None; inspect.set(false); }, "Reset" }
+            }
+            if inspect() {
+                aside { class: "inspector", aria_label: "Study controls",
+                    p { "Kill is a real action: the row leaves the rail and the group count follows. The status spine stays unbroken through live, idle, and killed rows. Actions exist only on hover, selection, or focus-within — never at rest." }
+                    pre { "{review}" }
+                }
+            }
+            SessionList {
+                groups: visible,
+                selected: state.selected,
+                on_select: move |id: String| { study.write().select(&id); },
+                on_kill: move |id: String| { study.write().kill(&id); },
+            }
         }
     }
 }

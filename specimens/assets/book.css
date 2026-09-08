@@ -156,3 +156,82 @@ fieldset.radio-row legend{font-size:13px;color:#52666f;padding:0}
 .outcome-fail{color:var(--ink);background:var(--hover);border-left:2px dashed var(--muted)}
 .outcome-fail strong{font-weight:650}
 @media(max-width:360px){.vault-open{gap:6px}.vault-facts div{grid-template-columns:1fr;gap:3px}}
+/* live-sessions rail — designed by gpt-6-astra (consult 0005, LOW, 36.2k tok incl. mock):
+   unbroken status spine in a fixed gutter, title track owns the row, actions
+   revealed on hover/selected/focus-within, durability dots, trailing count
+   badges. Mock: mocks/0005-sessions-mock.png. zcode/GLM wired. */
+.sess-list {
+  --ink: #24343b;
+  --muted: #52666f;
+  --hover: #f3f6f5;
+  --accent: #265f63;
+  --paper: #fff;
+  --selected: color-mix(in srgb, var(--accent) 11%, var(--paper));
+  --rule: color-mix(in srgb, var(--muted) 22%, var(--paper));
+  --action-hover: color-mix(in srgb, var(--accent) 12%, var(--paper));
+  --action-press: color-mix(in srgb, var(--accent) 22%, var(--paper));
+  --durable: #398354;
+  --transient: #397cad;
+  --row-height: 28px;
+  --gutter: 24px;
+  font: 12px/1.35 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+.sess-list { width: 360px; max-width: 100%; margin: 0; padding: 4px 0; list-style: none; }
+.sess-group-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 28px; padding: 0 8px 0 var(--gutter); color: var(--muted);
+}
+.sess-hash { font-weight: 600; }
+.sess-count {
+  min-width: 20px; padding: 1px 5px; border-radius: 4px;
+  background: var(--hover); text-align: center; font-variant-numeric: tabular-nums;
+}
+/* Fixed status gutter; actions consume zero width at rest. */
+.sess-row {
+  position: relative; display: flex; align-items: center;
+  height: var(--row-height); padding-right: 8px; outline: none;
+}
+.sess-row::before {
+  content: ""; position: absolute; inset: 0 0 0 var(--gutter);
+  border-radius: 3px; pointer-events: none; z-index: 0;
+}
+.sess-row > * { position: relative; z-index: 1; }
+.sess-row:hover::before { background: var(--hover); }
+.sess-row[aria-selected="true"]::before {
+  background: var(--selected); box-shadow: inset 2px 0 var(--accent);
+}
+.sess-row:focus-within::before { outline: 1px solid var(--accent); outline-offset: -1px; }
+/* A continuous one-pixel spine survives live, idle, and empty slots. */
+.sess-status { flex: 0 0 var(--gutter); height: 100%; }
+.sess-status::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 11px;
+  width: 1px; background: var(--rule);
+}
+.sess-status::after {
+  content: ""; position: absolute; width: 5px; height: 5px;
+  left: 9px; top: calc(50% - 2.5px); border-radius: 50%;
+}
+.sess-status.live::after { background: var(--accent); }
+.sess-status.idle::after { background: var(--paper); border: 1px solid var(--muted); }
+/* No modifier (or .none) leaves just the spine. */
+.sess-title {
+  flex: 1 1 0; min-width: 0; padding-left: 7px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.sess-durability { flex: 0 0 5px; height: 5px; margin-left: 8px; border-radius: 50%; }
+.sess-durability.survives { background: var(--durable); }
+.sess-durability.transient { background: var(--transient); }
+.sess-durability.none { background: transparent; }
+.sess-time { flex: 0 0 30px; margin-left: 6px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sess-actions { display: none; flex: 0 0 auto; align-items: center; gap: 2px; margin-left: 4px; }
+.sess-row:is(:hover, [aria-selected="true"], :focus-within) .sess-actions { display: flex; }
+.sess-act {
+  display: grid; place-items: center; width: 24px; height: 24px;
+  padding: 0; border: 0; border-radius: 3px; background: transparent;
+  color: var(--muted); font: inherit; font-size: 18px; line-height: 1; cursor: pointer;
+}
+.sess-act:hover { color: var(--ink); background: var(--action-hover); }
+.sess-act:active { color: var(--accent); background: var(--action-press); }
+.sess-act:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; }

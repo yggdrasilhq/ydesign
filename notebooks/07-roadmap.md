@@ -18,7 +18,7 @@ it first — visibly, here, so the next app finds it instead of reinventing it.
 
 | Demand | Who needs it | Layer that grows | State |
 |---|---|---|---|
-| **Mini-app conversions still owed** — Live Sessions row anatomy, the ychrome sidebar, the ychrome vault sidebar (as the Complex-sidebars working example) | every document app | own chapters with real mini-apps (studies exist; the shared row/renderer pieces their hosts own) | Named by the owner 2026-09-08 |
+| **Mini-app conversions still owed** — Live Sessions row anatomy, the ychrome sidebar, the ychrome vault sidebar (as the Complex-sidebars working example) | every document app | own chapters with real mini-apps (studies exist; the shared row/renderer pieces their hosts own) | Row anatomy DESIGNED (gpt-6-astra, chain 0005, mock 0005-sessions-mock.png) and staged as specimen study 04; host-renderer conversion still pending |
 | **Left-ruler scroll component** — marks on a vertical rail (user turns in a transcript; months/years in a photo library; headings as bookmarks) | transcripts, media, readers | `yggui` — one component owning rail geometry; hosts supply `{offset, depth, label}` | Spec'd (see *emd & notebooks*); first host lands it |
 | **Plot-quality charts** — ggplot2/plotly-grade statistical plots as components | telemetry notebooks, analytics | emd `plot` grows facets/scales; the renderer owns layout | `plot` exists (line/area/bar/point/step); quality bar tracked here |
 | **Full-width devtools mini-app** — a network-timing inspector as one notebook block, scrollable, reusable | web development inside notebooks | emd component composed of `panel` + `datagrid` + `plot`, driven live by a document-version refresh | Demanded |
