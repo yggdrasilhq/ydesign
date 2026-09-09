@@ -240,3 +240,186 @@ fieldset.radio-row legend{font-size:13px;color:#52666f;padding:0}
 .sess-act:hover { color: var(--ink); background: var(--action-hover); }
 .sess-act:active { color: var(--accent); background: var(--action-press); }
 .sess-act:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; }
+/* list-table — designed by gpt-6-astra (chain 0007, mock-first: mock.png approved
+   by the owner before construction). Contained interactive list-table, Socket-list
+   reference: trailing chevron controls, hairline dividers, accent current rule.
+   zcode/GLM wired (tokens scoped to the component; mock page shell dropped). */
+.list-table {
+  --lt-ink: #24343b;
+  --lt-muted: #52666f;
+  --lt-hover: #f3f6f5;
+  --lt-accent: #265f63;
+  --lt-paper: #fff;
+  --lt-canvas: color-mix(in srgb, var(--lt-hover) 40%, var(--lt-paper));
+  --lt-border: color-mix(in srgb, var(--lt-muted) 24%, var(--lt-paper));
+  --lt-divider: color-mix(in srgb, var(--lt-muted) 18%, var(--lt-paper));
+  --lt-control: color-mix(in srgb, var(--lt-hover) 65%, var(--lt-paper));
+  --lt-control-border: color-mix(in srgb, var(--lt-muted) 29%, var(--lt-paper));
+  --lt-press: color-mix(in srgb, var(--lt-accent) 10%, var(--lt-paper));
+  --lt-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Optional contents-page shell: 824px card at the mock's 1000px viewport. */
+.contents-page {
+  box-sizing: border-box;
+  width: min(824px, calc(100% - 48px));
+  margin: 42px auto 70px;
+  color: var(--lt-ink);
+  font-family: var(--lt-font);
+}
+.contents-page h1 {
+  margin: 0 0 14px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.6px;
+}
+.contents-page > p {
+  margin: 0 0 32px;
+  color: var(--lt-muted);
+  font-size: 16px;
+  line-height: 27px;
+  box-sizing: border-box;
+}
+.list-table {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--lt-border);
+  border-radius: 12px;
+  background: var(--lt-paper);
+  color: var(--lt-ink);
+  font-family: var(--lt-font);
+}
+.list-table__item {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.list-table__item + .list-table__item {
+  border-top: 1px solid var(--lt-divider);
+}
+.list-table__open {
+  position: relative;
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+  width: 100%;
+  min-height: 63px;
+  margin: 0;
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.list-table__item:first-child > .list-table__open {
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
+}
+.list-table__item:last-child > .list-table__open {
+  border-bottom-left-radius: 11px;
+  border-bottom-right-radius: 11px;
+}
+.list-table__ordinal {
+  color: var(--lt-muted);
+  font-size: 12px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.list-table__copy { display: block; min-width: 0; }
+.list-table__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+}
+.list-table__title {
+  min-width: 0;
+  max-width: 600px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+}
+.list-table__current {
+  color: var(--lt-accent);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.list-table__description {
+  display: block;
+  margin-top: 2px;
+  color: var(--lt-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+}
+.list-table__trailing {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.list-table__chevron {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border: 1px solid var(--lt-control-border);
+  border-radius: 7px;
+  background: var(--lt-control);
+  color: var(--lt-muted);
+}
+.list-table__chevron svg { display: block; width: 16px; height: 16px; }
+.list-table__open[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 13px;
+  bottom: 13px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--lt-accent);
+}
+@media (hover: hover) {
+  .list-table__open:hover { background: var(--lt-hover); }
+  .list-table__open:hover .list-table__chevron {
+    border-color: color-mix(in srgb, var(--lt-accent) 42%, var(--lt-paper));
+    background: var(--lt-paper);
+    color: var(--lt-accent);
+  }
+}
+.list-table__open:active { background: var(--lt-press); }
+.list-table__open:active .list-table__chevron {
+  border-color: var(--lt-accent);
+  background: color-mix(in srgb, var(--lt-accent) 15%, var(--lt-paper));
+  color: var(--lt-accent);
+  transform: translateX(1px);
+}
+.list-table__open:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--lt-accent);
+  outline-offset: -3px;
+}
+.list-table__open:focus-visible .list-table__chevron {
+  border-color: var(--lt-accent);
+  background: var(--lt-paper);
+  color: var(--lt-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lt-accent) 18%, transparent);
+}
+@media (forced-colors: active) {
+  .list-table__open[aria-current="page"]::before { background: Highlight; }
+  .list-table__open:focus-visible { outline-color: Highlight; }
+}

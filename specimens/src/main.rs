@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ydesign_specimens::{
-    fixtures, ribbon_fixture, vault_fixture, Anatomy, ChapterList, CommandKind,
-    FillOutcome, ListDensity, RibbonStudy, SessionList, SessionsStudy, Study, VaultStudy,
+    fixtures, ribbon_fixture, vault_fixture, Anatomy, CommandKind, FillOutcome, ListTable,
+    RibbonStudy, SessionList, SessionsStudy, Study, VaultStudy,
 };
 
 fn main() { dioxus::launch(App); }
@@ -121,7 +121,6 @@ fn ListStudyPage() -> Element {
                 aside { class: "inspector", aria_label: "Study controls",
                     label { input { r#type: "checkbox", checked: state.long_labels, onchange: move |e| study.write().long_labels = e.checked() } "Long labels" }
                     label { input { r#type: "checkbox", checked: state.narrow, onchange: move |e| study.write().narrow = e.checked() } "Narrow column" }
-                    label { input { r#type: "checkbox", checked: state.compact, onchange: move |e| study.write().compact = e.checked() } "Compact density" }
                     p { "Compare density, not different data. Narrow column is a layout exercise, not browser zoom proof." }
                 }
             }
@@ -150,10 +149,9 @@ fn ListStudyPage() -> Element {
                     }
                 } else {
                     h3 { "Contents" }
-                    ChapterList {
-                        chapters: fixtures(state.long_labels),
+                    ListTable {
+                        rows: fixtures(state.long_labels),
                         current: state.last_opened.clone(),
-                        density: if state.compact { ListDensity::Compact } else { ListDensity::Editorial },
                         on_open: move |id: String| { study.write().open(&id); },
                     }
                 }

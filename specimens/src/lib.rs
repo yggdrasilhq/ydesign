@@ -9,67 +9,78 @@
 use dioxus::prelude::*;
 
 #[derive(Clone, PartialEq)]
-pub struct Chapter {
+pub struct ListRow {
     pub id: String,
+    /// Display-ready ordinal, e.g. "01".
+    pub ordinal: String,
     pub title: String,
     pub description: String,
 }
 
-#[derive(Clone, Copy, PartialEq, Default)]
-pub enum ListDensity {
-    #[default]
-    Editorial,
-    Compact,
-}
-
-/// The parent owns width and alignment. This component never adds a second
-/// max-width or reserves an icon slot for items that have no icon.
 #[component]
-pub fn ChapterList(
-    chapters: Vec<Chapter>,
+pub fn ListTable(
+    rows: Vec<ListRow>,
     on_open: EventHandler<String>,
     #[props(default)] current: Option<String>,
-    #[props(default)] density: ListDensity,
 ) -> Element {
-    let class = match density {
-        ListDensity::Editorial => "chapter-list editorial",
-        ListDensity::Compact => "chapter-list compact",
-    };
     rsx! {
-        ol { class,
-            for (index, chapter) in chapters.iter().enumerate() {
-                li { key: "{chapter.id}",
+        ol { class: "list-table",
+            for row in rows.iter() {
+                li { key: "{row.id}", class: "list-table__item",
                     button {
-                        id: "chapter-{chapter.id}",
-                        class: "chapter-link",
+                        class: "list-table__open",
                         r#type: "button",
-                        aria_current: if current.as_ref() == Some(&chapter.id) { "page" } else { "false" },
+                        aria_current: if current.as_ref() == Some(&row.id) { "page" } else { "false" },
                         onclick: {
-                            let id = chapter.id.clone();
+                            let id = row.id.clone();
                             move |_| on_open.call(id.clone())
                         },
-                        span { class: "ordinal", aria_hidden: "true", "{index + 1:02}" }
-                        span { class: "chapter-copy",
-                            span { class: "chapter-title", "{chapter.title}" }
-                            if !chapter.description.is_empty() {
-                                span { class: "chapter-description", "{chapter.description}" }
+                        span { class: "list-table__ordinal", aria_hidden: "true", "{row.ordinal}" }
+                        span { class: "list-table__copy",
+                            span { class: "list-table__heading",
+                                span { class: "list-table__title", "{row.title}" }
+                                if current.as_ref() == Some(&row.id) {
+                                    span { class: "list-table__current", "You are here" }
+                                }
+                            }
+                            if !row.description.is_empty() {
+                                span { class: "list-table__description", "{row.description}" }
+                            }
+                        }
+                        // One native keyboard target; the chevron is its visible control.
+                        span { class: "list-table__trailing", aria_hidden: "true",
+                            span { class: "list-table__chevron",
+                                svg {
+                                    view_box: "0 0 16 16",
+                                    fill: "none",
+                                    path {
+                                        d: "M6 3.5 10.5 8 6 12.5",
+                                        stroke: "currentColor",
+                                        stroke_width: "1.5",
+                                        stroke_linecap: "round",
+                                        stroke_linejoin: "round",
+                                    }
+                                }
                             }
                         }
                     }
+                    // Future independent actions belong beside the row button,
+                    // in this item, never nested inside the navigation button.
                 }
             }
         }
     }
 }
 
-pub fn fixtures(long: bool) -> Vec<Chapter> {
+pub fn fixtures(long: bool) -> Vec<ListRow> {
     let titles = [
         "Start with the person", "Color and material", "Typography",
         "List views", "Commands in context", "Forms", "Feedback",
         "Navigation", "Identity", "Motion", "Inheritance", "Review",
     ];
-    titles.iter().enumerate().map(|(i, title)| Chapter {
+    titles.iter().enumerate().map(|(i, title)| ListRow {
         id: format!("c{}", i + 1),
+        ordinal: format!("{:02}", i + 1),
         title: if long && i == 3 {
             "List views that remain readable when chapter titles need more than one line".into()
         } else { (*title).into() },
@@ -84,7 +95,6 @@ pub struct Study {
     pub selected: Option<String>,
     pub last_opened: Option<String>,
     pub long_labels: bool,
-    pub compact: bool,
     pub narrow: bool,
     pub critique: String,
 }
@@ -99,8 +109,8 @@ impl Study {
     pub fn back(&mut self) { self.selected = None; }
     pub fn reset(&mut self) { *self = Self::default(); }
     pub fn review_text(&self) -> String {
-        format!("Book: ydesign\nSpecimen: list-views/v1-proposal\nScenario: long={}, compact={}, narrow={}\nChapter: {}\nObservation: {}",
-            self.long_labels, self.compact, self.narrow,
+        format!("Book: ydesign\nSpecimen: list-views/v1-proposal\nScenario: long={}, narrow={}\nChapter: {}\nObservation: {}",
+            self.long_labels, self.narrow,
             self.last_opened.as_deref().unwrap_or("contents"), self.critique)
     }
 }
