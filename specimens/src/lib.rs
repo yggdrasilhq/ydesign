@@ -139,12 +139,17 @@ pub struct RibbonCommand {
     pub id: &'static str,
     pub label: &'static str,
     pub kind: CommandKind,
+    /// A disabled command is shown, never silent: the chip reads as real but
+    /// unavailable (the mock's Resolve).
+    pub disabled: bool,
 }
 
 #[derive(Clone, PartialEq)]
 pub struct RibbonGroup {
     pub label: &'static str,
     pub commands: Vec<RibbonCommand>,
+    /// The find group carries the observable find/replace workflow.
+    pub find: bool,
 }
 
 #[derive(Clone, PartialEq)]
@@ -163,12 +168,12 @@ pub fn ribbon_fixture() -> Vec<RibbonTab> {
             id: "home",
             label: "Home",
             groups: vec![
-                RibbonGroup { label: "Find", commands: vec![
-                    RibbonCommand { id: "find", label: "Find", kind: CommandKind::Ordinary },
-                    RibbonCommand { id: "replace", label: "Replace", kind: CommandKind::Ordinary },
+                RibbonGroup { label: "Find", find: true, commands: vec![
+                    RibbonCommand { id: "find", label: "Find", kind: CommandKind::Ordinary, disabled: false },
+                    RibbonCommand { id: "replace", label: "Replace", kind: CommandKind::Ordinary, disabled: false },
                 ]},
-                RibbonGroup { label: "Document", commands: vec![
-                    RibbonCommand { id: "save", label: "Save", kind: CommandKind::Primary },
+                RibbonGroup { label: "Document", find: false, commands: vec![
+                    RibbonCommand { id: "save", label: "Save", kind: CommandKind::Primary, disabled: false },
                 ]},
             ],
         },
@@ -176,8 +181,9 @@ pub fn ribbon_fixture() -> Vec<RibbonTab> {
             id: "review",
             label: "Review",
             groups: vec![
-                RibbonGroup { label: "Proofing", commands: vec![
-                    RibbonCommand { id: "spellcheck", label: "Spelling", kind: CommandKind::Toggle },
+                RibbonGroup { label: "Proofing", find: false, commands: vec![
+                    RibbonCommand { id: "spellcheck", label: "Spelling", kind: CommandKind::Toggle, disabled: false },
+                    RibbonCommand { id: "resolve", label: "Resolve", kind: CommandKind::Ordinary, disabled: true },
                 ]},
             ],
         },
@@ -844,3 +850,183 @@ pub fn SessionList(
         }
         }
     }
+
+// ─── RibbonView — the approved ribbon v2 (consult 0008, mock-first) ─────────
+
+/// The ribbon component proper: a tab strip of visible chips over one
+/// contained command band. Pinned shows the band always; temporary collapses
+/// it behind a visible Show-commands affordance. Toggle state and the
+/// find/replace workflow live in the model, never in the component.
+#[component]
+pub fn RibbonView(
+    tabs: Vec<RibbonTab>,
+    active: String,
+    pinned: bool,
+    expanded: bool,
+    toggled: Vec<String>,
+    find_value: String,
+    replace_value: String,
+    find_matches: usize,
+    on_tab: EventHandler<String>,
+    on_command: EventHandler<String>,
+    on_find: EventHandler<String>,
+    on_replace: EventHandler<String>,
+    on_toggle_pin: EventHandler<()>,
+    on_toggle_expand: EventHandler<()>,
+) -> Element {
+    let visible = pinned || expanded;
+    let chevron = if visible { "up" } else { "down" };
+    let show_label = if visible { "Hide commands" } else { "Show commands" };
+    let active_tab = tabs.iter().find(|tab| tab.id == active);
+    rsx! {
+        div { class: if visible { "ribbon" } else { "ribbon is-collapsed" },
+            div { class: "ribbon-tabs",
+                div { class: "ribbon-tab-list", role: "tablist", aria_label: "Ribbon tasks",
+                    for tab in &tabs {
+                        button {
+                            key: "{tab.id}", class: "ribbon-tab", r#type: "button", role: "tab",
+                            aria_selected: if tab.id == active { "true" } else { "false" },
+                            onclick: {
+                                let id = tab.id.to_string();
+                                move |_| on_tab.call(id.clone())
+                            },
+                            "{tab.label}"
+                        }
+                    }
+                }
+                div { class: "ribbon-mode-controls",
+                    if pinned {
+                        button { class: "unpin-control", r#type: "button",
+                            onclick: move |_| on_toggle_pin.call(()), "Unpin" }
+                    } else {
+                        if visible {
+                            button { class: "pin-control", r#type: "button",
+                                onclick: move |_| on_toggle_pin.call(()), "Pin" }
+                        }
+                        button { class: "show-commands", r#type: "button",
+                            aria_expanded: if visible { "true" } else { "false" },
+                            onclick: move |_| on_toggle_expand.call(()),
+                            CommandIcon { name: chevron }
+                            "{show_label}"
+                        }
+                    }
+                }
+            }
+            if visible {
+                div { class: "ribbon-band", role: "region", aria_label: "Commands",
+                    if let Some(tab) = active_tab {
+                        for group in &tab.groups {
+                            div {
+                                key: "{group.label}",
+                                class: if group.commands.iter().any(|c| c.kind == CommandKind::Primary) {
+                                    "ribbon-group has-primary"
+                                } else {
+                                    "ribbon-group"
+                                },
+                                role: "group", "aria-label": "{group.label}",
+                                div { class: "ribbon-commands",
+                                    for command in &group.commands {
+                                        RibbonCommandButton {
+                                            key: "{command.id}",
+                                            command_id: command.id,
+                                            label: command.label,
+                                            kind: command.kind,
+                                            disabled: command.disabled,
+                                            pressed: toggled.iter().any(|t| t == command.id),
+                                            on_command,
+                                        }
+                                    }
+                                    if group.find {
+                                        label { class: "find-field",
+                                            CommandIcon { name: "find" }
+                                            input {
+                                                r#type: "search",
+                                                placeholder: "Find in document",
+                                                aria_label: "Find in document",
+                                                value: "{find_value}",
+                                                oninput: move |e| on_find.call(e.value()),
+                                            }
+                                        }
+                                        button {
+                                            class: "command", r#type: "button",
+                                            onclick: move |_| on_command.call("find-now".into()),
+                                            "Find ({find_matches})"
+                                        }
+                                        input {
+                                            class: "replace-field",
+                                            r#type: "text",
+                                            placeholder: "Replace with",
+                                            aria_label: "Replace with",
+                                            value: "{replace_value}",
+                                            oninput: move |e| on_replace.call(e.value()),
+                                        }
+                                        button {
+                                            class: "command", r#type: "button",
+                                            onclick: move |_| on_command.call("replace-all".into()),
+                                            "Replace all"
+                                        }
+                                    }
+                                }
+                                div { class: "ribbon-caption", "{group.label}" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn RibbonCommandButton(
+    command_id: &'static str,
+    label: &'static str,
+    kind: CommandKind,
+    disabled: bool,
+    pressed: bool,
+    on_command: EventHandler<String>,
+) -> Element {
+    let class = match kind {
+        CommandKind::Primary => "command primary",
+        CommandKind::Toggle => "command toggle",
+        CommandKind::Ordinary => "command",
+    };
+    rsx! {
+        button {
+            class, r#type: "button",
+            disabled,
+            aria_pressed: if kind == CommandKind::Toggle { if pressed { "true" } else { "false" } } else { "" },
+            onclick: move |_| on_command.call(command_id.to_string()),
+            if kind == CommandKind::Toggle {
+                span { class: "toggle-switch", aria_hidden: "true",
+                    span { class: "toggle-thumb" }
+                }
+            } else {
+                CommandIcon { name: label }
+            }
+            "{label}"
+        }
+    }
+}
+
+/// Inline line-icon registry (the mock's icons). Unknown commands keep a
+/// text-only chip; the icon source notebook owns the family.
+#[component]
+fn CommandIcon(name: &'static str) -> Element {
+    let path = match name {
+        "open" => "M3 6h6l2 3h10v11H3z M3 6V4h6l2 2",
+        "find" => "M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14 M15 15l6 6",
+        "comment" => "M21 11a9 9 0 0 1-9 9c-2 0-3-.4-4-1L2 21l2-6a9 9 0 1 1 17-4z",
+        "save" => "M3 3h14l4 4v14H3z M7 3v7h10V3 M7 21v-8h10v8",
+        "down" => "M6 9l6 6 6-6",
+        "up" => "M6 15l6-6 6 6",
+        _ => "",
+    };
+    rsx! {
+        if !path.is_empty() {
+            svg { class: "command-icon", view_box: "0 0 24 24",
+                path { d: path }
+            }
+        }
+    }
+}

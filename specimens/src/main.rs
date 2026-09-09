@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use ydesign_specimens::{
     fixtures, ribbon_fixture, vault_fixture, Anatomy, CommandKind, FillOutcome, ListTable,
-    RibbonStudy, SessionList, SessionsStudy, Study, VaultStudy,
+    RibbonStudy, RibbonView, SessionList, SessionsStudy, Study, VaultStudy,
 };
 
 fn main() { dioxus::launch(App); }
@@ -199,7 +199,8 @@ fn RibbonStudyPage() -> Element {
                 }
             }
             div { class: if rejected { "ribbon rejected" } else if state.pinned { "ribbon pinned" } else { "ribbon temporary" },
-                                    div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs (arrow keys move)",
+                                    if rejected {
+                div { class: "ribbon-tabs", role: "tablist", aria_label: "Ribbon tabs (arrow keys move)",
                     tabindex: "0",
                     onkeydown: move |evt: KeyboardEvent| {
                         match evt.key() {
@@ -218,17 +219,7 @@ fn RibbonStudyPage() -> Element {
                         }
                     }
                 }
-                if !rejected && !state.pinned {
-                    button {
-                        class: "command",
-                        aria_expanded: "{state.expanded}",
-                        aria_controls: "ribbon-band",
-                        onclick: move |_| study.write().toggle_overlay(),
-                        if state.expanded { "Hide commands" } else { "Show commands" }
-                    }
-                }
-                if show_band {
-                    if rejected {
+                    if show_band {
                         div { class: "ribbon-panel rejected-panel", role: "group", aria_label: "Commands (rejected composition)",
                             for group in state.active_tab_groups() {
                                 for command in group.commands {
@@ -239,56 +230,28 @@ fn RibbonStudyPage() -> Element {
                                     }
                                 }
                             }
-                            span { class: "panel-note", "The SAME commands, ungrouped and floating — only the composition differs." }
+                                                    span { class: "panel-note", "The SAME commands, ungrouped and floating — only the composition differs." }
                         }
                     } else {
-                        div { class: "ribbon-band", id: "ribbon-band", role: "group", aria_label: "Grouped commands",
-                            for group in state.active_tab_groups() {
-                                div { class: "ribbon-group",
-                                    div { class: "ribbon-commands",
-                                        for command in group.commands {
-                                            button {
-                                                class: if command.kind == CommandKind::Primary { "command primary" } else if command.kind == CommandKind::Toggle { "command toggle" } else { "command" },
-                                                aria_pressed: if state.toggled.iter().any(|t| t == command.id) { "true" } else { "false" },
-                                                onclick: move |_| ribbon_command(&mut study, command.id),
-                                                "{command.label}"
-                                            }
-                                        }
-                                        if group.label == "Find" {
-                                            input {
-                                                class: "find-field",
-                                                r#type: "search",
-                                                placeholder: "Find in document",
-                                                aria_label: "Find in document",
-                                                value: "{state.find_query}",
-                                                oninput: move |e| study.write().set_find_query(e.value()),
-                                            }
-                                            button {
-                                                class: "command",
-                                                onclick: move |_| {
-                                                    let n = study.read().find_matches();
-                                                    study.write().log.push(format!("Find: {n} match(es) in the document."));
-                                                },
-                                                "Find ({state.find_matches()})"
-                                            }
-                                            input {
-                                                class: "find-field",
-                                                r#type: "text",
-                                                placeholder: "Replace with",
-                                                aria_label: "Replace with",
-                                                value: "{state.replace_with}",
-                                                oninput: move |e| study.write().set_replace_with(e.value()),
-                                            }
-                                            button { class: "command", onclick: move |_| { study.write().replace_all(); }, "Replace all" }
-                                        }
-                                    }
-                                    span { class: "ribbon-caption", "{group.label}" }
-                                }
-                            }
-                        }
+                        p { class: "panel-note", "The ribbon is collapsed. Its commands are inside the closed panel — try Save and watch the two-click path cost." }
                     }
                 } else {
-                    p { class: "panel-note", "The ribbon is collapsed. Its commands are inside the closed panel — try Save and watch the two-click path cost." }
+                    RibbonView {
+                        tabs: ribbon_fixture(),
+                        active: state.active_tab.clone(),
+                        pinned: state.pinned,
+                        expanded: state.expanded,
+                        toggled: state.toggled.clone(),
+                        find_value: state.find_query.clone(),
+                        replace_value: state.replace_with.clone(),
+                        find_matches: state.find_matches(),
+                        on_tab: move |id: String| { let _ = study.write().select_tab(&id); },
+                        on_command: move |id: String| ribbon_command(&mut study, &id),
+                        on_find: move |v: String| study.write().set_find_query(v),
+                        on_replace: move |v: String| study.write().set_replace_with(v),
+                        on_toggle_pin: move |_| { let next = !study.read().pinned; study.write().pinned = next; },
+                        on_toggle_expand: move |_| study.write().toggle_overlay(),
+                    }
                 }
             }
             div { class: "document-area",
@@ -330,7 +293,7 @@ fn ribbon_tabs() -> Vec<(&'static str, &'static str)> {
     ribbon_fixture().into_iter().map(|t| (t.id, t.label)).collect()
 }
 
-fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &'static str) {
+fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &str) {
     // Signals are Copy: own a copy for the spawned task so no borrow escapes.
     let mut owned = *study;
     match id {
