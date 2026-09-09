@@ -19,6 +19,13 @@ Consult your own layer; fall through to the layer below when undefined; when
 the layer below lacks a component, **grow the lower layer** — never a local
 hand-roll. Judge every visual decision from a **pixel screenshot**.
 
+## Quick start
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/yggdrasilhq/yggterm/main/scripts/install.sh | sh
+ynpx @ygghq/ydesign
+```
+
 ## The notebooks
 
 | Notebook | What it covers |

@@ -1,0 +1,58 @@
+{
+  "name": "@ygghq/ydesign",
+  "version": "0.1.1",
+  "description": "ydesign - the yggdrasilhq build, delivered by ynpm",
+  "bin": {
+    "ydesign": "bin/ydesign"
+  },
+  "files": [
+    "bin/",
+    "finalize.mjs"
+  ],
+  "optionalDependencies": {
+    "@ygghq/ydesign-linux-x64": "0.1.1",
+    "@ygghq/ydesign-linux-arm64": "0.1.1",
+    "@ygghq/ydesign-darwin-x64": "0.1.1",
+    "@ygghq/ydesign-darwin-arm64": "0.1.1",
+    "@ygghq/ydesign-win32-x64": "0.1.1",
+    "@ygghq/ydesign-win32-arm64": "0.1.1"
+  },
+  "scripts": {
+    "postinstall": "node ./finalize.mjs"
+  },
+  "yggterm": {
+    "app": {
+      "name": "ydesign",
+      "label": "Ydesign",
+      "icon": "",
+      "binary": "ydesign",
+      "verbs": [
+        {
+          "id": "new",
+          "label": "New Ydesign",
+          "args": [],
+          "row_spawn": true
+        }
+      ],
+      "context_menu": {
+        "enabled": true,
+        "contexts": [
+          "workspace",
+          "session"
+        ],
+        "verbs": [
+          "new"
+        ]
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yggdrasilhq/ydesign.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
