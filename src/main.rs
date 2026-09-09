@@ -9,7 +9,6 @@
 //! layer when it lacks a component, and argue every visual judgement from a
 //! pixel screenshot.
 
-mod manifest;
 mod notebook;
 mod osc;
 mod persist;
@@ -94,8 +93,6 @@ fn main() -> Result<()> {
         shelf_load.elapsed().as_millis() as f64,
         json!({"project_notebooks": notebooks}),
     );
-    manifest::write_best_effort();
-
     if let Some(id) = args.notebook {
         return server::print_notebook(id.trim(), args.page);
     }
