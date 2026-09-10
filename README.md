@@ -23,7 +23,7 @@ hand-roll. Judge every visual decision from a **pixel screenshot**.
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/yggdrasilhq/yggterm/main/scripts/install.sh | sh
-ynpx @ygghq/ydesign
+ynpx @ygghq/ydesign-app
 ```
 
 ## The notebooks

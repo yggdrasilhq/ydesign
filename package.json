@@ -1,5 +1,5 @@
 {
-  "name": "@ygghq/ydesign",
+  "name": "@ygghq/ydesign-app",
   "version": "0.1.1",
   "description": "ydesign - the yggdrasilhq build, delivered by ynpm",
   "bin": {
@@ -10,17 +10,23 @@
     "finalize.mjs"
   ],
   "optionalDependencies": {
-    "@ygghq/ydesign-linux-x64": "0.1.1",
-    "@ygghq/ydesign-linux-arm64": "0.1.1",
-    "@ygghq/ydesign-darwin-x64": "0.1.1",
-    "@ygghq/ydesign-darwin-arm64": "0.1.1",
-    "@ygghq/ydesign-win32-x64": "0.1.1",
-    "@ygghq/ydesign-win32-arm64": "0.1.1"
+    "@ygghq/ydesign-app-linux-x64": "0.1.1",
+    "@ygghq/ydesign-app-linux-arm64": "0.1.1",
+    "@ygghq/ydesign-app-darwin-x64": "0.1.1",
+    "@ygghq/ydesign-app-darwin-arm64": "0.1.1",
+    "@ygghq/ydesign-app-win32-x64": "0.1.1",
+    "@ygghq/ydesign-app-win32-arm64": "0.1.1"
   },
   "scripts": {
     "postinstall": "node ./finalize.mjs"
   },
+  "ynpm": {
+    "build": "cargo build --release",
+    "bins": { "ydesign": "target/release/ydesign" },
+    "watch": "@ygghq/ydesign-app"
+  },
   "yggterm": {
+    "schema": 1,
     "app": {
       "name": "ydesign",
       "label": "Ydesign",
