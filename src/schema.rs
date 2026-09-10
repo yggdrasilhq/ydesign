@@ -1,8 +1,8 @@
-//! The widget schema, what yggterm paints in both Viewport and Rail surfaces.
+//! The widget schema — what yggterm paints in both Viewport and Rail surfaces.
 //!
 //! Rail: the notebook shelf, in reading order, with the mode switch in the
-//! titlebar. Viewport: the open page as a `markdown` widget, and, for the
-//! exhibition pages, a COMPOSED appendix of real widgets below the prose, so
+//! titlebar. Viewport: the open page as a `markdown` widget, and — for the
+//! exhibition pages — a COMPOSED appendix of real widgets below the prose, so
 //! a reader (human or agent) meets the components as painted controls, not
 //! only as text about them.
 
@@ -29,7 +29,7 @@ pub struct View {
 }
 
 impl View {
-    /// Every book of this mode, expanded. The shelf opens PRE-POPULATED,
+    /// Every book of this mode, expanded. The shelf opens PRE-POPULATED —
     /// all row groups and all their chapter rows are on the first paint, and
     /// collapsing a group is the reader's gesture, not the app's default.
     /// (Owner direction 2026-09-07: a one-group-at-a-time shelf reads as lazy
@@ -58,7 +58,7 @@ impl View {
             selected_book: Some("yggui".into()),
             expanded_books: Self::expanded_all(&mode),
             mode,
-            // ydesign opens on its home page, the language itself is the home
+            // ydesign opens on its home page — the language itself is the home
             // page, and there is no nameless view you reach by having selected
             // nothing.
             selected_notebook: Some(home.to_string()),
@@ -144,7 +144,6 @@ impl View {
             "study:back" => self.study_detail = false,
             "study:fill" | "study:save" => self.study_actions += 1,
             "study:toggle" => self.study_toggled = !self.study_toggled,
-            "study:tab" => self.study_tab = value.to_string(),
             "study:reset" => {
                 self.study_proposed = true;
                 self.study_detail = false;
@@ -153,22 +152,11 @@ impl View {
                 self.study_tab = "home".to_string();
                 self.study_toggled = false;
             }
+            other if other.starts_with("study:tab:") => {
+                self.study_tab = other.strip_prefix("study:tab:").unwrap_or("home").to_string();
+            }
             _ => return false,
         }
-        self.notice = Some(format!(
-            "Study: {} · {} · {} simulated commands",
-            if self.study_proposed {
-                "proposed"
-            } else {
-                "rejected"
-            },
-            if self.study_detail {
-                "entry details"
-            } else {
-                "list"
-            },
-            self.study_actions
-        ));
         true
     }
     pub fn select_mode(&mut self, mode: &str) -> bool {
@@ -269,21 +257,21 @@ pub fn viewport_view(view: &View) -> Value {
             .find(|b| &b.id == book_id)
     {
         widgets.push(json!({"kind":"markdown","id":"book-opening","source":format!(
-            "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nOpen a chapter below, every row acts, and the open chapter is marked. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
+            "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nOpen a chapter below — every row acts, and the open chapter is marked. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
             book.title)}));
-        // The interactive list-table (chain 0007): one contained card, hairline
-        // dividers, whole-row targets with a trailing Open affordance, and the
-        // open chapter marked, the host renderer paints these.
-        widgets.push(json!({"kind":"section","text":"Chapters","card":true}));
+        // The interactive list-table (chain 0007): whole-row page_open targets
+        // with a trailing arrow affordance and the open chapter marked. No
+        // section heading: a card section paints its text into the viewport
+        // top bar, and the page already carries a Contents heading.
         for (index, chapter) in book.chapters.iter().enumerate() {
             let open = view.selected_notebook.as_deref() == Some(chapter.id.as_str());
             widgets.push(
                 json!({"kind":"list-row","id":format!("contents:{}",chapter.id),
-                "title":format!("{:02}  {}",index+1,chapter.title),
+                "title":format!("{}. {}",index+1,chapter.title),
                 "subtitle":chapter.description.lines().next().unwrap_or(""),
                 "selected":open,
                 "row_action":format!("page_open:{}:0",chapter.id),
-                "actions":[{"action":format!("page_open:{}:0",chapter.id),"label":"Open"}]}),
+                "actions":[{"action":format!("page_open:{}:0",chapter.id),"label":"→"}]}),
             );
         }
         return json!({"title":book.title,"titlebar_switch":titlebar_switch_spec(&view.mode),"widgets":widgets});
@@ -315,7 +303,7 @@ pub fn viewport_view(view: &View) -> Value {
                 }
             }
             return json!({
-                "title": format!("{}, {}", nb.title, page.title),
+                "title": format!("{} — {}", nb.title, page.title),
                 "titlebar_switch": titlebar_switch_spec(&view.mode),
                 "widgets": widgets,
                 "footer": [json!({
@@ -328,8 +316,8 @@ pub fn viewport_view(view: &View) -> Value {
     }
 
     // No selection: the empty state names the shelf instead of painting a
-    // blank sheet. Reaching it in practice is a bug, the view always opens
-    // with a page selected, but the surface must still say something true.
+    // blank sheet. Reaching it in practice is a bug — the view always opens
+    // with a page selected — but the surface must still say something true.
     widgets.push(json!({
         "kind": "markdown",
         "id": "empty",
@@ -349,7 +337,7 @@ pub fn viewport_view(view: &View) -> Value {
 /// `list-row` and editor widgets in the BODY flow; every other kind
 /// (`section`, `label`, `toggle`, `search-box`, …) forms the TOP BAR. The
 /// first build of this appendix appended bar widgets after the prose and the
-/// pixel proof caught them squeezed into a horizontal strip above the page,
+/// pixel proof caught them squeezed into a horizontal strip above the page —
 /// the design system's own first filed-and-fixed defect. A specimen that
 /// wants a rail-only widget belongs in a rail, not here.
 fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
@@ -380,27 +368,30 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
     }
     if nb.id == "ribbons" {
         widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
-            "## Ribbon exercise\n\nTabs genuinely switch the command set (currently **{}**); Track changes persists until toggled back; the primary action sits at the trailing edge. These rows are the host's own renderer, the study image proposes the same composition with richer chrome.",
+            "## Ribbon exercise\n\nTabs genuinely switch the command set (currently **{}**); Track changes persists until toggled back; the primary action sits at the trailing edge. These rows are the host's own renderer — the study image proposes the same composition with richer chrome.",
             view.study_tab)}));
-        widgets.push(json!({
-            "kind":"tabs", "id":"ribbon-tabs", "action":"study:tab",
-            "tabs":[
-                {"id":"home","label":"Home"},
-                {"id":"insert","label":"Insert"},
-                {"id":"review","label":"Review"}
-            ]}));
+        // Tab rows in the body flow: a Tabs widget paints into the viewport top
+        // bar (the worked-examples first catch), so the ribbon's tabs are rows
+        // like every other control on a document surface.
+        for tab in [("home", "Home"), ("insert", "Insert"), ("review", "Review")] {
+            widgets.push(json!({"kind":"list-row", "id":format!("ribbon-tab:{}", tab.0),
+                "title":tab.1,
+                "subtitle":if view.study_tab == tab.0 {"Current tab"} else {""},
+                "selected":view.study_tab == tab.0,
+                "row_action":format!("study:tab:{}", tab.0)}));
+        }
         match view.study_tab.as_str() {
             "review" => {
                 widgets.push(json!({"kind":"list-row", "id":"study-track",
                     "title":"Track changes",
-                    "subtitle":if view.study_toggled {"ON, edits are tracked"} else {"OFF"},
+                    "subtitle":if view.study_toggled {"ON — edits are tracked"} else {"OFF"},
                     "selected":view.study_toggled,
                     "row_action":"study:toggle"}));
                 widgets.push(json!({"kind":"list-row", "id":"study-comment",
                     "title":"Comment", "subtitle":"Opens the comment workflow",
                     "row_action":"study:save"}));
                 widgets.push(json!({"kind":"list-row", "id":"study-resolve",
-                    "title":"Resolve", "subtitle":"Unavailable, nothing to resolve in this fixture"}));
+                    "title":"Resolve", "subtitle":"Unavailable — nothing to resolve in this fixture"}));
             }
             "insert" => {
                 widgets.push(json!({"kind":"list-row", "id":"study-picture",
@@ -409,7 +400,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
             }
             _ => {
                 widgets.push(json!({"kind":"list-row", "id":"study-save",
-                    "title":"File · Simulate Save", "subtitle":"Primary · trailing, commands belong to a task group",
+                    "title":"File · Simulate Save", "subtitle":"Primary · trailing — commands belong to a task group",
                     "row_action":"study:save"}));
                 widgets.push(json!({"kind":"list-row", "id":"study-open",
                     "title":"Open", "subtitle":"Opens a document",
@@ -443,12 +434,12 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_gallery_intro",
-            "source": "## Live specimens, rows as the host paints them\n\nRail-density rows, driven by the shared row engine: a status slot per row (durable · transient · empty), the selected row wearing the tint, and the whole title track free at rest.".to_string(),
+            "source": "## Live specimens — rows as the host paints them\n\nRail-density rows, driven by the shared row engine: a status slot per row (durable · transient · empty), the selected row wearing the tint, and the whole title track free at rest.".to_string(),
         }));
         for (idx, (title, status, selected)) in [
-            ("Saved note, durable", "durable", false),
-            ("Draft note, transient", "transient", true),
-            ("Brand-new note, empty slot", "", false),
+            ("Saved note — durable", "durable", false),
+            ("Draft note — transient", "transient", true),
+            ("Brand-new note — empty slot", "", false),
         ]
         .into_iter()
         .enumerate()
@@ -468,7 +459,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_live_intro",
-            "source": "## Specimen 1, the Live Sessions anatomy, rebuilt\n\nA filter lives in a rail's tool row, on a document surface it would paint into the top bar, which is exactly where the first draft of this page put it. The rows below are the anatomy: one unbroken dot column, a count badge on the group's trailing edge, durability in the slot.".to_string(),
+            "source": "## Specimen 1 — the Live Sessions anatomy, rebuilt\n\nA filter lives in a rail's tool row — on a document surface it would paint into the top bar, which is exactly where the first draft of this page put it. The rows below are the anatomy: one unbroken dot column, a count badge on the group's trailing edge, durability in the slot.".to_string(),
         }));
         for (idx, (title, status, badge)) in [
             ("9.4 Continue the novel outline", "durable", ""),
@@ -494,7 +485,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_partition_intro",
-            "source": "## Specimen 2, the partitioned sidebar, its list partition\n\nThe yedit files rail is the reference: top partition ≤ 30% (a card of toggles, a RAIL sight, shown in every settings rail), the FILES list as the majority, and the status line pinned in the footer. Below, its list partition as rows:".to_string(),
+            "source": "## Specimen 2 — the partitioned sidebar, its list partition\n\nThe yedit files rail is the reference: top partition ≤ 30% (a card of toggles — a RAIL sight, shown in every settings rail), the FILES list as the majority, and the status line pinned in the footer. Below, its list partition as rows:".to_string(),
         }));
         for (idx, (name, status)) in [
             ("triage-board.md", "durable"),
@@ -515,7 +506,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_partition_footer",
-            "source": "*Status line: 3 files · 1,204 words, on a rail this is the pinned footer, the third partition.*".to_string(),
+            "source": "*Status line: 3 files · 1,204 words — on a rail this is the pinned footer, the third partition.*".to_string(),
         }));
     }
 

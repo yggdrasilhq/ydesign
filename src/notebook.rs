@@ -28,6 +28,10 @@ pub const ALWAYS_VISIBLE: &[&str] = &["start-here", "roadmap"];
 /// exhibited as bare caption chips where the screenshots should have been).
 pub const ASSETS: &[(&str, &[u8])] = &[
     (
+        "ribbon-excel-mock.png",
+        include_bytes!("../assets/ribbon-excel-mock.png"),
+    ),
+    (
         "ribbon-study.svg",
         include_bytes!("../assets/ribbon-study.svg"),
     ),
