@@ -1,15 +1,15 @@
-//! The libyggterm OSC 7717 channel — ydesign's side of the surface contract.
+//! The libyggterm OSC 7717 channel, ydesign's side of the surface contract.
 //!
 //! ydesign is a DOCUMENT-SURFACE app: it declares one viewport pane and one
 //! rail pane, and yggterm renders their SCHEMA as ordinary shell DOM. No web
-//! engine, no child webview — which is what keeps the notebooks screenshot-
+//! engine, no child webview, which is what keeps the notebooks screenshot-
 //! faithful and reachable by the host's own automation, and is the reason the
 //! tier exists at all. A design language that cannot be screenshotted cannot
 //! be argued from.
 //!
 //! ⛔ THE SCHEMA DOES NOT RIDE THE OSC. The declare carries only a loopback
 //! control URL and the list of panes offered; the GUI then GETs the schema it
-//! wants. A notebook page is large and refreshes often — putting it on the PTY
+//! wants. A notebook page is large and refreshes often, putting it on the PTY
 //! byte stream would push every frame of it through the terminal.
 
 use base64::Engine as _;
@@ -23,7 +23,7 @@ fn emit(verb: &str, action: &str, payload: &str) {
     let _ = stdout.flush();
 }
 
-/// `sidebar ; declare` — idempotent, re-emitted on the heartbeat cadence as the
+/// `sidebar ; declare`, idempotent, re-emitted on the heartbeat cadence as the
 /// liveness signal. `document_version` moves when the shelf does, and that is
 /// what makes the GUI refetch.
 ///

@@ -1,11 +1,11 @@
-//! ydesign — the yggui base design language, shipped as live notebooks.
+//! ydesign, the yggui base design language, shipped as live notebooks.
 //!
 //! Every Web/GUI project in the fleet builds on ONE design language:
 //! Dioxus primitives, then the yggui component system (libyggterm), then an
 //! app's own layer. ydesign is that base language made VISIBLE: a libyggterm
 //! document-surface app whose notebooks exhibit the components, the canonical
 //! patterns (sidebar partitioning, the row engine, forms), and the working
-//! habit — consult your layer, fall through to the one below, grow the lower
+//! habit, consult your layer, fall through to the one below, grow the lower
 //! layer when it lacks a component, and argue every visual judgement from a
 //! pixel screenshot.
 
@@ -107,7 +107,7 @@ fn main() -> Result<()> {
     if args.once || session.is_empty() {
         if session.is_empty() && !args.once {
             eprintln!(
-                "ydesign: not running inside yggterm ($YGGTERM_SESSION_ID unset) — \
+                "ydesign: not running inside yggterm ($YGGTERM_SESSION_ID unset), \
                  printing the shelf instead of opening a surface."
             );
         }
@@ -119,8 +119,8 @@ fn main() -> Result<()> {
         return server::print_once(&mode, "", args.json);
     }
 
-    // The last opened state restores the reading place — mode, open page,
-    // expanded groups — so a cold start reopens where the reader left off.
+    // The last opened state restores the reading place, mode, open page,
+    // expanded groups, so a cold start reopens where the reader left off.
     // An explicit `--mode` still wins over the saved mode.
     let saved = persist::load();
     let mut view = saved

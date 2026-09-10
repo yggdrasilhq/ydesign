@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Foundations — calm chrome, clear content
+# Foundations, calm chrome, clear content
 
 **edition 2026-09-07 · rev 1**
 

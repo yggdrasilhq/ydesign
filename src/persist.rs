@@ -1,10 +1,10 @@
-//! The last opened state — the reading place a cold start restores.
+//! The last opened state, the reading place a cold start restores.
 //!
 //! `~/.config/ydesign/state.json`, next to the `projects.json` registry,
 //! written best-effort on every accepted action (the file is a few hundred
 //! bytes) and loaded once at boot. Owner direction 2026-09-07: ydesign must
 //! reopen where the reader left off, not reset to the home page every launch.
-//! Saved ids are re-validated against the current shelf on load — a notebook
+//! Saved ids are re-validated against the current shelf on load, a notebook
 //! that was renamed or removed falls back to the home page, never a stale id.
 use crate::schema::View;
 use serde::{Deserialize, Serialize};

@@ -1,7 +1,7 @@
 //! Wiring tests: the shelf may not silently drop a book.
 //!
 //! 2026-09-07: the Icons and ZCode-reversed notebooks sat in `notebooks/`
-//! for a day without an entry in `base_notebooks()` — written, reviewed, and
+//! for a day without an entry in `base_notebooks()`, written, reviewed, and
 //! unreachable from the app. This test makes that class fail the build: every
 //! markdown file under `notebooks/` must be embedded by `src/notebook.rs`
 //! (each shows up exactly once as `include_str!("../notebooks/<name>")`).
@@ -29,7 +29,7 @@ fn every_notebook_file_is_wired_into_the_shelf() {
     }
     assert!(
         missing.is_empty(),
-        "notebooks present on disk but never wired into base_notebooks() — \
+        "notebooks present on disk but never wired into base_notebooks(), \
          add an entry or a documented allowlist row: {missing:?}"
     );
 }

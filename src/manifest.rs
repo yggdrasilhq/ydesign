@@ -1,8 +1,8 @@
-//! ydesign's LAUNCHER MANIFEST — how the yggterm menus learn ydesign exists.
+//! ydesign's LAUNCHER MANIFEST, how the yggterm menus learn ydesign exists.
 //!
 //! Written to `~/.yggterm/apps/ydesign.json` on the app's OWN host on every
 //! run, which repairs the binary path after an upgrade. The host's daemon scans
-//! the directory and deletes manifests whose binary is gone — that is the whole
+//! the directory and deletes manifests whose binary is gone, that is the whole
 //! uninstall story. An app declares itself with a FILE, not by linking the
 //! platform.
 

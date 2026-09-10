@@ -1,4 +1,4 @@
-//! The notebook shelf — ydesign's content model.
+//! The notebook shelf, ydesign's content model.
 //!
 //! Base notebooks are SOURCE-CONTROLLED in this repository and ship with the
 //! binary (embedded with `include_str!`), the same doctrine ytop uses: a base
@@ -22,7 +22,7 @@ pub const ALWAYS_VISIBLE: &[&str] = &["start-here", "roadmap"];
 
 /// The catalogue's screenshots, embedded at build time. The notebook
 /// markdown references them as `%ASSETS%/name.png`; the schema substitutes a
-/// `data:image/png;base64` URL built from these bytes — data URLs render
+/// `data:image/png;base64` URL built from these bytes, data URLs render
 /// from ANY page origin, which file:// does not (WebKit blocks file
 /// subresources from the shell's own origin; the first build of this
 /// exhibited as bare caption chips where the screenshots should have been).
@@ -114,14 +114,14 @@ pub fn base_notebooks() -> Vec<Notebook> {
         (
             "start-here",
             MODE_GUIDE,
-            "Start here — the base language",
+            "Start here, the base language",
             "What the design language is, the layer ladder, and how to work under it.",
             include_str!("../notebooks/00-start-here.md"),
         ),
         (
             "foundations",
             MODE_GUIDE,
-            "Foundations — the visual language",
+            "Foundations, the visual language",
             "Color, typography, material and relationships.",
             include_str!("../notebooks/11-foundations.md"),
         ),
@@ -135,14 +135,14 @@ pub fn base_notebooks() -> Vec<Notebook> {
         (
             "catalogue",
             MODE_GUIDE,
-            "The catalogue — the design, exhibited",
+            "The catalogue, the design, exhibited",
             "Real pixels from the running fleet: the patterns, and the choices behind them.",
             include_str!("../notebooks/08-design-catalogue.md"),
         ),
         (
             "sidebars",
             MODE_GUIDE,
-            "Sidebars — the canonical patterns",
+            "Sidebars, the canonical patterns",
             "The Live Sessions anatomy, sidebar partitioning, the row engine, and the status vocabulary.",
             include_str!("../notebooks/02-sidebars.md"),
         ),
@@ -170,56 +170,56 @@ pub fn base_notebooks() -> Vec<Notebook> {
         (
             "ribbons",
             MODE_GUIDE,
-            "Ribbons — commands in context",
+            "Ribbons, commands in context",
             "Rejected and proposed anatomy, command grouping and keyboard intent.",
             include_str!("../notebooks/09-ribbons.md"),
         ),
         (
             "complex-sidebars",
             MODE_GUIDE,
-            "Complex sidebars — task and identity",
+            "Complex sidebars, task and identity",
             "A vault study: identity, progressive disclosure and common action paths.",
             include_str!("../notebooks/10-complex-sidebars.md"),
         ),
         (
             "list-views",
             MODE_GUIDE,
-            "List views — alignment and reading rhythm",
+            "List views, alignment and reading rhythm",
             "Editorial contents, navigation rails and operational rows: one family, distinct purposes.",
             include_str!("../notebooks/15-list-views.md"),
         ),
         (
             "icons",
             MODE_GUIDE,
-            "Icons — the one icon source",
+            "Icons, the one icon source",
             "The crispness recipe, the yggui-icons contract, and the unicode-arrow defect class.",
             include_str!("../notebooks/14-icons.md"),
         ),
         (
             "inheritance",
             MODE_GUIDE,
-            "Inheritance — the base chain",
+            "Inheritance, the base chain",
             "Dioxus, yggui and app notebook ownership.",
             include_str!("../Inheritance.md"),
         ),
         (
             "zcode-reversed",
             MODE_GUIDE,
-            "ZCode reversed — a measured reference",
+            "ZCode reversed, a measured reference",
             "The observed anatomy and colour system of the ZCode desktop, and its Dioxus port path.",
             include_str!("../notebooks/12-zcode-reversed-components.md"),
         ),
         (
             "examples",
             MODE_EXAMPLES,
-            "Worked examples — mini-webapps",
+            "Worked examples, mini-webapps",
             "The canonical sidebars rebuilt as real schemas you can screenshot and compare against.",
             include_str!("../notebooks/06-worked-examples.md"),
         ),
         (
             "roadmap",
             MODE_GUIDE,
-            "Roadmap — demanded components",
+            "Roadmap, demanded components",
             "Components the apps have demanded, each with its forcing consumer and admission gate.",
             include_str!("../notebooks/07-roadmap.md"),
         ),
@@ -294,7 +294,7 @@ pub struct Book {
 pub fn books(mode: Option<&str>) -> Vec<Book> {
     let mut books = vec![Book {
         id: "yggui".into(),
-        title: "Yggui — the design language".into(),
+        title: "Yggui, the design language".into(),
         chapters: Vec::new(),
     }];
     for chapter in list_notebooks(mode) {
@@ -323,7 +323,7 @@ pub fn books(mode: Option<&str>) -> Vec<Book> {
 }
 
 /// True when the viewport should append the LIVE widget appendix after the
-/// page's markdown — the "mini-webapp in the notebook" half. Only the pages
+/// page's markdown, the "mini-webapp in the notebook" half. Only the pages
 /// that exist to exhibit real controls compose; a pure reading page never
 /// grows a random control block under it.
 pub fn composes_live_widgets(notebook_id: &str) -> bool {

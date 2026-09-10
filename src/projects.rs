@@ -1,9 +1,9 @@
 //! Registered design layers. Configuration is local; notebook sources stay in their repos.
 //!
 //! ⚡ LENIENT PER PROJECT, STRICT PER CONFIG. A structurally broken config
-//! (bad JSON, duplicate or invalid id) is refused — the registry file must be
-//! fixed. But one UNAVAILABLE PROJECT — a path that only exists on another
-//! fleet host, a restructure in flight, a missing design/Inheritance.md — is
+//! (bad JSON, duplicate or invalid id) is refused, the registry file must be
+//! fixed. But one UNAVAILABLE PROJECT, a path that only exists on another
+//! fleet host, a restructure in flight, a missing design/Inheritance.md, is
 //! skipped with a warning while the rest of the shelf loads. Before
 //! 2026-09-07 a single stale registry row hard-exited the whole app at cold
 //! start; a registry row must never cost the app its surface.
@@ -99,7 +99,7 @@ fn load_project(project: &Project, config_dir: &Path) -> Result<Vec<Notebook>> {
 }
 
 /// ONE notebook file; `Err` here skips the file. An escaping file (an asset
-/// or include reaching outside design/) is never served — it is skipped,
+/// or include reaching outside design/) is never served, it is skipped,
 /// which keeps the containment guarantee while the rest of the shelf loads.
 fn load_notebook(
     file: &Path,
@@ -211,7 +211,7 @@ pub fn init(repo: &Path, id: &str, config: &Path) -> Result<()> {
     let files = [
         (root.join("DESIGN.md"), "# Design guide\n\nRead design/Inheritance.md, then the notebooks in design/. Visual identity, palette, typography and examples live in those notebooks. Consult the inherited ydesign base notebooks for undefined decisions. Preview with ydesign --notebook; register this repository with ydesign init.\n".to_string()),
         (design.join("Inheritance.md"), format!("# Inheritance\n\nLayer: {id}\n\nParent: yggui (ydesign base notebooks). Transitive chain: Dioxus components → yggui → {id}. Read the parent Inheritance.md before overriding a decision.\n\nLocal notebooks override only decisions they explicitly name. All other rules inherit. Multiple parents must name their order and resolve overlaps explicitly; cycles and unresolved conflicts are invalid. This file records provenance and override scope, not palette or typography.\n")),
-        (design.join("00-brand.md"), format!("# {id} — brand identity\n\nStatus: inherited baseline; app-specific choices are not yet approved.\n\nInherit yggui semantic colors, system typography, focus and interaction behavior. Record app-specific palette, typography, imagery and rationale here when chosen. Add a large rendered specimen and keyboard/mouse walkthrough for each material override.\n")),
+        (design.join("00-brand.md"), format!("# {id}, brand identity\n\nStatus: inherited baseline; app-specific choices are not yet approved.\n\nInherit yggui semantic colors, system typography, focus and interaction behavior. Record app-specific palette, typography, imagery and rationale here when chosen. Add a large rendered specimen and keyboard/mouse walkthrough for each material override.\n")),
         (design.join("assets/.gitkeep"), String::new()),
     ];
     for (path, body) in files {
@@ -309,7 +309,7 @@ mod tests {
     }
 
     /// A stale registry row (a path that exists only on another fleet host)
-    /// is SKIPPED, never fatal — and an escaping notebook file is dropped
+    /// is SKIPPED, never fatal, and an escaping notebook file is dropped
     /// while its siblings still load. The app must open either way.
     #[test]
     fn one_unavailable_project_or_escaping_file_never_kills_the_shelf() {

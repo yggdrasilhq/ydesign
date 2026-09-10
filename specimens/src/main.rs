@@ -100,7 +100,7 @@ fn StudyHeader(kind: StudyKind) -> Element {
     }
 }
 
-// ─── Study 01 — list views ──────────────────────────────────────────────────
+// ─── Study 01, list views ──────────────────────────────────────────────────
 
 #[component]
 fn ListStudyPage() -> Element {
@@ -165,7 +165,7 @@ fn ListStudyPage() -> Element {
     }
 }
 
-// ─── Study 02 — ribbons ─────────────────────────────────────────────────────
+// ─── Study 02, ribbons ─────────────────────────────────────────────────────
 
 #[component]
 fn RibbonStudyPage() -> Element {
@@ -195,7 +195,7 @@ fn RibbonStudyPage() -> Element {
                             if state.expanded { "Close temporary panel" } else { "Open temporary panel" }
                         }
                     }
-                    p { "Switching anatomy resets to that anatomy's default — the two are never silently compared from different states." }
+                    p { "Switching anatomy resets to that anatomy's default, the two are never silently compared from different states." }
                 }
             }
             div { class: if rejected { "ribbon rejected" } else if state.pinned { "ribbon pinned" } else { "ribbon temporary" },
@@ -230,10 +230,10 @@ fn RibbonStudyPage() -> Element {
                                     }
                                 }
                             }
-                                                    span { class: "panel-note", "The SAME commands, ungrouped and floating — only the composition differs." }
+                                                    span { class: "panel-note", "The SAME commands, ungrouped and floating, only the composition differs." }
                         }
                     } else {
-                        p { class: "panel-note", "The ribbon is collapsed. Its commands are inside the closed panel — try Save and watch the two-click path cost." }
+                        p { class: "panel-note", "The ribbon is collapsed. Its commands are inside the closed panel, try Save and watch the two-click path cost." }
                     }
                 } else {
                     RibbonView {
@@ -304,7 +304,7 @@ fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &str) {
                 study.write().log.push(reason.into());
             }
             // The focus proof: refocus the document, restore the exact caret
-            // position, and report it — an observed result, not a claim.
+            // position, and report it, an observed result, not a claim.
             spawn(async move {
                 let script = "requestAnimationFrame(() => requestAnimationFrame(() => { const el = document.getElementById('ribbon-doc'); if (el) { const pos = el.selectionStart ?? 0; el.focus(); el.setSelectionRange(pos, pos); window.__ribbonCaret = pos; } }));";
                 let _ = document::eval(&script).await;
@@ -324,7 +324,7 @@ fn ribbon_command(study: &mut Signal<RibbonStudy>, id: &str) {
     }
 }
 
-// ─── Study 03 — complex sidebars (the vault) ────────────────────────────────
+// ─── Study 03, complex sidebars (the vault) ────────────────────────────────
 
 /// Keyboard and pointer Back share ONE restoration path: close details and
 /// return focus to the entry the reader came from.
@@ -405,7 +405,7 @@ fn VaultStudyPage() -> Element {
                         oninput: move |e| study.write().search(e.value()),
                     }
                     if state.needs_all_items_route() {
-                        button { class: "command", onclick: move |_| study.write().show_all(), "No matches for this site — show all items" }
+                        button { class: "command", onclick: move |_| study.write().show_all(), "No matches for this site, show all items" }
                     }
                 }
                 ul { class: "vault-list", aria_label: "Accounts",
@@ -441,7 +441,7 @@ fn VaultStudyPage() -> Element {
                         }
                     }
                     if visible_is_empty {
-                        li { class: "vault-empty", strong { "No account matches this page." } "Search, or take the explicit all-items route above — never a blank rail." }
+                        li { class: "vault-empty", strong { "No account matches this page." } "Search, or take the explicit all-items route above, never a blank rail." }
                     }
                 }
             }
@@ -462,7 +462,7 @@ fn VaultStudyPage() -> Element {
     }
 }
 
-// ─── Study 04 — live sessions (the most-watched rail) ───────────────────────
+// ─── Study 04, live sessions (the most-watched rail) ───────────────────────
 
 #[component]
 fn SessionsStudyPage() -> Element {
@@ -480,7 +480,7 @@ fn SessionsStudyPage() -> Element {
             }
             if inspect() {
                 aside { class: "inspector", aria_label: "Study controls",
-                    p { "Kill is a real action: the row leaves the rail and the group count follows. The status spine stays unbroken through live, idle, and killed rows. Actions exist only on hover, selection, or focus-within — never at rest." }
+                    p { "Kill is a real action: the row leaves the rail and the group count follows. The status spine stays unbroken through live, idle, and killed rows. Actions exist only on hover, selection, or focus-within, never at rest." }
                     pre { "{review}" }
                 }
             }

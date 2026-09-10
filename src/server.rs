@@ -4,7 +4,7 @@
 //! `POST /action` (mode switch, page turns, specimen controls).
 //!
 //! ⚡ THE ACTION REPLY REPAINTS. A mutating action replies with the POSTing
-//! pane's schema plus `refetch_document: true` — the GUI applies both at once
+//! pane's schema plus `refetch_document: true`, the GUI applies both at once
 //! (`AppPaneActionReply`). The GUI only re-fetches on the `document_version`
 //! EDGE, which it observes on the next heartbeat declare (≤4s) or ping
 //! (~2.5s); before this reply shape every shelf click sat through that wait,
@@ -55,7 +55,7 @@ impl PaneState {
 
     /// The wire reply for one handled action. A mutation repaints the POSTing
     /// pane immediately (the returned `schema`) and refetches the document
-    /// surface immediately (`refetch_document`) — neither waits for the next
+    /// surface immediately (`refetch_document`), neither waits for the next
     /// heartbeat. The stamp is only a change DETECTOR; the schema in the reply
     /// is the app's current truth whatever stamp it is filed under.
     fn action_reply(&self, pane_id: &str, mutated: bool) -> Value {
@@ -67,10 +67,10 @@ impl PaneState {
             "schema": self.schema_for(pane_id),
             // Redundant when the action came from the document itself (its
             // schema is already in the reply) and load-bearing when it came
-            // from the rail — the viewport must turn the page NOW.
+            // from the rail, the viewport must turn the page NOW.
             "refetch_document": pane_id != "design",
             // The mirror arm: a document-pane action (mode switch, contents
-            // row) moves rail rows too — repaint the shelf now instead of
+            // row) moves rail rows too, repaint the shelf now instead of
             // at the next ping-discovered version edge.
             "refetch_rail": pane_id != "rail",
         })
@@ -212,7 +212,7 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
                 other => {
                     // Specimen controls and shelf rows. The verb prefix names
                     // the family; every one of them only proves the round
-                    // trip — an action POSTed, a reply schema repainted.
+                    // trip, an action POSTed, a reply schema repainted.
                     let named = other
                         .split_once(':')
                         .map(|(family, _)| family)
@@ -230,7 +230,7 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
                                     pane.view.selected_notebook = Some(nb_id.to_string());
                                     pane.view.selected_page = Some(page.id.clone());
                                     pane.view.notice =
-                                        Some(format!("📖 {} — {}", nb.title, page.title));
+                                        Some(format!("📖 {}, {}", nb.title, page.title));
                                 }
                                 pane.touch();
                             }
@@ -238,7 +238,7 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
                         "demo" | "demo_tab" | "notebook" | "specimen_row" | "live_row"
                         | "file_row" => {
                             pane.view.notice = Some(format!(
-                                "Specimen control “{value}” answered — an action POSTed, a schema replied."
+                                "Specimen control “{value}” answered, an action POSTed, a schema replied."
                             ));
                             pane.touch();
                         }
@@ -298,7 +298,7 @@ pub fn print_notebook(id: &str, page: Option<usize>) -> Result<()> {
         return Ok(());
     }
     let Some(nb) = notebook::get_notebook(id) else {
-        anyhow::bail!("no notebook `{id}` — run `ydesign --notebook` to list the shelf");
+        anyhow::bail!("no notebook `{id}`, run `ydesign --notebook` to list the shelf");
     };
     let Some(n) = page else {
         println!("📖 {}  [{}]\n{}\n", nb.title, nb.mode, nb.description);
@@ -319,7 +319,7 @@ pub fn print_notebook(id: &str, page: Option<usize>) -> Result<()> {
     Ok(())
 }
 
-/// The standalone degradation: no `$YGGTERM_SESSION_ID`, no surface — print
+/// The standalone degradation: no `$YGGTERM_SESSION_ID`, no surface, print
 /// the shelf and say how to open it for real. Never a half-open window.
 pub fn print_once(_mode: &str, _tab: &str, as_json: bool) -> Result<()> {
     let shelf = notebook::list_notebooks(None);
@@ -339,7 +339,7 @@ pub fn print_once(_mode: &str, _tab: &str, as_json: bool) -> Result<()> {
         );
         return Ok(());
     }
-    println!("ydesign — the yggui base design language");
+    println!("ydesign, the yggui base design language");
     println!("Not running inside yggterm ($YGGTERM_SESSION_ID unset); printing the shelf.");
     println!();
     for nb in &shelf {
@@ -395,7 +395,7 @@ mod tests {
         pane.touch();
         let reply = pane.action_reply("rail", true);
         assert_eq!(reply["ok"], true);
-        // The rail repaints from the reply itself — no heartbeat wait.
+        // The rail repaints from the reply itself, no heartbeat wait.
         let widgets = reply["schema"]["widgets"].as_array().expect("rail schema");
         assert!(widgets.iter().any(|w| w["id"] == "book:yggui"));
         // The viewport refetches NOW instead of on the next version edge.

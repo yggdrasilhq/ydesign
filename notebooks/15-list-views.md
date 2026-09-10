@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# List views — one reading grid, distinct purposes
+# List views, one reading grid, distinct purposes
 
 **edition 2026-09-07 · rev 1**
 
@@ -60,7 +60,7 @@ The editorial tokens are the consultant's, not the wiring seat's
 description 15px, ordinal 13px tabular and right-aligned, list gap 18px,
 row padding 14px block, ordinal column 2.25ch, column gap 16px, accent
 #265f63, hover #f3f6f5. The current chapter reads by accent ink and a 2px
-underline rule — never a card. They live as custom properties in
+underline rule, never a card. They live as custom properties in
 `specimens/assets/book.css` and remain starting values for live pixel
 critique, not constants. Long titles and descriptions wrap; row height
 follows content. Do not use ellipsis to hide the words that distinguish

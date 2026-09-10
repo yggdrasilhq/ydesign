@@ -1,8 +1,8 @@
-//! ytrace probes — ydesign's side of every surface timeline.
+//! ytrace probes, ydesign's side of every surface timeline.
 //!
 //! The GUI's traces show a declare arriving and a pane being fetched; these
-//! records carry the APP side — cold-start phases, schema build cost, action
-//! handling, the declare cadence — into the same query plane, so a populate
+//! records carry the APP side, cold-start phases, schema build cost, action
+//! handling, the declare cadence, into the same query plane, so a populate
 //! or repaint complaint can be answered from one trace read instead of a
 //! code argument. JSONL lands at `~/.local/share/ytrace/ydesign/ytrace.jsonl`
 //! on the host the app runs on (`ytrace query --name … --json` to read it).

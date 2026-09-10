@@ -117,7 +117,7 @@ fn a_saved_reading_place_restores_and_stale_ids_fall_back_to_home() {
     );
 
     // An explicitly empty saved expansion set is the reader's own
-    // all-collapsed shelf — restore is faithful, not re-expanding.
+    // all-collapsed shelf, restore is faithful, not re-expanding.
     let examples = crate::persist::SavedView {
         mode: MODE_EXAMPLES.into(),
         selected_book: None,

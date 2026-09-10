@@ -4,7 +4,7 @@
 //! These are the living-books conversion studies for the Ribbons and Complex
 //! sidebars books: real interactive Dioxus mini-apps with deterministic
 //! fixtures, a complete reset and a critique reference. They are staging
-//! targets — the shared renderers they teach (ribbon renderer, vault row
+//! targets, the shared renderers they teach (ribbon renderer, vault row
 //! renderer) remain their owners' pending changes.
 use dioxus::prelude::*;
 
@@ -115,7 +115,7 @@ impl Study {
     }
 }
 
-// ─── Ribbon — commands that belong to the workspace ─────────────────────────
+// ─── Ribbon, commands that belong to the workspace ─────────────────────────
 
 /// The two compositions the Ribbons book compares. Switching resets to the
 /// variant's default state; nothing silent is carried across.
@@ -202,7 +202,7 @@ pub struct RibbonStudy {
     pub saved: bool,
     /// Real on/off state for Toggle commands; aria_pressed renders it.
     pub toggled: Vec<String>,
-    /// The find query survives tab changes in the proposed anatomy — a query
+    /// The find query survives tab changes in the proposed anatomy, a query
     /// that disappears on tab change is a reject condition in the book.
     pub find_query: String,
     pub replace_with: String,
@@ -239,7 +239,7 @@ impl RibbonStudy {
             .unwrap_or_default()
     }
 
-    /// Switching variants resets to that anatomy's default and says so —
+    /// Switching variants resets to that anatomy's default and says so,
     /// never silently compare different starting states.
     pub fn set_variant(&mut self, variant: Anatomy) {
         if self.variant == variant { return; }
@@ -310,8 +310,8 @@ impl RibbonStudy {
         self.replace_with = q;
     }
 
-    /// Find reports an observable result — the number of live matches in the
-    /// document — not a button that opens another workflow.
+    /// Find reports an observable result, the number of live matches in the
+    /// document, not a button that opens another workflow.
     pub fn find_matches(&self) -> usize {
         let q = self.find_query.as_str();
         if q.is_empty() { return 0; }
@@ -333,12 +333,12 @@ impl RibbonStudy {
         Some(count)
     }
 
-    /// Save. Returns Err(reason) when the anatomy makes it a two-click path —
+    /// Save. Returns Err(reason) when the anatomy makes it a two-click path,
     /// the study refuses and names it, the way the review table says a design
     /// must not silently widen.
     pub fn save(&mut self) -> Result<(), &'static str> {
         if !self.pinned && !self.expanded {
-            return Err("Save is inside the closed panel — expand first (two clicks), or pin the ribbon.");
+            return Err("Save is inside the closed panel, expand first (two clicks), or pin the ribbon.");
         }
         self.saved = true;
         self.log.push(format!(
@@ -361,7 +361,7 @@ impl Default for RibbonStudy {
     fn default() -> Self { Self::new() }
 }
 
-// ─── Vault — a complex sidebar that makes the next action obvious ───────────
+// ─── Vault, a complex sidebar that makes the next action obvious ───────────
 
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub enum Credential {
@@ -414,7 +414,7 @@ pub fn vault_fixture() -> Vec<VaultAccount> {
     ]
 }
 
-/// Outcome of a simulated fill. The request being sent is not completion —
+/// Outcome of a simulated fill. The request being sent is not completion,
 /// the study reports a result, and failure keeps every bit of context.
 #[derive(Clone, Debug, PartialEq)]
 pub enum FillOutcome {
@@ -511,7 +511,7 @@ impl VaultStudy {
     }
 
     /// Back from details: the query, the narrowed list and the return target
-    /// survive — only the details view closes.
+    /// survive, only the details view closes.
     pub fn back(&mut self) { self.selected = None; }
 
     /// Fill is explicit and reports its outcome; failure keeps the selection
@@ -703,7 +703,7 @@ mod tests {
     }
 }
 
-// ─── Live sessions — the most-watched rail, honest at rest ──────────────────
+// ─── Live sessions, the most-watched rail, honest at rest ──────────────────
 
 /// Durability: green = survives the app, blue = lives only while it does,
 /// empty slot = nothing to say. Distinct from the live/idle status dot.
@@ -752,7 +752,7 @@ pub fn sessions_fixture() -> Vec<SessionGroup> {
         hash: "#local",
         count: 3,
         rows: vec![
-            SessionEntry { id: "probe", title: "trace-fixing — ytrace probe sweep on the attach path", live: true, durability: Durability::Survives, minutes: 2 },
+            SessionEntry { id: "probe", title: "trace-fixing, ytrace probe sweep on the attach path", live: true, durability: Durability::Survives, minutes: 2 },
             SessionEntry { id: "icons", title: "practice L3 icons", live: true, durability: Durability::Transient, minutes: 14 },
             SessionEntry { id: "archive", title: "a very long session title that must ellipsize to make room for the verbs and never push the trailing edge around", live: false, durability: Durability::None, minutes: 183 },
         ],
@@ -851,7 +851,7 @@ pub fn SessionList(
         }
     }
 
-// ─── RibbonView — the approved ribbon v2 (consult 0008, mock-first) ─────────
+// ─── RibbonView, the approved ribbon v2 (consult 0008, mock-first) ─────────
 
 /// The ribbon component proper: a tab strip of visible chips over one
 /// contained command band. Pinned shows the band always; temporary collapses

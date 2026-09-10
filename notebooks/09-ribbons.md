@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Ribbons — commands that belong to the workspace
+# Ribbons, commands that belong to the workspace
 
 **edition 2026-09-07 · rev 2**
 
@@ -52,8 +52,8 @@ proposal that needs a shared renderer change.
 
 ## Follow the hand and keyboard
 
-From a collapsed state: click Home, then Save — two clicks. From a pinned
-state: Save — one click. A keyboard shortcut keeps the document focus and
+From a collapsed state: click Home, then Save, two clicks. From a pinned
+state: Save, one click. A keyboard shortcut keeps the document focus and
 requires neither click. Command search complements recognition; it does not
 replace visible commands for new users.
 
@@ -95,7 +95,7 @@ and focus returned to the correct place, not when a key event was accepted.
 
 ## The specimen
 
-**Specimen** `ydesign/ribbons@2026-09-07-r1` — registry: `specimens/specimens.json`;
+**Specimen** `ydesign/ribbons@2026-09-07-r1`, registry: `specimens/specimens.json`;
 source: `specimens/src/lib.rs` (`RibbonStudy`) + `specimens/src/main.rs`;
 build: `bash scripts/build-specimens.sh`.
 
@@ -103,22 +103,22 @@ The staging study implements the book's own review table as state, not prose:
 
 - **Save, then keep typing.** Pinned: Save is one click; the study then
   refocuses the document, restores the exact caret position, and LOGS the
-  observed position — a focus proof, not a claim. Collapsed: Save is REFUSED
-  with the reason named ("expand first — two clicks"), the way the review
+  observed position, a focus proof, not a claim. Collapsed: Save is REFUSED
+  with the reason named ("expand first, two clicks"), the way the review
   table says a design must not silently widen.
 - **Find, then replace.** Find and Replace share one group and do the real
   job: Find reports its live match count in the document; Replace rewrites
   every occurrence, marks the document unsaved, and reports the count. The
-  find query SURVIVES a tab change — a query that disappears on tab change
+  find query SURVIVES a tab change, a query that disappears on tab change
   is a reject condition, and the study carries it and says so in the log.
 - **Keyboard.** Arrow keys move between tabs; Tab/Enter reach every command;
   Escape closes the temporary panel; focus returns to the editor and the
   caret position is restored and reported (verified in the study's log).
 - **Discover an unfamiliar command.** The rejected variant renders the SAME
-  active-tab commands as the proposed band — ungrouped, floating, two
-  saturated buttons — so the comparison differs by composition alone, from
+  active-tab commands as the proposed band, ungrouped, floating, two
+  saturated buttons, so the comparison differs by composition alone, from
   the same starting state.
-- **Switching variants resets** to that anatomy's default and logs it — never
+- **Switching variants resets** to that anatomy's default and logs it, never
   a silent comparison from different starting states. Reset restores the
   document fixture, saved state, find query, log and critique draft.
 

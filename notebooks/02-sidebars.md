@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Sidebars — the canonical patterns
+# Sidebars, the canonical patterns
 
 **edition 2026-09-07 · rev 1**
 
@@ -19,17 +19,17 @@ Every session-style list row is ONE anatomy, drawn by ONE engine:
 - **Two densities, one typography.** `Sidebar` (the main tree: 20px icon box,
   9px status column, indent base/step 12px) and `Rail` (app panes: padding
   5/8, radius 8, indent base 8/step 19, ONE mark column). Font, size and
-  icon-box geometry are IDENTICAL across densities — a rail that reads as a
+  icon-box geometry are IDENTICAL across densities, a rail that reads as a
   smaller font is a defect, not a density.
 - **The empty slot is still laid out.** A row with no dot still reserves the
   status column, so an appearing dot never shoves titles sideways and two
   rows never start their text at different x.
 - **The title track is the whole row.** Trailing actions are in flow and
   `display:none` at rest; the row reveals them on hover, on selection, and
-  on focus-within — all three triggers, because a keyboard-reached row must
+  on focus-within, all three triggers, because a keyboard-reached row must
   show its verbs too.
 - ⛔ **No background behind the revealed verbs.** Not a chip, not a fade, not
-  a blur. The reflow — the title ellipsizing to make room — is the point.
+  a blur. The reflow, the title ellipsizing to make room, is the point.
 - **Folders above loose rows, at every level.** Organization first, then the
   working set. A group row wears a FILLED folder glyph when open, an outline
   one when shut, plus the always-visible disclosure chevron in its trailing
@@ -40,14 +40,14 @@ Every session-style list row is ONE anatomy, drawn by ONE engine:
 
 | Colour | Meaning |
 |---|---|
-| `GREEN` | durable — survives the app (a kept session, a saved file) |
-| `BLUE` | transient — lives only while the app does (an unkept session, an unsaved draft) |
-| `AMBER` | attention — recovery in progress, degraded, **written-to and unanswered**; steady, never blinking |
-| `RED` | reserved — dead/unrecoverable |
+| `GREEN` | durable, survives the app (a kept session, a saved file) |
+| `BLUE` | transient, lives only while the app does (an unkept session, an unsaved draft) |
+| `AMBER` | attention, recovery in progress, degraded, **written-to and unanswered**; steady, never blinking |
+| `RED` | reserved, dead/unrecoverable |
 | blink | an orthogonal modifier meaning *working right now* |
 
 - The app names a **class** (`durable`/`transient`); the host owns the
-  colour. A status token the host does not paint renders the empty slot —
+  colour. A status token the host does not paint renders the empty slot,
   never a guessed colour.
 - ⛔ Status never lives in the title. A `●` glyph in the name paints in the
   text colour and shifts the name; if a row needs to signal, it has a slot.
@@ -61,17 +61,17 @@ A list-oriented sidebar (the yedit files rail is the reference) has three
 regions. A details or edit page need not repeat the list's controls; see
 the Complex sidebars notebook for that distinction:
 
-1. **Top partition — the knobs.** Small, ≤ 30% of the rail's height: identity
+1. **Top partition, the knobs.** Small, ≤ 30% of the rail's height: identity
    row, tool buttons, the search field, a segmented control, at most a couple
    of toggles. Everything here is a *control for the list below*.
-2. **The majority — the list.** The rows, unbroken by cards. A file tree, a
-   tab rail, a notebook shelf: no section cards around a long list — that is
+2. **The majority, the list.** The rows, unbroken by cards. A file tree, a
+   tab rail, a notebook shelf: no section cards around a long list, that is
    the nested-boxes look the brand rules out by name.
-3. **The pinned footer — the status line.** Counts, modes, the word count.
+3. **The pinned footer, the status line.** Counts, modes, the word count.
    Behind a separator, never scrolling with the list.
 
-A sidebar that mixes these — prose paragraphs beside toggles, a toolbar
-grafted onto a list with no heading voice — reads broken even when every
+A sidebar that mixes these, prose paragraphs beside toggles, a toolbar
+grafted onto a list with no heading voice, reads broken even when every
 individual row is fine. When a rail feels wrong, check the partitions before
 touching any row.
 
@@ -83,10 +83,10 @@ setup explanations should not become permanent partitions in every page.
 
 ## Header anatomy (the top of a rail, in order)
 
-1. Title row — the rail's name and its leading verb (`FILES` `+`).
-2. Tool row — search, segmented control, icon buttons. One row, aligned to
+1. Title row, the rail's name and its leading verb (`FILES` `+`).
+2. Tool row, search, segmented control, icon buttons. One row, aligned to
    the row grid beneath.
-3. Section heading — 10px, weight 800, uppercase, tracked ~0.07em, in the
+3. Section heading, 10px, weight 800, uppercase, tracked ~0.07em, in the
    TEXT colour (not muted-on-muted).
 
 A header that skips the heading voice and floats controls directly above a
@@ -96,7 +96,7 @@ spacing: give the controls a row and the list a name.
 ## Chrome behaviour that is not optional
 
 - **A hidden sidebar is an auto-hide sidebar**: a thin hover strip on its own
-  edge, revealing over the workspace on the z axis as a floating island —
+  edge, revealing over the workspace on the z axis as a floating island,
   inset card, rounded, soft shadow on every side, radius matching the
   viewport. There is no settings toggle for "hidden means gone".
 - **A reveal never resizes the workspace.** The revealed panel is out of

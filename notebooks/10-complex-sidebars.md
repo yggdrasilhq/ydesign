@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Complex sidebars — make the next action obvious
+# Complex sidebars, make the next action obvious
 
 **edition 2026-09-07 · rev 2**
 
@@ -96,7 +96,7 @@ line distinguishes which identity will be used. Never rely on color alone.
 This is a proposed acceptance walkthrough, not a claim that the miniature
 implements browser matching, credential storage or authentication. The
 staging study covers search, the matching-first list, the All-items route,
-details/back with focus restoration, and fill with a reported outcome — it
+details/back with focus restoration, and fill with a reported outcome, it
 does not touch a real vault, clipboard or network.
 
 | State | Helpful next action | Avoid |
@@ -114,7 +114,7 @@ third-party favicon service as a side effect of opening the vault.
 
 ## The specimen
 
-**Specimen** `ydesign/complex-sidebars@2026-09-07-r1` — registry:
+**Specimen** `ydesign/complex-sidebars@2026-09-07-r1`, registry:
 `specimens/specimens.json`; source: `specimens/src/lib.rs` (`VaultStudy`) +
 `specimens/src/main.rs`; build: `bash scripts/build-specimens.sh`.
 
@@ -122,8 +122,8 @@ The staging study runs the walkthrough with invented entries only. The
 fixtures are the recognition test itself: two accounts on example.test
 (Personal with a passkey, Work with a password), a non-matching pair, and a
 deliberately long address for the wrap test. Identity slots come in BOTH
-states — a stable invented favicon square for two accounts, the letter
-fallback for the other two — never a credential icon standing in for the
+states, a stable invented favicon square for two accounts, the letter
+fallback for the other two, never a credential icon standing in for the
 site. Row semantics are clean: the row is a noninteractive container with a
 separate Open region and a separate Fill button, so clicking Fill never also
 opens the entry. Matches are DERIVED from the current page: an inspector
@@ -131,7 +131,7 @@ control changes the origin, every match and Fill offer re-evaluate, and a
 stale match is refused rather than silently applied. Fill reports its outcome
 in an aria-live line; a simulated failure keeps the selection and the page
 while naming what happened. Details replace the list with a labeled Back, and
-keyboard Escape shares the SAME restoration path — the search, the narrowed
+keyboard Escape shares the SAME restoration path, the search, the narrowed
 list, and focus on the entry you came from. A search that matches nothing
 offers the explicit All-items route instead of a blank rail. Reset restores
 the query, origin, selection, outcome, failure toggle and critique draft.
