@@ -183,7 +183,7 @@ fn handle_conn(stream: TcpStream, state: Arc<Mutex<PaneState>>) {
             let mut pane = state.lock().unwrap();
             let before = pane.stamp;
 
-            if pane.view.book_action(&action) || pane.view.study_action(&action) {
+            if pane.view.book_action(&action) || pane.view.study_action(&action, &value) {
                 pane.touch();
                 let reply = pane.action_reply(&pane_id, true);
                 let bytes = respond(stream, 200, &reply);

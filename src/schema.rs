@@ -24,6 +24,8 @@ pub struct View {
     pub study_detail: bool,
     pub study_actions: usize,
     pub lesson_step: usize,
+    pub study_tab: String,
+    pub study_toggled: bool,
 }
 
 impl View {
@@ -66,6 +68,8 @@ impl View {
             study_detail: false,
             study_actions: 0,
             lesson_step: 0,
+            study_tab: "home".to_string(),
+            study_toggled: false,
         }
     }
 
@@ -132,18 +136,22 @@ impl View {
         }
         true
     }
-    pub fn study_action(&mut self, action: &str) -> bool {
+    pub fn study_action(&mut self, action: &str, value: &str) -> bool {
         match action {
             "study:next" => self.lesson_step = (self.lesson_step + 1) % 3,
             "study:compare" => self.study_proposed = !self.study_proposed,
             "study:open" => self.study_detail = true,
             "study:back" => self.study_detail = false,
             "study:fill" | "study:save" => self.study_actions += 1,
+            "study:toggle" => self.study_toggled = !self.study_toggled,
+            "study:tab" => self.study_tab = value.to_string(),
             "study:reset" => {
                 self.study_proposed = true;
                 self.study_detail = false;
                 self.study_actions = 0;
                 self.lesson_step = 0;
+                self.study_tab = "home".to_string();
+                self.study_toggled = false;
             }
             _ => return false,
         }
@@ -261,14 +269,21 @@ pub fn viewport_view(view: &View) -> Value {
             .find(|b| &b.id == book_id)
     {
         widgets.push(json!({"kind":"markdown","id":"book-opening","source":format!(
-            "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nRead in order or open a chapter below. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
+            "# {}\n\nA living design book for readers, reviewers and implementers.\n\n## Contents\n\nOpen a chapter below — every row acts, and the open chapter is marked. Component chapters are being converted to real Dioxus mini-apps; legacy illustrations and state exercises are not yet reference implementations.\n\nInheritance and brand decisions remain in their named chapters.",
             book.title)}));
+        // The interactive list-table (chain 0007): one contained card, hairline
+        // dividers, whole-row targets with a trailing Open affordance, and the
+        // open chapter marked — the host renderer paints these.
+        widgets.push(json!({"kind":"section","text":"Chapters","card":true}));
         for (index, chapter) in book.chapters.iter().enumerate() {
+            let open = view.selected_notebook.as_deref() == Some(chapter.id.as_str());
             widgets.push(
                 json!({"kind":"list-row","id":format!("contents:{}",chapter.id),
                 "title":format!("{:02}  {}",index+1,chapter.title),
                 "subtitle":chapter.description.lines().next().unwrap_or(""),
-                "row_action":format!("page_open:{}:0",chapter.id)}),
+                "selected":open,
+                "row_action":format!("page_open:{}:0",chapter.id),
+                "actions":[{"action":format!("page_open:{}:0",chapter.id),"label":"Open"}]}),
             );
         }
         return json!({"title":book.title,"titlebar_switch":titlebar_switch_spec(&view.mode),"widgets":widgets});
@@ -363,25 +378,63 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({"kind":"list-row", "id":"lesson-reset", "title":"Reset walkthrough", "row_action":"study:reset"}));
         return widgets;
     }
-    if matches!(nb.id.as_str(), "ribbons" | "complex-sidebars") {
+    if nb.id == "ribbons" {
+        widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
+            "## Ribbon exercise\n\nTabs genuinely switch the command set (currently **{}**); Track changes persists until toggled back; the primary action sits at the trailing edge. These rows are the host's own renderer — the study image proposes the same composition with richer chrome.",
+            view.study_tab)}));
+        widgets.push(json!({
+            "kind":"tabs", "id":"ribbon-tabs", "action":"study:tab",
+            "tabs":[
+                {"id":"home","label":"Home"},
+                {"id":"insert","label":"Insert"},
+                {"id":"review","label":"Review"}
+            ]}));
+        match view.study_tab.as_str() {
+            "review" => {
+                widgets.push(json!({"kind":"list-row", "id":"study-track",
+                    "title":"Track changes",
+                    "subtitle":if view.study_toggled {"ON — edits are tracked"} else {"OFF"},
+                    "selected":view.study_toggled,
+                    "row_action":"study:toggle"}));
+                widgets.push(json!({"kind":"list-row", "id":"study-comment",
+                    "title":"Comment", "subtitle":"Opens the comment workflow",
+                    "row_action":"study:save"}));
+                widgets.push(json!({"kind":"list-row", "id":"study-resolve",
+                    "title":"Resolve", "subtitle":"Unavailable — nothing to resolve in this fixture"}));
+            }
+            "insert" => {
+                widgets.push(json!({"kind":"list-row", "id":"study-picture",
+                    "title":"Insert picture", "subtitle":"Opens the insert workflow",
+                    "row_action":"study:save"}));
+            }
+            _ => {
+                widgets.push(json!({"kind":"list-row", "id":"study-save",
+                    "title":"File · Simulate Save", "subtitle":"Primary · trailing — commands belong to a task group",
+                    "row_action":"study:save"}));
+                widgets.push(json!({"kind":"list-row", "id":"study-open",
+                    "title":"Open", "subtitle":"Opens a document",
+                    "row_action":"study:save"}));
+            }
+        }
+        widgets.push(json!({"kind":"list-row", "id":"study-compare", "title":"Switch rejected / proposed", "row_action":"study:compare"}));
+        widgets.push(json!({"kind":"list-row", "id":"study-reset", "title":"Reset exercise", "row_action":"study:reset"}));
+        return widgets;
+    }
+    if nb.id == "complex-sidebars" {
         widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
             "## Live exercise\n\n{} anatomy · {} · {} simulated commands. These controls use the current host row renderer; the study image proposes the future composition.",
             if view.study_proposed {"Proposed"} else {"Rejected"},
             if view.study_detail {"entry details"} else {"list"}, view.study_actions)}));
         widgets.push(json!({"kind":"list-row", "id":"study-compare", "title":"Switch rejected / proposed", "row_action":"study:compare"}));
-        if nb.id == "complex-sidebars" {
-            if view.study_detail {
-                widgets.push(json!({"kind":"list-row", "id":"study-back", "title":"Back to matching accounts", "row_action":"study:back"}));
-                widgets.push(json!({"kind":"markdown", "id":"study-account", "source":"### Example · Personal\n\nreader@example.test · Passkey\n\nThis is an invented account. No secret is loaded or copied."}));
-            } else {
-                if !view.study_proposed {
-                    widgets.push(json!({"kind":"markdown", "id":"study-obstruction", "source":"### Repeated setup explanation\n\nThis rejected state repeats passkey setup ahead of the task. Notice the added reading and travel before reaching an account."}));
-                }
-                widgets.push(json!({"kind":"list-row", "id":"study-personal", "title":"Example · Personal", "subtitle":"reader@example.test · Passkey", "row_action":"study:open", "actions":[{"action":"study:fill","label":"Simulate Fill"}]}));
-                widgets.push(json!({"kind":"list-row", "id":"study-work", "title":"Example · Work", "subtitle":"writer@example.test · Password", "row_action":"study:open"}));
-            }
+        if view.study_detail {
+            widgets.push(json!({"kind":"list-row", "id":"study-back", "title":"Back to matching accounts", "row_action":"study:back"}));
+            widgets.push(json!({"kind":"markdown", "id":"study-account", "source":"### Example · Personal\n\nreader@example.test · Passkey\n\nThis is an invented account. No secret is loaded or copied."}));
         } else {
-            widgets.push(json!({"kind":"list-row", "id":"study-save", "title":"File · Simulate Save", "subtitle":if view.study_proposed {"Commands belong to a task group"} else {"Sparse command stretched across a floating panel"}, "row_action":"study:save"}));
+            if !view.study_proposed {
+                widgets.push(json!({"kind":"markdown", "id":"study-obstruction", "source":"### Repeated setup explanation\n\nThis rejected state repeats passkey setup ahead of the task. Notice the added reading and travel before reaching an account."}));
+            }
+            widgets.push(json!({"kind":"list-row", "id":"study-personal", "title":"Example · Personal", "subtitle":"reader@example.test · Passkey", "row_action":"study:open", "actions":[{"action":"study:fill","label":"Simulate Fill"}]}));
+            widgets.push(json!({"kind":"list-row", "id":"study-work", "title":"Example · Work", "subtitle":"writer@example.test · Password", "row_action":"study:open"}));
         }
         widgets.push(json!({"kind":"list-row", "id":"study-reset", "title":"Reset exercise", "row_action":"study:reset"}));
         return widgets;

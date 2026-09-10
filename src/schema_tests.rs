@@ -48,14 +48,14 @@ fn study_changes_visible_state_and_resets_without_external_actions() {
         ..View::default()
     };
     let before = viewport_view(&view);
-    assert!(view.study_action("study:open"));
+    assert!(view.study_action("study:open", ""));
     assert_ne!(before, viewport_view(&view));
-    assert!(view.study_action("study:fill"));
+    assert!(view.study_action("study:fill", ""));
     assert_eq!(view.study_actions, 1);
-    assert!(view.study_action("study:back"));
+    assert!(view.study_action("study:back", ""));
     assert!(!view.study_detail);
-    assert!(!view.study_action("fill-real-vault"));
-    assert!(view.study_action("study:reset"));
+    assert!(!view.study_action("fill-real-vault", "test"));
+    assert!(view.study_action("study:reset", ""));
     assert_eq!(view.study_actions, 0);
     assert!(view.study_proposed);
 }
