@@ -9,6 +9,12 @@ predictable places. The document remains the main event.
 
 ![Ribbon study: detached sparse toolbar and integrated grouped ribbon](%ASSETS%/ribbon-study.svg)
 
+The Excel-class target (consulted mock, 2026-09-10): task tabs, a dominant
+primary, selector controls, a real switch in the toggle chip, dividers and
+captions under every group.
+
+![The Excel-class ribbon target](%ASSETS%/ribbon-excel-mock.png)
+
 ## What the rejected example teaches
 
 The upper study reconstructs the reported editor ribbon from the supplied

@@ -16,6 +16,10 @@ it first, visibly, here, so the next app finds it instead of reinventing it.
 
 ## The queue
 
+| **Keyboard navigability law (owner 2026-09-10)** — every interactive list/row navigable with Up/Down arrows, Windows-style, throughout the UI; basic keyboard presence is intuition, not a feature | every document app + the shell | yggterm-shell row renderer: roving focus + arrow handling on document list-rows | Named by the owner |
+| **Hover accent from the theme engine** — interactive rows hover to an accent that SUITS the active theme, derived by algorithm, never hardcoded; blue family when the theme has no accent | shell row renderer | Algorithm spec consulted (gpt-6-astra, chain 0010): OKLCH blend 84/16 toward ink, C clamp 0.025-0.060, L delta 0.04-0.10, contrast >= 4.5 with search-and-gamut-map | Spec ready, implementation pending |
+| **Theme picker modal with preset accent combinations** — the theme engine modal supplies pre-existing combinations (Deep Teal #265F63, Ink Wash #24343B, Slate Blue #4568A0, Warm Bronze #93642F, Plum #805780, each with derived hover per the algorithm) | theme engine modal | Presets in chain 0010 | Named by the owner |
+
 | Demand | Who needs it | Layer that grows | State |
 |---|---|---|---|
 | **Mini-app conversions still owed**, Live Sessions row anatomy, the ychrome sidebar, the ychrome vault sidebar (as the Complex-sidebars working example) | every document app | own chapters with real mini-apps (studies exist; the shared row/renderer pieces their hosts own) | Row anatomy DESIGNED (gpt-6-astra, chain 0005, mock 0005-sessions-mock.png) and staged as specimen study 04; host-renderer conversion still pending |
