@@ -52,16 +52,17 @@ jobs:
             win32-x64) PKG_OS=win32; PKG_CPU=x64 ;;
             win32-arm64) PKG_OS=win32; PKG_CPU=arm64 ;;
           esac
-          mkdir -p "pack/@ygghq/ydesign-$TARGET/bin"
-          cp "$BUILT/$EXE" "pack/@ygghq/ydesign-$TARGET/bin/ydesign"
-          printf '{"name":"@ygghq/ydesign-%s","version":"0.1.1","bin":{"ydesign":"bin/ydesign"},"os":["$PKG_OS"],"cpu":["$PKG_CPU"],"license":"GPL-3.0-or-later","repository":{"type":"git","url":"git+https://github.com/yggdrasilhq/ydesign.git"}}\n' "$TARGET" > "pack/@ygghq/ydesign-$TARGET/package.json"
+          mkdir -p "pack/@ygghq/ydesign-app-$TARGET/bin"
+          cp "$BUILT/$EXE" "pack/@ygghq/ydesign-app-$TARGET/bin/ydesign"
+          VER=$(node -p "require('./package.json').version")
+          printf '{"name":"@ygghq/ydesign-app-%s","version":"%s","bin":{"ydesign":"bin/ydesign"},"os":["%s"],"cpu":["%s"],"license":"GPL-3.0-or-later","repository":{"type":"git","url":"git+https://github.com/yggdrasilhq/ydesign.git"}}\n' "$TARGET" "$VER" "$PKG_OS" "$PKG_CPU" > "pack/@ygghq/ydesign-app-$TARGET/package.json"
       - name: Publish platform package
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' > ~/.npmrc
-          cd "pack/@ygghq/ydesign-${{ matrix.target }}"
+          cd "pack/@ygghq/ydesign-app-${{ matrix.target }}"
           # IDEMPOTENCE WITHOUT LYING: only the genuine already-published
           # conflict is a skip; every other publish error fails the step with
           # its real output (a broken package.json must not report as a clean
