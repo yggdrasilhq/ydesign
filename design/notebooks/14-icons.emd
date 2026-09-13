@@ -72,3 +72,82 @@ The icon row and every icon-bearing control in the component testbed app
 render from the crate at 1.5 stroke; the composer, sidebar rows and rail
 sections show them in context at 14–16px. Chapter status and the owed pixel
 pass are tracked in the [chapter inventory](chapter-inventory.md).
+
+## The catalogue: every icon, as SVG blocks
+
+The one icon source is the `yggui-icons` crate (lucide v1.17 paths on the
+24 grid, stroke 1.5, round caps and joins, currentColor, fill none,
+rendered at wrapper size; 16px is the default UI size). The catalogue
+below IS the crate, block by block; a new inline `<svg` in an app layer
+is the defect this crate exists to prevent. Lucide path data is ISC;
+provenance recorded in the crate.
+
+- **Arrow Up**
+
+![Arrow Up](%ASSETS%/icon-arrow-up.svg)
+- **Arrow Down**
+
+![Arrow Down](%ASSETS%/icon-arrow-down.svg)
+- **Arrow Left**
+
+![Arrow Left](%ASSETS%/icon-arrow-left.svg)
+- **Arrow Right**
+
+![Arrow Right](%ASSETS%/icon-arrow-right.svg)
+- **Chevron Up**
+
+![Chevron Up](%ASSETS%/icon-chevron-up.svg)
+- **Chevron Down**
+
+![Chevron Down](%ASSETS%/icon-chevron-down.svg)
+- **Chevron Left**
+
+![Chevron Left](%ASSETS%/icon-chevron-left.svg)
+- **Chevron Right**
+
+![Chevron Right](%ASSETS%/icon-chevron-right.svg)
+- **X**
+
+![X](%ASSETS%/icon-x.svg)
+- **Plus**
+
+![Plus](%ASSETS%/icon-plus.svg)
+- **Minus**
+
+![Minus](%ASSETS%/icon-minus.svg)
+- **Ellipsis**
+
+![Ellipsis](%ASSETS%/icon-ellipsis.svg)
+- **Ellipsis Vertical**
+
+![Ellipsis Vertical](%ASSETS%/icon-ellipsis-vertical.svg)
+- **Search**
+
+![Search](%ASSETS%/icon-search.svg)
+- **Square Pen**
+
+![Square Pen](%ASSETS%/icon-square-pen.svg)
+- **Pencil**
+
+![Pencil](%ASSETS%/icon-pencil.svg)
+- **Copy**
+
+![Copy](%ASSETS%/icon-copy.svg)
+- **Rotate Cw**
+
+![Rotate Cw](%ASSETS%/icon-rotate-cw.svg)
+- **Git Branch**
+
+![Git Branch](%ASSETS%/icon-git-branch.svg)
+- **Settings**
+
+![Settings](%ASSETS%/icon-settings.svg)
+- **Share**
+
+![Share](%ASSETS%/icon-share.svg)
+- **Message Circle**
+
+![Message Circle](%ASSETS%/icon-message-circle.svg)
+- **Hash**
+
+![Hash](%ASSETS%/icon-hash.svg)
