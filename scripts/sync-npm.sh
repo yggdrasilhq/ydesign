@@ -4,12 +4,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 version=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+# The no-shipping law: ydesign ships no notebooks, so the npm face carries
+# the tokens only and points at libyggterm for the design language.
 rm -rf npm/notebooks npm/assets
-mkdir -p npm/notebooks npm/assets
-cp design/notebooks/*.emd npm/notebooks/
-cp -r design/assets/. npm/assets/
-rm -f npm/assets/.gitkeep npm/assets/icons/.gitkeep npm/assets/fonts/.gitkeep npm/assets/components/.gitkeep npm/assets/img/.gitkeep
-cp design/Inheritance.md npm/Inheritance.md
+rm -f npm/Inheritance.md
 python3 - "$version" << 'PY'
 import json, sys
 p = "npm/package.json"

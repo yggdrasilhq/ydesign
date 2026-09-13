@@ -77,8 +77,9 @@ and inherit the same chain.
 and what is explicitly overridden — see [notebook-layers.md](notebook-layers.md)
 for the registration and inheritance contract. Undefined decisions inherit;
 explicit local decisions override; cycles and unresolved overlaps are
-invalid. The base chain every project inherits through is ydesign's own
-`design/Inheritance.md`.
+invalid. The base chain every project inherits through is libyggterm's
+`design/Inheritance.md` — the platform owns the base notebooks (owner,
+2026-09-13: the reader ships nothing).
 
 ## emd and the extensible renderer
 

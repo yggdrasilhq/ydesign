@@ -49,20 +49,20 @@ impl View {
             MODE_GUIDE
         }
         .to_string();
-        let home = if mode == MODE_EXAMPLES {
-            "examples"
-        } else {
-            "start-here"
+        let (home, home_page) = match mode_home(&mode) {
+            Some((id, page)) => (Some(id), Some(page)),
+            None => (None, None),
         };
+        let home_book = home.as_ref().map(|id| book_id_of(id));
         Self {
-            selected_book: Some("yggui".into()),
+            selected_book: home_book.or(Some("yggui".into())),
             expanded_books: Self::expanded_all(&mode),
             mode,
             // ydesign opens on its home page — the language itself is the home
             // page, and there is no nameless view you reach by having selected
             // nothing.
-            selected_notebook: Some(home.to_string()),
-            selected_page: Some(format!("{home}-page")),
+            selected_notebook: home,
+            selected_page: home_page,
             notice: None,
             study_proposed: true,
             study_detail: false,
@@ -136,7 +136,7 @@ impl View {
         }
         true
     }
-    pub fn study_action(&mut self, action: &str, value: &str) -> bool {
+    pub fn study_action(&mut self, action: &str, _value: &str) -> bool {
         match action {
             "study:next" => self.lesson_step = (self.lesson_step + 1) % 3,
             "study:compare" => self.study_proposed = !self.study_proposed,
@@ -168,13 +168,13 @@ impl View {
         // A mode switch is a fresh reading: the whole shelf of that mode
         // opens populated, exactly like a cold start.
         self.expanded_books = Self::expanded_all(mode);
-        let home = if mode == MODE_EXAMPLES {
-            "examples"
-        } else {
-            "start-here"
+        let (home, home_page) = match mode_home(mode) {
+            Some((id, page)) => (Some(id), Some(page)),
+            None => (None, None),
         };
-        self.selected_notebook = Some(home.to_string());
-        self.selected_page = Some(format!("{home}-page"));
+        self.selected_book = home.as_ref().map(|id| book_id_of(id)).or(Some("yggui".into()));
+        self.selected_notebook = home;
+        self.selected_page = home_page;
         self.notice = None;
         true
     }
@@ -206,6 +206,33 @@ fn titlebar_switch_spec(active_mode: &str) -> Value {
 }
 
 // ─── RAIL (the notebook shelf) ────────────────────────────────────────────────
+
+
+/// The book id that owns a notebook on the shelf: project books group by
+/// their registered project, the legacy base group was "yggui".
+fn book_id_of(notebook_id: &str) -> String {
+    notebook_id
+        .strip_prefix("project/")
+        .and_then(|rest| rest.split_once('/'))
+        .map(|(pid, _)| format!("project/{pid}"))
+        .unwrap_or_else(|| "yggui".into())
+}
+
+/// The mode's home reading: the first notebook of that mode's shelf. The
+/// reader ships no notebooks, so a host with an empty registry opens on the
+/// empty state instead of a phantom home.
+fn mode_home(mode: &str) -> Option<(String, String)> {
+    notebook::list_notebooks(Some(mode))
+        .first()
+        .map(|nb| {
+            let page = nb
+                .pages
+                .first()
+                .map(|p| p.id.clone())
+                .unwrap_or_else(|| format!("{}-page", nb.id));
+            (nb.id.clone(), page)
+        })
+}
 
 pub fn rail_view(view: &View) -> Value {
     let mut widgets = Vec::new();
@@ -290,7 +317,7 @@ pub fn viewport_view(view: &View) -> Value {
             widgets.push(json!({
                 "kind": "markdown",
                 "id": format!("book_page:{}", page.id),
-                "source": notebook::resolve_asset_paths(&page.markdown),
+                "source": page.markdown,
             }));
             // ── The exhibition half ─────────────────────────────────────
             // A design language is argued from pixels, so the pages that
@@ -366,7 +393,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({"kind":"list-row", "id":"lesson-reset", "title":"Reset walkthrough", "row_action":"study:reset"}));
         return widgets;
     }
-    if nb.id == "ribbons" {
+    if nb.id.ends_with("09-ribbons") {
         widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
             "## Ribbon exercise\n\nTabs genuinely switch the command set (currently **{}**); Track changes persists until toggled back; the primary action sits at the trailing edge. These rows are the host's own renderer — the study image proposes the same composition with richer chrome.",
             view.study_tab)}));
@@ -411,7 +438,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({"kind":"list-row", "id":"study-reset", "title":"Reset exercise", "row_action":"study:reset"}));
         return widgets;
     }
-    if nb.id == "complex-sidebars" {
+    if nb.id.ends_with("10-complex-sidebars") {
         widgets.push(json!({"kind":"markdown", "id":"study-state", "source":format!(
             "## Live exercise\n\n{} anatomy · {} · {} simulated commands. These controls use the current host row renderer; the study image proposes the future composition.",
             if view.study_proposed {"Proposed"} else {"Rejected"},
@@ -430,7 +457,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         widgets.push(json!({"kind":"list-row", "id":"study-reset", "title":"Reset exercise", "row_action":"study:reset"}));
         return widgets;
     }
-    if nb.id == "gallery" {
+    if nb.id.ends_with("01-component-gallery") {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_gallery_intro",
@@ -455,7 +482,7 @@ fn exhibition_widgets(nb: &Notebook, view: &View) -> Vec<Value> {
         }
     }
 
-    if nb.id == "examples" {
+    if nb.id.ends_with("06-worked-examples") {
         widgets.push(json!({
             "kind": "markdown",
             "id": "specimen_live_intro",
