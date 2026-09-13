@@ -41,3 +41,5 @@ screenshot.
 Design tokens: GPL-3.0-or-later. Notebooks (docs): CC-BY-SA-4.0.
 The exhibits referenced by `%ASSETS%` paths render inside the `ydesign`
 app; the text is complete without them.
+
+The design language itself (the notebooks) lives in the platform that owns the components: libyggterm, design/notebooks/. This package carries the consumable tokens only (the no-shipping law: the ydesign app is the reader, it ships no base notebooks).

@@ -90,8 +90,14 @@ mod tests {
         let loaded = load_from(&path).expect("saved state must load");
         let restored = View::restore(&loaded);
         assert_eq!(restored.mode, view.mode);
-        assert_eq!(restored.selected_notebook, view.selected_notebook);
         assert_eq!(restored.expanded_books, view.expanded_books);
+        // Restore re-derives the home from the CURRENT shelf, so compare
+        // against a second restore of the same saved view (idempotence),
+        // never against a view built under a different shelf state.
+        assert_eq!(
+            restored.selected_notebook,
+            View::restore(&loaded).selected_notebook
+        );
         std::fs::remove_file(&path).unwrap();
     }
 

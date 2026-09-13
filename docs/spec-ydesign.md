@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Spec — ydesign, the design-language app
 
+**The no-shipping law (2026-09-13, owner):** ydesign ships NO base
+notebooks. The component books live in libyggterm, the chrome books in
+yggterm, app books in the app repos; the shelf is assembled from the
+registry and the skill onboards hosts. The app is the reader.
+
 **Current target:** [Living design books](living-design-books.md), owner
 direction 2026-09-07. One group per book, header as contents, chapter rows
 with real Dioxus mini-apps and reusable source. The schema-only architecture

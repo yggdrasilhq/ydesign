@@ -9,9 +9,20 @@ The design system of a repository is files: a root `DESIGN.md` pointer page
 (doors, not rooms), a `design/` tree of decision notebooks, inheritance
 records, assets, and — where the project has interactive pages —
 `design/notebooks/*.emd`. The layout contract is
-[docs/design-layout.md](../../../docs/design-layout.md) (version 1.0.0) in
-the ydesign repository. Nobody needs the ydesign app to work in a
-repository; only `design/notebooks/*.emd` need it to render.
+[docs/design-layout.md](../../../docs/design-layout.md) (version 1.1.0) in
+this repository. Nobody needs the ydesign app to work in a repository; only
+`design/notebooks/*.emd` need it to render.
+
+**The reader ships nothing.** The BASE design language lives in libyggterm
+(`design/notebooks/*.emd` — the component vocabulary); yggterm owns its
+chrome books; every app owns its own books. The ydesign app is the reader
+and the shelf is assembled from the registry. Onboarding a host means
+registering the repos below and letting the skill keep them fresh:
+
+- libyggterm (id `yggui`) — the base chain every project inherits;
+- yggterm (id `yggterm`) — the shell chrome books;
+- yggui-priv-modules (id `yggui-priv`) — the private modules and their design books;
+- each product repo by its own id.
 
 ## Entry procedure (every UX task, every repo)
 
@@ -20,7 +31,7 @@ repository; only `design/notebooks/*.emd` need it to render.
    the component notebooks, the interactive pattern in
    `design/notebooks/*.emd`. Never invent a value a door already decides.
 2. **Read the chain.** `design/Inheritance.md` names the layer and parents;
-   read the complete parent chain into the yggui base notebooks before
+   read the complete parent chain into the libyggterm base notebooks before
    overriding anything. Undefined decisions inherit; explicit local
    decisions override; cycles and unresolved overlaps are invalid.
 3. **Work at the owning layer.** A missing component grows the lower layer

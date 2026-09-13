@@ -1,20 +1,12 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Inheritance
 
-**edition 2026-09-07 · rev 1**
+Layer: **ydesign, the reader app**. This repository carries no design
+language of its own beyond the reading surfaces it renders.
 
-Layer: yggui base design notebooks, published by ydesign.
+Parent: yggui (L1, libyggterm) — whose `design/notebooks/*.emd` are the base
+design language this app exists to exhibit. Transitive: Dioxus (L0).
 
-Parent: Dioxus components (component and event substrate). The yggui layer
-adds semantic theme tokens, typography, row anatomy, focus, ribbon, rail and
-feedback patterns. Dioxus alone does not prescribe the yggui visual identity.
-
-An app inheriting yggui inherits this chain transitively. App notebooks may
-override named visual decisions, with rationale and specimens; structural
-accessibility, state ownership and truthful feedback remain requirements.
-For multiple parents, list them in precedence order and explicitly resolve
-overlapping decisions. A cycle or unresolved overlap is invalid.
-
-This is design inheritance, not a dependency manager: consult each project's
-manifest for the actual Dioxus and yggui versions. No code is imported by
-registering a notebook.
+The specimen demo styling (specimens/assets/book.css) inherits the yggui
+token names; anything the reader renders is governed by the layer that owns
+the component being exhibited.
