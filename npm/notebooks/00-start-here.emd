@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# Start here — the base design language
+# Start here, the base design language
 
 **edition 2026-09-07 · rev 1**
 
@@ -11,14 +11,14 @@ whole point:
 |---|---|---|
 | **L0 · Dioxus** | UI primitives | upstream |
 | **L1 · yggui** | The component vocabulary, the type system, the contracts | libyggterm (`crates/yggui`, `yggui-contract`, `emd-renderer`) |
-| **L2 · App languages** | yedit, ychrome, ytop, kasten — each app's own patterns over L1 | each app's repo |
+| **L2 · App languages** | yedit, ychrome, ytop, kasten, each app's own patterns over L1 | each app's repo |
 | **L3 · Project overlays** | A product's own design notebook, layered over L1 | that product's repo |
 
 ## The consultation ladder
 
 Work at your own layer first. When your layer does not answer a question:
 
-1. **Fall through one layer** — read the same concern in the layer below.
+1. **Fall through one layer**, read the same concern in the layer below.
    An app that cannot decide a row's spacing consults the row engine (L1),
    never invents a number (L2).
 2. **If the lower layer lacks the component, grow the lower layer.** A new
@@ -26,16 +26,16 @@ Work at your own layer first. When your layer does not answer a question:
    gallery* notebook), not hand-rolled inside the app that wanted it. The
    admission gate is the platform's own: a forcing consumer, and a second
    consumer before the widget becomes a vocabulary kind.
-3. **Never ship a second encoding of a decided thing.** If a rule exists —
+3. **Never ship a second encoding of a decided thing.** If a rule exists,
    one segmented control, one field skin, one row engine, one status
-   vocabulary — a second implementation is the bug, however local it feels.
+   vocabulary, a second implementation is the bug, however local it feels.
 
 ## The working habit: argue from pixels
 
 A design judgement is argued from a **pixel screenshot**, never from source
 and never from a description. The instruments:
 
-- Component work: render the gallery example and shoot it —
+- Component work: render the gallery example and shoot it,
   `cargo run -p yggui --example conversation_gallery`, then
   `libyggterm/scripts/gallery-shot.sh <example> out.png` (headless sway +
   grim; build the example *first*, outside the capture window).
@@ -47,15 +47,15 @@ and never from a description. The instruments:
 
 ## Where authority lives
 
-- **DESIGN.md** — routing and working procedure. Palette, typography and
+- **DESIGN.md**, routing and working procedure. Palette, typography and
   brand rationale belong in the design notebooks it points to.
-- **These notebooks and the app's design/ notebooks** — the visual authority:
+- **These notebooks and the app's design/ notebooks**, the visual authority:
   components, specimens, semantic tokens and their rationale.
-- **Inheritance.md** — parent layers and explicit override scope, from Dioxus
+- **Inheritance.md**, parent layers and explicit override scope, from Dioxus
   through yggui into an app. Undefined decisions inherit transitively.
-- **libyggterm specs** — `docs/spec-app-architecture.md` (the tier decision:
+- **libyggterm specs**, `docs/spec-app-architecture.md` (the tier decision:
   who paints the pixels) and `docs/spec-emd-renderer.md` (what a document is).
-- **`.agents/skills/libyggterm-surfaces/SKILL.md`** — the app-platform
+- **`.agents/skills/libyggterm-surfaces/SKILL.md`**, the app-platform
   contract: surfaces, transport, lifecycle, the widget vocabulary.
 
 When DESIGN.md duplicates a visual decision, move that decision and its
@@ -70,12 +70,12 @@ every book and project layer:
 
 | Label | Claim |
 |---|---|
-| **observed** | Measured from a real surface — a screenshot, a probe, a grep — with the instrument named. |
+| **observed** | Measured from a real surface, a screenshot, a probe, a grep, with the instrument named. |
 | **reconstructed** | Redrawn to teach, with invented content; useful ideas, not proof. |
 | **proposed** | Offered for comment; becomes a decision only when its component change lands with its own proof. |
 | **verified** | Re-checked against the artifact on a stated date (who ran what, what it showed). |
 
-A chapter that cannot name its label is asserting by tone — refuse it in
+A chapter that cannot name its label is asserting by tone, refuse it in
 review. The per-chapter conversion status (front matter, legacy illustration,
 working specimen, reviewed reference) lives in the
 [chapter inventory](chapter-inventory.md); no chapter may claim a status the
@@ -85,29 +85,29 @@ inventory does not grant it.
 
 Read in this order; each book assumes the ones before it:
 
-1. **Foundations** — semantic colour, typography, relationships: the visual
+1. **Foundations**, semantic colour, typography, relationships: the visual
    language under everything.
-2. **Component gallery** — every component an app may reach for, and the
+2. **Component gallery**, every component an app may reach for, and the
    one-owner rule each encodes.
-3. **The catalogue** — the design exhibited: real pixels with the choices
+3. **The catalogue**, the design exhibited: real pixels with the choices
    behind them.
-4. **Sidebars** — the row engine, status vocabulary, partitioning, header
+4. **Sidebars**, the row engine, status vocabulary, partitioning, header
    anatomy.
-5. **Forms & settings** — section cards, the one field skin, the short-phrase
+5. **Forms & settings**, section cards, the one field skin, the short-phrase
    rule.
-6. **Motion & feedback** — toasts and anchors, the stage curtain, the shared
+6. **Motion & feedback**, toasts and anchors, the stage curtain, the shared
    blink clock.
-7. **emd & notebooks** — the extended-markdown contracts and authoring rules.
-8. **Ribbons** — commands that belong to the workspace.
-9. **Complex sidebars** — task-first identity and progressive disclosure.
-10. **List views** — one reading grid, distinct purposes.
-11. **Icons** — the one icon source and the crispness recipe.
-12. **Inheritance** — what the base decides, what an app may override.
-13. **ZCode reversed** — a measured external reference and its Dioxus port
+7. **emd & notebooks**, the extended-markdown contracts and authoring rules.
+8. **Ribbons**, commands that belong to the workspace.
+9. **Complex sidebars**, task-first identity and progressive disclosure.
+10. **List views**, one reading grid, distinct purposes.
+11. **Icons**, the one icon source and the crispness recipe.
+12. **Inheritance**, what the base decides, what an app may override.
+13. **ZCode reversed**, a measured external reference and its Dioxus port
     path.
-14. **Worked examples** (Examples mode) — canonical surfaces rebuilt as live
+14. **Worked examples** (Examples mode), canonical surfaces rebuilt as live
     schemas to screenshot against.
-15. **Roadmap** — the defect and demand ledger; where an agent files before
+15. **Roadmap**, the defect and demand ledger; where an agent files before
     fixing.
 
 ## How other apps consume this
@@ -121,4 +121,4 @@ An app's campaign memory points at these notebooks (the shelf ships inside
 the app: run `ydesign` inside yggterm). A project that defines its own layer
 (L3) writes its own design notebook in its own repo, states what it overrides,
 and defers to this base set for everything it does not. The fallback is
-always the adjacent lower layer — never a local invention.
+always the adjacent lower layer, never a local invention.

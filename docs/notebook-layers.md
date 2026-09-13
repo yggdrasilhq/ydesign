@@ -17,7 +17,7 @@ redesign an app's brand.
 overridden. Default chain: Dioxus components → yggui base → app layer.
 Read the complete parent chain. Undefined decisions inherit; explicit local
 decisions override. Reject cycles and unresolved conflicts during review.
-The base chain lives in ydesign's root `Inheritance.md`. The registry loads
+The base chain lives in ydesign's `design/Inheritance.md`. The registry loads
 documents; it does not compute CSS or prove the correctness of inheritance.
 
 ## Initialize and register
@@ -28,8 +28,9 @@ ydesign --config /path/to/projects.json --notebook
 ydesign --notebook project/sample-app/00-brand --page 1
 ```
 
-`init` creates missing `DESIGN.md`, `design/Inheritance.md`,
-`design/00-brand.md`, and `design/assets/`. It preserves existing files and
+`init` creates missing `DESIGN.md` (the pointer page), `design/Inheritance.md`,
+`design/00-brand.md`, `design/assets/{icons,fonts,components,img}`, and
+`design/notebooks/`. It preserves existing files and It preserves existing files and
 registers the repo in the local config, defaulting to
 `$XDG_CONFIG_HOME/ydesign/projects.json` (normally `~/.config/ydesign/`).
 Use `--config` to keep an isolated registry for a worktree or review.
@@ -39,11 +40,14 @@ Use `--config` to keep an isolated registry for a worktree or review.
 ```
 
 Paths are absolute or relative to the config file. Keep machine-specific
-registries outside public git. After a worktree is merged and removed, point
+registries outside public git. The default registry lives at
+`~/.yggterm/config/ydesign/projects.json` (the organized yggterm config
+area, ydesign 1.0.0); a pre-1.0 registry at the OS config location keeps
+working until the organized one exists. After a worktree is merged and removed, point
 the registry at the persistent main checkout. Restart ydesign after editing
 the registry or notebook source: it loads a snapshot at startup.
 
-External Markdown files become separately selectable notebooks in the Guide
+External markdown and emd files (`design/*.md`, `design/notebooks/*.emd`) become separately selectable notebooks in the Guide
 shelf. IDs are namespaced `project/<id>/<filename-without-extension>`; they
 cannot replace the base. Each file needs a `# heading`. Images use
 `%ASSETS%/image.png` and resolve inside that project's `design/assets/` as

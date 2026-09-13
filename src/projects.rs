@@ -31,7 +31,23 @@ pub struct Project {
     pub path: PathBuf,
 }
 
+/// The registry lives under the organized yggterm config area (the 1.0.0
+/// layout); a pre-1.0 registry at the old OS config location keeps working
+/// until the organized one exists. Fresh machines get the organized path.
 pub fn config_path() -> PathBuf {
+    if let Some(home) = dirs::home_dir() {
+        let organized = home.join(".yggterm/config/ydesign/projects.json");
+        if organized.exists() {
+            return organized;
+        }
+        if let Some(dir) = dirs::config_dir() {
+            let legacy = dir.join("ydesign/projects.json");
+            if legacy.exists() {
+                return legacy;
+            }
+        }
+        return organized;
+    }
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
         .join("ydesign/projects.json")
@@ -82,17 +98,29 @@ fn load_project(project: &Project, config_dir: &Path) -> Result<Vec<Notebook>> {
         .context("project needs design/")?;
     let inheritance = std::fs::read_to_string(design.join("Inheritance.md"))
         .context("project needs design/Inheritance.md")?;
-    let mut files: Vec<_> = std::fs::read_dir(&design)?.collect::<std::io::Result<Vec<_>>>()?;
-    files.sort_by_key(|entry| entry.file_name());
     let mut notebooks = Vec::new();
-    for entry in files {
-        let file = entry.path();
-        if file.extension().and_then(|s| s.to_str()) != Some("md") {
+    for dir in [design.clone(), design.join("notebooks")] {
+        if !dir.is_dir() {
             continue;
         }
-        match load_notebook(&file, &design, &project.id, &inheritance) {
-            Ok(notebook) => notebooks.push(notebook),
-            Err(error) => eprintln!("ydesign: skipping `{}`: {error:#}", file.display()),
+        let mut files: Vec<_> = std::fs::read_dir(&dir)?.collect::<std::io::Result<Vec<_>>>()?;
+        files.sort_by_key(|entry| entry.file_name());
+        for entry in files {
+            let file = entry.path();
+            if !matches!(file.extension().and_then(|s| s.to_str()), Some("md") | Some("emd")) {
+                continue;
+            }
+            match load_notebook(&file, &design, &project.id, &inheritance) {
+                Ok(notebook) => {
+                    if notebooks.iter().any(|n: &Notebook| n.id == notebook.id) {
+                        eprintln!("ydesign: duplicate notebook id `{}`, skipping `{}`",
+                            notebook.id, file.display());
+                    } else {
+                        notebooks.push(notebook);
+                    }
+                }
+                Err(error) => eprintln!("ydesign: skipping `{}`: {error:#}", file.display()),
+            }
         }
     }
     Ok(notebooks)
@@ -208,8 +236,13 @@ pub fn init(repo: &Path, id: &str, config: &Path) -> Result<()> {
     }
     let design = root.join("design");
     std::fs::create_dir_all(design.join("assets"))?;
+    for kind in ["icons", "fonts", "components", "img"] {
+        std::fs::create_dir_all(design.join("assets").join(kind))?;
+    }
+    std::fs::create_dir_all(design.join("notebooks"))?;
     let files = [
-        (root.join("DESIGN.md"), "# Design guide\n\nRead design/Inheritance.md, then the notebooks in design/. Visual identity, palette, typography and examples live in those notebooks. Consult the inherited ydesign base notebooks for undefined decisions. Preview with ydesign --notebook; register this repository with ydesign init.\n".to_string()),
+        (root.join("DESIGN.md"), "# Design guide\n\nDoors, not rooms: this page routes, the notebooks decide. Read [design/Inheritance.md](design/Inheritance.md) for the layer chain, then the notebook that owns your decision. Visual identity, palette, typography and examples live in design/*.md; interactive component notebooks live in design/notebooks/*.emd and render with ydesign. The layout contract is docs/design-layout.md in the ydesign repository (version 1.0.0). Navigation skill: ~/.yggterm/skills/ydesign/SKILL.md. Preview with ydesign --notebook; register this repository with ydesign init.\n".to_string()),
+        (design.join("notebooks/.gitkeep"), String::new()),
         (design.join("Inheritance.md"), format!("# Inheritance\n\nLayer: {id}\n\nParent: yggui (ydesign base notebooks). Transitive chain: Dioxus components → yggui → {id}. Read the parent Inheritance.md before overriding a decision.\n\nLocal notebooks override only decisions they explicitly name. All other rules inherit. Multiple parents must name their order and resolve overlaps explicitly; cycles and unresolved conflicts are invalid. This file records provenance and override scope, not palette or typography.\n")),
         (design.join("00-brand.md"), format!("# {id}, brand identity\n\nStatus: inherited baseline; app-specific choices are not yet approved.\n\nInherit yggui semantic colors, system typography, focus and interaction behavior. Record app-specific palette, typography, imagery and rationale here when chosen. Add a large rendered specimen and keyboard/mouse walkthrough for each material override.\n")),
         (design.join("assets/.gitkeep"), String::new()),

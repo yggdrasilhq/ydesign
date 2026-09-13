@@ -10,6 +10,11 @@ not sufficient acceptance for the new product.
 The 2026-09-05 extension in [Notebook layers](notebook-layers.md) defines
 project scaffolding, registration, inheritance and the visual teaching contract.
 
+**Version:** the [design/ layout](design-layout.md) (1.0.0, 2026-09-13)
+governs where design files live in every repository this contract reaches —
+root `DESIGN.md` pointer page, `design/` tree, `.emd` interactive
+notebooks, `AGENTS.md` routing to `DESIGN.md`.
+
 Recorded 2026-08-28, owner-directed. ydesign is the yggui base design
 language made visible: a libyggterm document-surface app whose notebooks are
 the base design system the fleet's Web/GUI projects consult.
@@ -23,7 +28,7 @@ the base design system the fleet's Web/GUI projects consult.
   pane (`rail`) carrying the notebook shelf.
 - An app-declared titlebar switch: **Guide | Examples** — the guideline
   shelf and the worked-examples shelf are the two reading modes.
-- Base notebooks compiled into the binary from `notebooks/*.md`
+- Base notebooks compiled into the binary from `design/notebooks/*.emd`
   (CC-BY-SA-4.0); the exhibition pages (`gallery`, `examples`) append real
   composed widgets below their prose so the page is a screenshot-able
   specimen, not a description.
