@@ -9,6 +9,14 @@ docs).** Do not introduce a second licence claim anywhere: README, NOTICE,
 `Cargo.toml`, and file headers must agree, and every file under `notebooks/`
 and `docs/` carries its `SPDX-License-Identifier: CC-BY-SA-4.0` banner.
 
+## Design system
+
+**UX guidelines route through [DESIGN.md](DESIGN.md)** — the pointer page:
+one line per door (notebooks, inheritance, assets, skill), body in the
+file. The layout contract is [docs/design-layout.md](docs/design-layout.md)
+(ydesign 1.0.0). Nobody needs the ydesign app to work in this repository;
+only `design/notebooks/*.emd` need it to render.
+
 ## The product rule
 
 The current product target is docs/living-design-books.md: one row group per

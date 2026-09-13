@@ -17,7 +17,7 @@ a tooltip must not be the only way keyboard or touch users learn a consequence.
 
 ## Section cards: a form is a card, a list is not
 
-A form group — heading plus the fields under it — sits in a card (14px
+A form group, heading plus the fields under it, sits in a card (14px
 radius, inset hairline, 11–12px padding). **Opt-in per section, and it stays
 opt-in**: a card around a long list is a stack of nested boxes, which the
 brand rules out by name. A form wants the card; a file tree does not.
@@ -46,14 +46,14 @@ The rule:
   explanation occupies more visual weight than the control, the row is wrong.
 
 The same law in menus: a verb's *reason* lives in the **tooltip**, never in
-the label — a label is a name, and appending a justification to it produced
+the label, a label is a name, and appending a justification to it produced
 unreadable menus once already.
 
 ## One field skin
 
 There is ONE text field in the product; every box is that control wearing
 different geometry. The skin is a **stylesheet** (hover and focus are states;
-an inline style cannot express one), and the style function emits the BOX —
+an inline style cannot express one), and the style function emits the BOX,
 never the fill, because one inline background out-specifies the stylesheet
 and silently kills hover and focus for that surface.
 
@@ -65,14 +65,14 @@ and silently kills hover and focus for that surface.
 - A field sits on a **section card** in a form, never floating on the bare
   rail.
 
-### A stored value: mask dots, an eye, a copy — on the field
+### A stored value: mask dots, an eye, a copy, on the field
 
-- The dots are a **placeholder**, never a value — fixed length, vanishing on
+- The dots are a **placeholder**, never a value, fixed length, vanishing on
   the first keystroke, submittable by nothing.
 - The verbs (eye, copy) sit inside the trailing edge, quiet at rest, lit on
   hover, with their room reserved so long values ellipsize behind them.
 - A revealed value is display-only; it never reaches the form draft.
-- **No eye for a value that is not there** — an empty box that adds one is an
+- **No eye for a value that is not there**, an empty box that adds one is an
   ordinary empty box with its own placeholder.
 
 ## Control choices that are already made
@@ -81,7 +81,7 @@ and silently kills hover and focus for that surface.
   track, near-edge-to-edge active fill, no drop shadow on the active chip.
 - **Binary on/off**: the switch (track + sliding thumb), not a segmented
   pair.
-- **Primary action**: unmistakably clickable — accent fill, white label,
+- **Primary action**: unmistakably clickable, accent fill, white label,
   AA contrast or better. "This does not look like a button" is a design
   failure, stated as a rule.
 - **Destructive verbs**: reversible by default. Bulk actions name their count

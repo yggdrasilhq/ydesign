@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# ZCode reversed — components & colour (measured reference)
+# ZCode reversed, components & colour (measured reference)
 
 **edition 2026-09-07 · rev 1**
 
@@ -10,7 +10,7 @@ repos are the evidence.
 | Reference | Repo | What it is | Licence posture |
 |---|---|---|---|
 | ZCode desktop 3.11.2 | zcodereversed (private fleet forgejo) | stylesheets + tokens + component anatomy extracted from the asar | first-party asset extraction (our own product) |
-| t3code | t3codereversed (private fleet forgejo; mirrors upstream e60821f0e) | verbatim `index.css` + 49-component ui kit | MIT — no RE, attribution in NOTICE |
+| t3code | t3codereversed (private fleet forgejo; mirrors upstream e60821f0e) | verbatim `index.css` + 49-component ui kit | MIT, no RE, attribution in NOTICE |
 | mini-lab | `t3codereversed/miniapp/`, served on a fleet host | dioxus 0.7 wasm gallery: one component vocabulary, four token arms | ours |
 
 Label: everything in the first two sections is **observed**; the Dioxus-path
@@ -18,7 +18,7 @@ section is **proposed** until the port lands app-by-app.
 
 ## What ZCode actually is (observed)
 
-React 19 + **shadcn/ui** (new-york, v4-era — `data-slot` markers) + Tailwind
+React 19 + **shadcn/ui** (new-york, v4-era, `data-slot` markers) + Tailwind
 v4 oklab + Radix behaviours + cva variant maps. **104 distinct `data-slot`
 components** inventoried from the renderer chunks:
 
@@ -45,22 +45,22 @@ textarea · tooltip (plus their `-*` parts).
 
 ### The ZCode flavour on top of stock shadcn (observed)
 
-1. **Compact control scale** — h-5…h-8 (20–32px), not shadcn's h-9/h-10. Denser
+1. **Compact control scale**, h-5…h-8 (20–32px), not shadcn's h-9/h-10. Denser
    than ChatGPT; this is the "pro but dense" feel.
 2. **A text scale tied to the user**: `text-ui-base`, `text-ui-sm`,
-   `--ui-font-size: 14px` — every control scales with one root variable.
-3. **Semantic tokens only** — components never name a palette colour; they say
+   `--ui-font-size: 14px`, every control scales with one root variable.
+3. **Semantic tokens only**, components never name a palette colour; they say
    `bg-hover`, `bg-menu`, `border-input-border`. The theme arms decide values.
-4. **Desktop-shell awareness** — `app-region:no-drag` and a
+4. **Desktop-shell awareness**, `app-region:no-drag` and a
    `platform-linux-desktop` variant inside component recipes.
-5. **Triggers show state** — `aria-expanded:bg-selected` on selects/dropdowns.
+5. **Triggers show state**, `aria-expanded:bg-selected` on selects/dropdowns.
 
-## The colour system (observed — full tables in repo FINDINGS.md)
+## The colour system (observed, full tables in repo FINDINGS.md)
 
 Four arms cascade in the main bundle, later wins:
 
 `:root` (tailwind light) → `.dark` (tailwind dark) → `.theme-zai-light` →
-`.theme-zai-dark` — the **zai arms are the shipped look** (the runtime toggles
+`.theme-zai-dark`, the **zai arms are the shipped look** (the runtime toggles
 `dark`+`theme-zai-dark` / `theme-zai-light` together).
 
 | Token | zai-light | zai-dark |
@@ -77,9 +77,9 @@ Four arms cascade in the main bundle, later wins:
 | trajectory | `#2563eb #0f766e #7c3aed #d97706 #0284c7` | `#60a5fa #2dd4bf #a78bfa #f59e0b #38bdf8` |
 
 The signature decision: **brand = ink**, and accents are pale washes
-(`#ebf4ff`), so colour carries almost no chrome — the poshness is neutral
+(`#ebf4ff`), so colour carries almost no chrome, the poshness is neutral
 surfaces + one accent + crisp hairlines. (The jyas dark fold of 2026-09-05
-keyed the generic `.dark` arm — neutral-900 — not the shipped zai-dark;
+keyed the generic `.dark` arm, neutral-900, not the shipped zai-dark;
 re-folding is queued in the jyas DESIGN.md orbit.)
 
 t3code's answer to the same brief, for contrast: light zinc-25 canvas + blue
@@ -89,15 +89,15 @@ opacity; 52px topbar.
 
 ## The Dioxus path (proposed)
 
-The kit is **class strings + token sheet** — no runtime dependency on React.
+The kit is **class strings + token sheet**, no runtime dependency on React.
 So the transform is mechanical, and mini-lab proves it:
 
 1. Copy the token arms verbatim into one stylesheet (mini-lab
    `assets/tokens.css`: `.t3-light/.t3-dark/.zai-light/.zai-dark`).
 2. Re-express each shadcn recipe as plain CSS classes over those tokens
-   (`assets/gallery.css`) — one component vocabulary, four arms.
+   (`assets/gallery.css`), one component vocabulary, four arms.
 3. Re-implement the Radix behaviours as small Dioxus hooks (open/close,
-   focus trap, outside-dismiss, command filter) — **this is the real port
+   focus trap, outside-dismiss, command filter), **this is the real port
    cost**; the visuals port for free.
 4. Keep the one-owner rule: shared components land in the yggui layer;
    app-specific wiring stays in the app layer.
@@ -105,6 +105,6 @@ So the transform is mechanical, and mini-lab proves it:
 Port order by jyas-webapp value: button/input/textarea/badge/card/kbd →
 tabs → dropdown + tooltip → dialog/sheet → command palette.
 
-**Testbed**: `t3codereversed/miniapp` — `dx build --platform web`
+**Testbed**: `t3codereversed/miniapp`, `dx build --platform web`
 (dioxus-cli 0.7.10 on the build host), serve the `public/` dir. Every section
 changes real state; the theme picker swaps all four arms live.

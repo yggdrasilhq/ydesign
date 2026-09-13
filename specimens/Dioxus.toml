@@ -2,6 +2,12 @@
 name = "ydesign-specimens"
 default_platform = "web"
 
+[web]
+# wasm-opt SIGABRTs on the current toolchain (DWARF version mismatch, 2026-09-13);
+# dx ships the unoptimized module fine, and the abort was failing every ci
+# lane. Re-enable when binaryen catches up.
+wasm-opt = false
+
 [web.app]
 title = "Ydesign — List view study"
 

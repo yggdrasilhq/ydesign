@@ -21,12 +21,12 @@ that tells the user nothing.
 - Hide/show motion must read as a *structure change*, not a flourish.
 - Decoration must never move text: a live indicator changes **colour only**.
   (A streaming answer's rule once also changed its padding, and every answer
-  slid sideways the moment it finished — a jump under the reader's eye, on
+  slid sideways the moment it finished, a jump under the reader's eye, on
   every turn. Never again.)
 
 ## Toasts
 
-- In-app toasts sit **horizontally centred near the top** by default — over a
+- In-app toasts sit **horizontally centred near the top** by default, over a
   terminal, whose newest output lives at the bottom.
 - Over a **document** the top of the viewport is the title being read, so the
   stack moves to the **bottom corner on the rail's edge** (directional chrome
@@ -56,7 +56,7 @@ frame is fully painted underneath. Latency is preferred over flicker.
 
 ## The shared blink clock
 
-Every blinking indicator — live dots, loading tabs, working marks — flips on
+Every blinking indicator, live dots, loading tabs, working marks, flips on
 the SAME tick: one timer, half of each **2400 ms** cycle, one stylesheet rule
 that stamps every marked indicator invisible. Indicators join by carrying the
 marker in their style; they never declare an animation of their own.
@@ -68,12 +68,12 @@ marker in their style; they never declare an animation of their own.
   every dot freezes. Whatever drives the phase must be a change the paint
   path cannot ignore.
 - A blink is proved with a **burst of screenshots**, never with a computed
-  style read — the probe that reads computed style forces the very
+  style read, the probe that reads computed style forces the very
   recalculation whose absence is the bug, so it can only answer "yes".
 
 ## Auto-hide chrome
 
-- The revealed auto-hide titlebar floats on a soft drop shadow **alone** —
+- The revealed auto-hide titlebar floats on a soft drop shadow **alone**,
   never a hairline (a bright separator line is what a 1px border paints, and
   it shows worst over the lighter sidebar).
 - Auto-hide reveal is **chrome, not layout**: it draws over the workspace
@@ -89,6 +89,6 @@ preserve status and focus without requiring blinking or movement to understand
 the result. A steady working label is still informative.
 
 Motion is proved in time, not in a single frame: burst screenshots across the
-transition (enter, settle, exit), checked for the three forbidden things —
+transition (enter, settle, exit), checked for the three forbidden things,
 text that moved, frames that flicker, states that linger. If the transition
 cannot survive a burst, it is decoration pretending to be function.
