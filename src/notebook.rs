@@ -32,6 +32,10 @@ pub const ASSETS: &[(&str, &[u8])] = &[
         include_bytes!("../design/assets/ribbon-excel-mock.png"),
     ),
     (
+        "ribbon-excel-class.svg",
+        include_bytes!("../design/assets/img/ribbon-excel-class.svg"),
+    ),
+    (
         "ribbon-study.svg",
         include_bytes!("../design/assets/ribbon-study.svg"),
     ),
