@@ -71,11 +71,25 @@ enum Command {
         #[arg(long)]
         id: String,
     },
+    /// Delete the saved reading place (state.json) and print the shelf, so
+    /// "open fresh" is drivable without touching dotfiles.
+    Forget,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     let config = args.config.unwrap_or_else(projects::config_path);
+    if let Some(Command::Forget) = args.command {
+        let path = persist::state_path();
+        let had = persist::forget_at(&path);
+        eprintln!(
+            "{} {}",
+            if had { "forgot" } else { "already fresh:" },
+            path.display()
+        );
+        projects::load(&config)?; // the shelf print reads the registry
+        return server::print_notebook("", None);
+    }
     if let Some(Command::Init { repo, id }) = args.command {
         return projects::init(&repo, &id, &config);
     }

@@ -30,6 +30,12 @@ pub fn state_path() -> PathBuf {
         .join("ydesign/state.json")
 }
 
+/// The `forget` verb: delete the saved reading place. Returns true when a
+/// state file existed and is now gone; a missing file is already forgotten.
+pub fn forget_at(path: &Path) -> bool {
+    std::fs::remove_file(path).is_ok()
+}
+
 pub fn load() -> Option<SavedView> {
     load_from(&state_path())
 }
@@ -99,6 +105,15 @@ mod tests {
             View::restore(&loaded).selected_notebook
         );
         std::fs::remove_file(&path).unwrap();
+    }
+
+    #[test]
+    fn forget_removes_state_and_tolerates_absence() {
+        let path = scratch_path("forget");
+        save_to(&path, &View::default());
+        assert!(forget_at(&path), "forget on an existing state file must report it");
+        assert!(!forget_at(&path), "forget on a missing file is already forgotten");
+        assert!(!path.exists());
     }
 
     #[test]

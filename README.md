@@ -55,8 +55,9 @@ Brand and typography decisions live in notebooks; DESIGN.md routes readers.
 The app persists the last opened state — mode, open page, expanded
 book groups — in `~/.config/ydesign/state.json` (written on every accepted
 action, atomically) and reopens there on the next launch. A saved id that no
-longer exists falls back to that mode's home page. Delete the file for a
-factory-fresh shelf. A registered project whose path is unavailable is
+longer exists falls back to that mode's home page. `ydesign forget` deletes
+it and prints the shelf — the factory-fresh reset, drivable without touching
+dotfiles. A registered project whose path is unavailable is
 skipped with a warning; one stale registry row never stops the app.
 
 Inside yggterm (thin-client surface mode — the daemon exports
